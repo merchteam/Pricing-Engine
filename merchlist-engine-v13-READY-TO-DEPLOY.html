@@ -1,0 +1,1902 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Merchlist Pricing Engine v13</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#111;-webkit-font-smoothing:antialiased;font-size:14px}button{font-family:inherit}input,select{font-family:inherit}
+.pin-ov{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;padding:20px}.pin-c{background:#fff;border-radius:20px;padding:48px 40px;max-width:380px;width:100%;text-align:center}.pin-logo{font-size:11px;font-weight:900;letter-spacing:5px;color:#16a34a;margin-bottom:8px}.pin-title{font-size:24px;font-weight:800;color:#111;margin-bottom:4px}.pin-sub{font-size:13px;color:#9ca3af;margin-bottom:28px}.pini{width:100%;padding:14px;font-size:22px;text-align:center;border:2px solid #e5e7eb;border-radius:12px;outline:none;letter-spacing:10px;color:#111;transition:border .15s}.pini:focus{border-color:#111}.pini.err{border-color:#dc2626;animation:shake .35s}@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}.pinb{width:100%;padding:14px;font-size:14px;font-weight:700;background:#111;color:#fff;border:none;border-radius:12px;cursor:pointer;margin-top:12px;letter-spacing:.5px}.pinb:hover{background:#1f2937}.pine{color:#dc2626;font-size:12px;margin-top:8px;min-height:18px}
+.app{display:flex;flex-direction:column;height:100vh}.topbar{background:#fff;border-bottom:1px solid #e5e7eb;height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}.tb-l{display:flex;align-items:center;gap:14px}.tb-logo{font-size:13px;font-weight:900;color:#16a34a;letter-spacing:1px}.tb-v{font-size:9px;color:#9ca3af}.tb-tabs{display:flex;gap:2px;margin-left:8px}.tab{padding:6px 14px;font-size:11px;font-weight:700;color:#6b7280;cursor:pointer;border-radius:6px;border:none;background:transparent;letter-spacing:.3px;transition:all .15s}.tab.on{color:#111;background:#f3f4f6}.tab:hover:not(.on){color:#374151}.tb-r{font-size:9px;color:#d1d5db;letter-spacing:1px;font-weight:600}.body{display:flex;flex:1;overflow:hidden}
+.sb{width:300px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0}.sf{padding:10px}.sf-inp{width:100%;padding:9px 10px 9px 32px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;background:#f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;color:#111;transition:all .15s}.sf-inp:focus{border-color:#111;background:#fff}.sf-row{display:flex;gap:5px;margin-top:6px}.sf-sel{flex:1;padding:6px 7px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:11px;outline:none;background:#f9fafb;color:#374151;cursor:pointer}.sf-cnt{font-size:10px;color:#9ca3af;margin-top:5px;padding-left:2px}.plist{flex:1;overflow-y:auto}
+.pi{padding:9px 10px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:8px;transition:background .1s}.pi:hover{background:#f9fafb}.pi.sel{background:#f0fdf4;border-left:3px solid #16a34a}.pi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.pi-dot.S{background:#16a34a}.pi-dot.H{background:#374151}.pi-dot.C{background:#9333ea}.pi-info{flex:1;min-width:0}.pi-n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111}.pi-m{font-size:10px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pi-p{font-size:11px;font-weight:700;color:#111;flex-shrink:0;margin-left:4px}.pi-oos{font-size:8px;color:#dc2626;font-weight:700}
+.mn{flex:1;overflow-y:auto;padding:18px 20px;background:#f5f5f5}.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#d1d5db;gap:8px;text-align:center}.empty .ic{font-size:48px;opacity:.5}.empty .t{font-size:14px;font-weight:600;color:#9ca3af}.empty .s{font-size:12px;color:#d1d5db;max-width:240px}
+.cd{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #e5e7eb;margin-bottom:12px}.cd.tight{padding:14px 16px}
+.ph{display:flex;gap:14px;align-items:flex-start}.ph-img{width:80px;height:80px;border-radius:10px;background:#f3f4f6;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;font-size:24px;color:#d1d5db;position:relative}.ph-img img{width:100%;height:100%;object-fit:cover}.ph-img.img-loading{background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);background-size:200% 100%;animation:shimmer 1.3s infinite}@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}.ph-info{flex:1;min-width:0}.ph-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.ph-title{font-size:16px;font-weight:700;color:#111;line-height:1.25;flex:1}.ph-price{font-size:13px;font-weight:700;color:#111;white-space:nowrap;flex-shrink:0;text-align:right}.ph-price .pl{font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:1px}.ph-sku{font-size:10px;color:#9ca3af;margin-top:3px;font-weight:500}.bds{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}.bd{padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px}.bd.stk{background:#dcfce7;color:#15803d}.bd.oos{background:#fee2e2;color:#b91c1c}.bd.S{background:#dcfce7;color:#166534}.bd.H{background:#f3f4f6;color:#374151}.bd.C{background:#f3e8ff;color:#6b21a8}
+.specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid #f3f4f6}.spec .l{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}.spec .v{font-size:11px;font-weight:600;color:#111;margin-top:2px}
+.cfg-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}.cfg-g{flex:1;min-width:160px}.cfg-s{flex:0 0 auto}.cfg-lbl{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}.btns{display:flex;flex-wrap:wrap;gap:4px}.btn{padding:5px 11px;border:1.5px solid #e5e7eb;border-radius:7px;background:#f9fafb;font-size:11px;font-weight:600;cursor:pointer;color:#374151;transition:all .12s;line-height:1.2}.btn:hover{border-color:#9ca3af;background:#fff}.btn.on{border-color:#111;background:#111;color:#fff}.btn .sub{font-size:8px;display:block;color:#9ca3af;font-weight:500;margin-top:1px}.btn.on .sub{color:rgba(255,255,255,.55)}.sides-row{display:flex;gap:3px}.sd-btn{width:32px;height:32px;border:1.5px solid #e5e7eb;border-radius:7px;background:#f9fafb;font-size:12px;font-weight:700;cursor:pointer;color:#374151;display:flex;align-items:center;justify-content:center;transition:all .12s}.sd-btn.on{border-color:#111;background:#111;color:#fff}.fab-row{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:7px;overflow:hidden}.fab-b{padding:5px 13px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#374151;transition:all .12s}.fab-b.on{background:#111;color:#fff}.moq-warn{margin-top:8px;padding:7px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#92400e}
+.qty-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}.qty-wrap{display:flex;align-items:center;border:2px solid #e5e7eb;border-radius:9px;overflow:hidden;background:#fff;transition:border .15s}.qty-wrap:focus-within{border-color:#111}.qty-btn{width:36px;height:42px;background:transparent;border:none;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center;user-select:none}.qty-btn:hover{background:#f3f4f6}.qty-inp{width:80px;height:42px;border:none;outline:none;font-size:18px;font-weight:700;text-align:center;background:transparent;color:#111;-moz-appearance:textfield}.qty-inp::-webkit-inner-spin-button,.qty-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.qty-lbl{font-size:12px;color:#6b7280}.er{color:#dc2626;font-weight:700}
+.quick-units{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}.qu-btn{padding:5px 12px;border:1.5px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:11px;font-weight:700;cursor:pointer;color:#374151;transition:all .12s}.qu-btn:hover{border-color:#9ca3af;background:#fff}.qu-btn.on{border-color:#111;background:#111;color:#fff}
+.qbox{border-radius:12px;padding:16px 18px}.qbox.ok{background:#f0fdf4;border:2px solid #86efac}.qbox.cap{background:#fefce8;border:2px solid #fde047}.qbox.bad{background:#fef2f2;border:2px solid #fca5a5}.q-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.q-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}.q-lbl.ok{color:#15803d}.q-lbl.w{color:#a16207}.q-lbl.r{color:#b91c1c}.q-val{font-size:32px;font-weight:800;line-height:1;color:#111}.q-val span{font-size:13px;font-weight:400;color:#9ca3af;margin-left:2px}.q-mgn{text-align:right}.q-mgn .ml{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-mgn .mv{font-size:20px;font-weight:800;line-height:1;margin-top:2px}.q-note{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.4}.q-note.w{background:rgba(234,179,8,.12);color:#a16207}.q-note.r{background:rgba(220,38,38,.08);color:#b91c1c}.q-totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid rgba(0,0,0,.07)}.q-tot .tl{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-tot .tv{font-size:13px;font-weight:700;margin-top:1px;color:#111}
+.tips{display:flex;flex-direction:column;gap:6px;margin:10px 0}.tip{padding:8px 11px;border:1.5px solid #e5e7eb;background:#fff;border-radius:8px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .12s}.tip:hover{border-color:#9ca3af;background:#f9fafb}.tip .ti{font-size:14px;flex-shrink:0}.tip .tt{font-size:11px;font-weight:700;color:#111;line-height:1.3}.tip .ts{font-size:10px;color:#6b7280;margin-top:1px}
+.sec-lbl{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.email-box{background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:9px;padding:14px 16px;font-size:12.5px;line-height:1.75;color:#374151;font-family:inherit;max-height:280px;overflow-y:auto}.copy-row{display:flex;gap:8px;margin-top:8px}.copy-btn{flex:1;padding:10px;background:#111;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:background .15s}.copy-btn:hover{background:#1f2937}.copy-btn.done{background:#16a34a}
+.proc{padding:40px 24px;background:#fff;border-radius:12px;border:1px solid #e5e7eb;text-align:center}.proc .ic{font-size:42px;margin-bottom:10px}.proc h3{font-size:18px;font-weight:800;color:#111;margin-bottom:4px}.proc .sub{font-size:12px;color:#6b7280;margin-bottom:14px}.proc .pill{display:inline-block;padding:8px 18px;background:#f3e8ff;color:#6b21a8;border-radius:20px;font-size:12px;font-weight:700}
+.fwrap{padding:20px;max-width:680px;margin:0 auto}.fwrap h2{font-size:20px;font-weight:800;color:#111;margin-bottom:4px}.fwrap .desc{font-size:12px;color:#6b7280;margin-bottom:20px;line-height:1.5}.finp-row{display:flex;gap:8px;margin-bottom:14px}.finp{flex:1;padding:11px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:13px;outline:none;background:#fff;color:#111;transition:border .15s}.finp:focus{border-color:#111}.fgo{padding:11px 20px;background:#111;color:#fff;border:none;border-radius:10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}.fgo:hover{background:#1f2937}.fres{background:#fff;border-radius:12px;border:1px solid #e5e7eb;overflow:hidden}.fmatch{padding:12px 16px;border-bottom:1px solid #f3f4f6;display:flex;align-items:flex-start;gap:10px}.fmatch:last-child{border-bottom:none}.fmatch:hover{background:#f9fafb}.fscore{min-width:38px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px}.fmi{flex:1;min-width:0}.fmt{font-size:13px;font-weight:700;color:#111}.fms{font-size:10px;color:#9ca3af;margin-top:2px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}.fuse{padding:6px 13px;background:#f0fdf4;color:#15803d;border:1.5px solid #86efac;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}.fuse:hover{background:#dcfce7}.fno{padding:32px 20px;text-align:center;background:#fff;border-radius:12px;border:1px solid #e5e7eb}.fno .ic{font-size:36px;margin-bottom:10px}.fno h3{font-size:15px;font-weight:700;color:#111;margin-bottom:4px}.fno p{font-size:12px;color:#6b7280;margin-bottom:14px}.fno .pill{display:inline-block;padding:10px 20px;background:#111;color:#fff;border-radius:8px;font-size:12px;font-weight:700}.fload{padding:24px;text-align:center;color:#9ca3af;font-size:13px;background:#fff;border-radius:12px;border:1px solid #e5e7eb}</style></head><body><div id="app"></div><script>
+
+const CM={TP:"Tshirts & Polos",UW:"Uniforms & Workwear",HS:"Hoodies & Sweatshirts",JS:"Jerseys & Sportswear",DW:"Drinkware",CH:"Caps & Hats",BT:"Bags & Totebags",OA:"Office & Accessories",PM:"Printing Materials",BP:"Boxes & Packaging",TT:"Travel & Tech",TE:"Tradeshow & Exhibitions",GS:"Gift Sets",HW:"Home & Wellness",PS:"Pants & Shorts",PE:"Pet Merch",KC:"Kids & Children",FC:"Food & Candy",XX:""};
+const SOFT=new Set(["TP","UW","HS","JS","CH","BT","PS","KC"]);
+const CUST=new Set(["PM","BP","FC"]);
+const TROLLEY=new Set(["TML-BT-021","TML-BT-050","TML-BT-051","TML-BT-054","TML-BT-070"]);
+const PREM_CATS=new Set(["TP","UW","HS","JS","CH","BT","PS","KC"]);
+const PMS=[
+{id:"dtf",n:"DTF",c:3,q:1,f:0,s:1,h:1},{id:"uv",n:"UV Print",c:3,q:1,f:0,s:0,h:1},
+{id:"uvdtf",n:"UV DTF",c:3,q:1,f:0,s:0,h:1},{id:"engrave",n:"Engraving",c:3,q:1,f:0,s:0,h:1},
+{id:"emb",n:"Embroidery",c:7,q:1,f:0,s:1,h:0},{id:"sand",n:"Sand Blast",c:30,q:1,f:1,s:0,h:1},
+{id:"screen",n:"Screen Print",c:2,q:50,f:0,s:1,h:1},{id:"sub",n:"Sublimation",c:10,q:1,f:1,s:1,h:1},
+{id:"deboss",n:"Debossing",c:4,q:50,f:0,s:0,h:1},{id:"emboss",n:"Embossing",c:4,q:50,f:0,s:0,h:1},
+{id:"p360",n:"360 Print",c:4,q:50,f:0,s:0,h:1},{id:"foil",n:"Gold Foil",c:4,q:50,f:0,s:0,h:1},
+{id:"trolley",n:"Trolley Screen",c:30,q:1,f:1,s:0,h:0,t:1},{id:"none",n:"No Print",c:0,q:1,f:1,s:1,h:1}
+];
+const TIERS=[1,6,12,24,50,100,250,500,1000,2500];
+const JRN={1:0,6:.04,12:.08,24:.15,50:.25,100:.38,250:.55,500:.72,1000:.88,2500:1};
+const PROX="https://api.allorigins.win/get?url=";
+const QUICK_UNITS=[1,10,50,100,250,500,1000];
+
+function aed(n){return"AED "+Number(n).toLocaleString("en",{minimumFractionDigits:2,maximumFractionDigits:2});}
+function he(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML;}
+
+// ── PRICING FORMULA (v9 backend) ──────────────────────────────────────────
+function wpc(m,w,s){
+  if(m==="none")return 0;
+  if(m==="emb")return[25,20,15,5][s]||5;
+  if(m==="sand"||m==="trolley")return s===0?45:0;
+  if(m==="sub")return s===0?20:0;
+  if(["screen","deboss","emboss","p360","foil"].indexOf(m)>=0)return 5;
+  if(w<=4)return[3,2,2,1][s]||1;
+  if(w<=10)return[8,5,2,1][s]||1;
+  return[10,8,6,2][s]||2;
+}
+function twp(m,w,d){
+  var pm=PMS.find(function(x){return x.id===m;});
+  if(!pm)return 0;
+  if(pm.f)return wpc(m,w,0);
+  var t=0;for(var i=0;i<d;i++)t+=wpc(m,w,i);return t;
+}
+function ipc(m,d){
+  var pm=PMS.find(function(x){return x.id===m;});
+  if(!pm)return 0;
+  if(pm.f)return pm.c;
+  return pm.c*d;
+}
+function isC(p){return p.type==="D"||CUST.has(p.cc);}
+function gridOf(p){if(isC(p))return"C";if(SOFT.has(p.cc))return"S";return"H";}
+function floorR(p){return(SOFT.has(p.cc)&&!isC(p))?0.80:0.85;}
+function showPrem(p){return p.prem>0&&PREM_CATS.has(p.cc);}
+function gpm(p){
+  var is=SOFT.has(p.cc),it=TROLLEY.has(p.sku);
+  return PMS.filter(function(m){if(m.t)return it;return is?m.s:m.h;});
+}
+function calcP(p,pm,sd,prem,tq){
+  try{
+    if(!p||!p.web||!p.cost)return null;
+    var bc=(prem&&showPrem(p))?p.prem:p.cost;
+    var wp=twp(pm,p.web,sd),ip=ipc(pm,sd);
+    var li=p.web+wp,tc=bc+ip,fr=floorR(p),fl=tc/fr;
+    if(li<=0||tc<=0)return null;
+    var base=0.20,maxD=1-(fl/li);
+    if(maxD<base)return{px:fl,m:(fl-tc)/fl*100,li:li,fl:fl,tc:tc,locked:true,wp:wp};
+    var j=JRN[tq]||0,td=base+(maxD-base)*j,qp=li*(1-td),fp=Math.max(qp,fl);
+    return{px:fp,m:(fp-tc)/fp*100,li:li,fl:fl,tc:tc,locked:false,td:td,wp:wp};
+  }catch(e){return null;}
+}
+function qt(q){var t=1;for(var i=0;i<TIERS.length;i++)if(q>=TIERS[i])t=TIERS[i];return t;}
+// ─────────────────────────────────────────────────────────────────────────
+
+var PDATA=`TML-TP-001|Short Sleeve T-shirt|TP|A|1|6.5|16.0|24.0|100% Cotton|0.3|1|FOUR SQUARE SANDHU,BLUZ,APEX|3
+TML-TP-002|Long Sleeve T-shirt|TP|A|1|12.0|21.0|34.0|100% Cotton|0.4|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-TP-003|Short Sleeve V-neck T-shirt|TP|A|1|11.0|19.0|29.0|100% Cotton|0.3|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-TP-004|Long Sleeve V-neck Tshirt|TP|A|1|14.0|21.0|34.0|100% Cotton|0.4|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-TP-005|Oversize T-shirt|TP|A|1|13.0|18.0|29.0|100% Cotton|0.6|1|MANUFACTURE|3
+TML-TP-006|Tank Top|TP|A|1|10.0|16.0|29.0|100% Cotton|0.3|1|MANUFACTURE|3
+TML-TP-007|Short Sleeve Crop Top|TP|A|1|10.0|16.0|29.0|100% Cotton|0.4|1|MANUFACTURE|3
+TML-TP-008|Long Sleeve Crop Top|TP|A|1|12.0|18.0|34.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-TP-009|Polo Shirt|TP|A|1|11.0|18.0|29.0|60% Cotton - 40% Polyester|0.4|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-TP-010|Long Sleeve Polo Shirt|TP|A|1|17.0|23.0|36.0|60% Cotton - 40% Polyester|0.5|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-TP-011|Recycled Eco-Friendly Polo Shirt - Pro EARTH|TP|C|1|27.36|0.0|41.0|60% Cotton - 40% Polyester|0.31|1|Jasani|3
+TML-TP-012|Recycled Eco-Friendly T-Shirt|TP|A|1|12.38|0.0|26.0|100% Cotton|0.21|1|Jasani|3
+TML-TP-013|Recycled Eco-Friendly Polo Shirt|TP|A|1|12.0|0.0|41.0|100% Cotton|0.3|1|FOUR SQUARE SANDHU,BLUZ,MANUFACTURE|3
+TML-TP-014|Hawaiian All-Over-Print Shirt|TP|A|1|30.0|0.0|55.0|35% Cotton - 65% Polyester|0.4|1|MANUFACTURE ( TARKEEB)|4
+TML-TP-015|Two-Tone Corporate Polo|TP|A|1|17.0|23.0|32.0|60% Cotton - 40% Polyester|0.4|1|MANUFACTURE|4
+TML-TP-016|Performance Polo with UV Protection|TP|C|1|22.56|0.0|35.0|65% Polyester - 35% Cotton|0.43|1|JASANI,APEX|3
+TML-TP-017|Zipper Polo Cotton Shirt|TP|A|1|18.0|22.0|30.0|60% Cotton - 40% Polyester|0.4|1|MANUFACTURE|3
+TML-TP-018|Raglan Long Sleeve T-shirt|TP|A|1|16.0|22.0|30.0|100% Cotton|0.4|1|MANUFACTURE|3
+TML-TP-019|Raglan Short Sleeve T-shirt|TP|A|1|14.0|21.0|28.0|100% Cotton|0.3|1|MANUFACTURE|3
+TML-TP-020|Softstyle Comfort T-shirt|TP|A|1|16.0|0.0|30.0|90% Cotton - 10% lycra|0.4|1|MANUFACTURE|3
+TML-TP-021|Vintage Acid Wash T-shirt|TP|C|1|45.0|0.0|79.0|100% Cotton|0.4|1|TEMU  (tarkeeb)|7
+TML-TP-022|Slim Fit T-shirt|TP|A|1|12.0|16.0|32.0|100% Cotton|0.3|1|MANUFACTURE|3
+TML-TP-024|Dri-Fit Golf Polo|TP|A|1|19.0|24.0|38.0|80% Cotton - 20% Polyster|0.4|1|MANUFACTURE|3
+TML-TP-025|Comfort T-shirt with Pocket|TP|A|1|14.0|22.0|34.0|100% Cotton|0.3|1|MANUFACTURE|3
+TML-TP-026|Corporate Polo with Pocket|TP|A|1|19.0|24.0|36.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-TP-027|Ringer T-shirt|TP|A|1|14.0|22.0|35.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-TP-028|Curved Hem T-Shirt|TP|A|1|14.0|22.0|26.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-TP-029|Ringer Polo Shirt|TP|A|1|17.0|22.0|29.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-030|Henley T-shirt|TP|A|1|17.0|22.0|24.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-TP-031|Sport-Tek Performance T-shirt|TP|A|1|15.0|21.0|24.0|95%polyster 5% Elastane|0.5|1|MANUFACTURE|3
+TML-TP-032|Acid Wash Tank Top|TP|C|1|40.0|0.0|77.0|100% Cotton|0.5|1|TEMU  https://www.temu.com/goods_snapsho|7
+TML-TP-033|Heavy Oversized Tshirt|TP|A|1|19.0|26.0|29.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-TP-034|Dry & Cool Polo Shirt|TP|A|1|17.0|22.0|31.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|3
+TML-TP-035|Dry & Cool T-shirt|TP|A|1|14.0|19.0|26.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|3
+TML-TP-036|Nike Dri-Fit Park T-shirt|TP|C|1|92.0|0.0|120.0|100% polyster|0.0|1|Amazon  Nike M Nk Dry Park Vii Jsy Ss T-|3
+TML-TP-037|Luxe Polo Shirt|TP|A|1|17.0|0.0|40.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-038|Luxe Long Sleeve T-shirt|TP|A|1|20.0|0.0|48.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-039|Luxe Long Sleeve Polo Shirt|TP|A|1|22.0|0.0|50.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-040|Luxe Crew Neck T-shirt|TP|A|1|14.0|0.0|34.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-041|Luxe Pocket Crew T-shirt|TP|A|1|16.0|0.0|40.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-042|Workwear Abaya|UW|C|1|50.0|0.0|75.0|100% polyster|0.5|1|Market|3
+TML-TP-043|Luxe V-Neck T-shirt|TP|A|1|14.0|0.0|42.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-044|Luxe V-neck Long Sleeve T-shirt|TP|A|1|17.0|0.0|48.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-045|Luxe Curved Hem T-shirt|TP|A|1|17.0|0.0|38.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-046|Luxe Muscle Tank|TP|A|1|16.0|0.0|40.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-047|Sleeveless crop top|TP|A|1|12.0|0.0|20.0|80% Cotton - 20% Polyster|0.5|1|MANUFACTURE|3
+TML-TP-048|BOSS Signature Stretch T-shirt|TP|C|1|330.0|0.0|410.0|100% Cotton|0.5|1|BOSS https://hugoboss.ae/product/regular|3
+TML-TP-049|Golf Polo with UV Protection|TP|A|1|25.44|0.0|58.0|100% polyester|0.27|1|Jasani|3
+TML-TP-050|Kid's Softstyle Comfort T-shirt|TP|A|1|14.0|0.0|26.0|90% Cotton - 10% lycra|0.5|1|MANUFACTURE|3
+TML-TP-051|Nike Dri-Fit Park Full Sleeve T-shirt|TP|C|1|96.0|0.0|144.0|100% polyester|0.16|1|Amazon|4
+TML-TP-052|Adidas Performance Polo Shirt|TP|C|1|164.0|0.0|245.0|100% polyester|0.3|1|Amazon|3
+TML-TP-053|Sleeveless Polo Tank|TP|A|1|17.0|0.0|46.0|100% cotton|0.0|1|MANUFACTURE|3
+TML-TP-054|Mandarin Collar Polo Shirt|TP|A|1|17.0|0.0|44.0|100% cotton|0.0|1|MANUFACTURE|
+TML-TP-055|Twin Tipped Polo Shirt|TP|A|1|19.0|0.0|50.0|100% cotton|0.0|1|MANUFACTURE|
+TML-HS-001|Pullover Hoodie|HS|A|1|28.0|35.0|48.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-002|Zipper Hoodie|HS|A|1|28.0|35.0|50.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-003|Quarter Zip Pullover|HS|A|1|26.0|33.0|46.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-004|Sweatshirt|HS|A|1|22.0|27.0|44.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-005|Crop Top Hoodie|HS|A|1|22.0|29.0|41.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-006|Varsity Jacket|HS|A|1|45.0|55.0|82.0|100% cotton|0.5|1|MANUFACTURE|4
+TML-HS-007|Oversize Sweatshirt|HS|A|1|24.0|31.0|43.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-008|Oversized Pullover Hoodie|HS|A|1|30.0|37.0|56.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-009|Oversize Zipper Hoodie|HS|A|1|30.0|37.0|63.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-010|Zipper Jacket|HS|A|1|40.0|55.0|65.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-011|Sports Tracksuit Jacket|HS|A|1|26.0|32.0|45.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-HS-012|Recycled Eco-Friendly Hoodie|HS|A|1|28.0|34.0|62.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-HS-013|Bomber Jacket|HS|A|1|40.0|55.0|65.0|100% Cotton|0.5|1|MANUFACTURE|4
+TML-HS-014|Puffer Vest Jacket|HS|C|1|65.18|0.0|100.0|100% polyester|0.7|1|Jasani|3
+TML-HS-015|Stringless Hoodie|HS|A|1|28.0|35.0|56.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-016|Sleeveless Hoodie|HS|A|1|24.0|32.0|45.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-017|Vintage Acid Wash Hoodie|HS|C|1|38.0|0.0|104.0|100% cotton|0.5|1|TEMU   https://www.temu.com/ae/casual-un|7
+TML-HS-018|Raglan Fleece Hoodie|HS|A|1|30.0|37.0|56.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-019|Sport-Tek Athletic Hoodie|HS|A|1|30.0|39.0|48.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-HS-020|Leather Letterman Varsity Jacket|HS|A|1|55.0|65.0|85.0|60% cotton 40% PU leather|0.5|1|MANUFACTURE|3
+TML-HS-021|Vintage Denim Hoodie|HS|C|1|94.38|0.0|120.0|100% cotton|0.5|0|TEMU|7
+TML-HS-022|Lightweight Athletic Hoodie|HS|A|1|26.0|32.0|36.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-HS-023|Fleece Jacket with Pockets|HS|A|1|42.0|52.0|90.0|100% cotton|0.5|1|TEMU|7
+TML-HS-024|Kid's Crop Top Hoodie|HS|A|1|19.0|0.0|38.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-HS-025|All-Season Comfort Wind Jacket|HS|A|1|37.2|0.0|52.0|100% polyester|0.64|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-JA-001|Dri-Fit Sports Jersey|JS|A|1|12.0|18.0|26.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|3
+TML-JA-002|Long Sleeve Sports Jersey|JS|A|1|14.0|20.0|34.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-003|Basketball Jerseys|JS|A|1|12.0|18.0|26.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-004|Activewear Polo Jerseys|JS|A|1|12.0|22.0|31.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-005|Short Sleeve Crop Top Activewear|JS|A|1|12.0|18.0|24.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-006|Long Sleeve Crop Top Activewear|JS|A|1|14.0|20.0|32.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-007|Hoodie Activewear|JS|A|1|26.0|34.0|48.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-008|Full Zipper Hoodie Activewear|JS|A|1|28.0|32.0|45.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-009|Activewear Sports Sweatshirt|JS|A|1|22.0|28.0|45.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-010|Quarter Zip Activewear Pullover|JS|A|1|24.0|32.0|45.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-011|Crop Top Hoodie Activewear|JS|A|1|20.0|26.0|51.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-012|Dri-fit Activewear Shorts|JS|A|1|14.0|22.0|32.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|3
+TML-JA-013|Sports Tracksuit|JS|A|1|45.0|55.0|80.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-014|Joggers Activewear|JS|A|1|17.0|25.0|36.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-015|Short Sleeve V-Neck Sports Jersey|JS|A|1|12.0|18.0|30.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-016|Cycling Jersey|JS|A|1|35.0|0.0|44.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-017|Football Jersey Set|JS|A|1|18.0|26.0|69.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-018|Cricket Jersey|JS|A|1|18.0|28.0|36.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-019|Padel Jersey|JS|A|1|18.0|28.0|36.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-020|Sports Training Bibs|JS|A|1|10.0|18.0|44.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-022|Baseball Jersey Shirt|JS|A|1|22.0|0.0|44.0|100% polyster|0.5|1|MANUFACTURE|3
+TML-JA-023|Sports Jacket Tracksuit with Piping|JS|A|1|55.0|0.0|70.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|4
+TML-JA-024|Metal Medal|JS|B|1|4.0|0.0|12.0||0.12|1|MTC & FOTOCAD                           |3
+TML-JA-025|Activewear Tank Top|JS|A|1|12.0|18.0|26.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-026|Compression Fit T-shirt|JS|A|1|22.0|22.0|55.0|97% polyster 3% elsatane|0.0|1|Temu MANUFACTURE   https://www.temu.com/|7
+TML-JA-027|Glass & Metal Medal|JS|B|1|9.0|0.0|18.0||0.12|1|MTC  https://mtc.ae/product/glass-medals|3
+TML-JA-028|Netball Jersey Dress|JS|A|1|25.0|0.0|55.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-029|Kids Sports Tracksuit with Piping|JS|A|1|45.0|0.0|59.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|4
+TML-JA-031|Full Sleeve Polo Activewear|JS|A|1|14.0|0.0|36.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-033|Short Sleeve Compression Fit T-shirt|JS|A|1|42.0|0.0|0.0||0.0|1|MANUFACTURE|3
+TML-JA-034|Kids Football Jersey Set|JS|A|1|12.0|0.0|40.0|97% polyster 3% elsatane|0.5|1|MANUFACTURE|3
+TML-JA-035|Women’s Sports Skirt|JS|C|1|39.0|0.0|55.0|90% polyester, 10% elastane|0.5|1|TEMU|5
+TML-JA-036|Football|JS|C|1|53.42|0.0|74.0||0.0|1|AMAZON|5
+TML-UW-001|Formal Office Shirt|UW|A|1|33.0|0.0|50.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|4
+TML-UW-002|Apron|UW|A|1|15.0|0.0|22.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|3
+TML-UW-003|Chef Coat|UW|A|1|45.0|0.0|55.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|4
+TML-UW-004|Lab Coat|UW|A|1|42.0|0.0|55.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|3
+TML-UW-005|Medical Scrub Suit|UW|A|1|52.0|0.0|75.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|3
+TML-UW-006|Housekeeping Uniform|UW|A|1|52.0|0.0|69.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|3
+TML-UW-007|Safety T-shirt|UW|A|1|16.0|0.0|26.0|100% polyster|0.5|1|Vaultex|3
+TML-UW-008|Safety Vest|UW|C|1|4.0|0.0|9.0|100% polyster|0.5|1|VAULTEX / SOUVENIR|3
+TML-UW-009|Security Shirt|UW|A|1|36.0|0.0|50.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|4
+TML-UW-010|Safety Coveralls|UW|C|1|45.0|0.0|64.0|polyviscose 60% cotton 40% polyster|0.5|1|VAULTEX / SOUVENIR|3
+TML-UW-011|Waist Apron|UW|A|1|12.0|0.0|23.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|3
+TML-UW-012|Safety Helmet|UW|C|1|5.0|0.0|18.0|High-density polyethylene (HDPE)|0.5|1|Vaultex|3
+TML-UW-013|All-Over-Print Tie|UW|A|1|14.0|0.0|41.0|Satin 100% polyster|0.5|1|MANUFACTURE|5
+TML-UW-014|Pocket Square|UW|A|1|4.0|0.0|24.0|Satin 100% polyster|0.5|1|Manufacture Four Star|3
+TML-UW-015|Chef Hat|UW|A|1|10.0|0.0|18.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|3
+TML-UW-016|Workwear Apron|UW|C|1|14.25|0.0|28.0||0.0|1|TEMU|3
+TML-UW-017|Culinary Chef Coat|UW|A|1|45.0|0.0|60.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|4
+TML-UW-018|Adjustable Chef Hats|UW|A|1|9.0|0.0|18.0|Twill 65%polyster 35% cotton|0.5|1|TEMU  https://www.temu.com/goods.html?_b|7
+TML-UW-019|Formal Trouser|UW|A|1|33.0|0.0|48.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|4
+TML-UW-020|Formal Shirt with Pocket|UW|A|1|35.0|0.0|55.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|4
+TML-UW-021|Safety Trouser|UW|A|1|38.0|0.0|59.0|Twill 65%polyster 35% cotton|0.5|1|Local Supplier|4
+TML-UW-022|Blazer Jacket|UW|A|1|170.0|0.0|260.0|polyviscose 60% cotton 40% polyster|0.5|1|MANUFACTURE|8
+TML-UW-023|Cargo Pants|UW|A|1|38.0|0.0|50.0|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|4
+TML-UW-024|Round Cufflinks|UW|C|1|8.97|0.0|20.0|Metal|0.0|1|Temu   https://www.temu.com/ae/1pair-men|7
+TML-UW-025|Flame Resistant Safety Coverall|UW|C|1|200.0|0.0|270.0|100% cotton|1.15|1|AMAZON, VAULTEX  https://www.amazon.ae/P|3
+TML-UW-026|Industrial Safety Vest|UW|C|1|7.0|0.0|12.0|100% polyster|0.5|1|Vaultex|3
+TML-UW-027|Two-Tone Industrial Safety Vest|UW|C|1|8.0|0.0|14.0|100% polyster|0.5|1|Vaultex|3
+TML-UW-028|Short Sleeve Shirt|UW|A|1|30.0|0.0|45.0|100% cotton|0.6|1|MANUFACTURE|
+TML-UW-029|Short Sleeve Shirt with Pocket|UW|A|1|30.0|0.0|45.0|100% cotton|0.65|1|MANUFACTURE|
+TML-DW-001|Ceramic Mug|DW|B|1|3.5|0.0|8.0|Ceramic|0.37|1|FOTOCAD, ASHBI MICRO, MTC, HAK  https://|3
+TML-DW-002|Stainless Steel Water Bottles|DW|B|1|19.0|19.5|35.0|Stainless Steel|0.38|1|HAK, MTC, AK FLASK, FOTOCAD https://mtc.|3
+TML-DW-003|Stainless Steel Travel Mug|DW|B|1|16.0|0.0|22.0|Stainless Steel|0.5|1|ASHBIMICRO|3
+TML-DW-004|Wheat Straw Cup|DW|B|1|9.0|0.0|16.0|Wheat|0.22|1|MTC|3
+TML-DW-005|Aluminum Sports Gym Bottle|DW|B|1|7.0|0.0|18.0|Aluminium|0.17|1|FOTOCAD, AL MAHIR, HAK  https://www.foto|3
+TML-DW-006|Smart Insulated Bottle with Temperature LED|DW|B|1|10.0|0.0|26.0|Stainless Steel|0.32|1|AK FLASH, MTC, FOTOCAD, HAK  https://mtc|3
+TML-DW-007|Magic Mug|DW|B|1|5.0|0.0|14.0|Ceramic|0.5|1|FOTOCAD, MTC, ASHBI  https://mtc.ae/prod|2
+TML-DW-008|Cork Coffee Mug|DW|B|1|4.8|0.0|18.0|Ceramic & Cork|0.47|1|HAK, MTC, FOTOCAD, JASANI, AK FLASH  htt|3
+TML-DW-009|Stainless Steel Coffee Tumbler|DW|B|1|10.0|0.0|19.0|Stainless Steel|0.23|1|HAK|3
+TML-DW-010|Cork Coffee Tumbler|DW|B|1|14.0|0.0|20.0|Stainless Steel and Cork|0.37|1|AK FLASH, MTC, FOTOCAD, HAK  https://akf|3
+TML-DW-011|Two Tone Mug|DW|B|1|4.0|0.0|10.0|Ceramic|0.35|1|MTC, FOTOCAD, HAK  https://mtc.ae/produc|2
+TML-DW-012|Stainless Steel Flask with Bamboo Lid|DW|B|1|15.0|0.0|24.0|Metal and Bamboo|0.42|1|AK FLASH, MTC, HAK, FOTOCAD, BELFAST    |3
+TML-DW-013|Bamboo Fiber Cups|DW|B|1|5.0|0.0|8.0|Bamboo Fiber|0.15|1|MTC HAK  https://mtc.ae/product/branded-|3
+TML-DW-014|Eco-friendly Glass Bottle with Sleeve|DW|B|1|7.0|0.0|23.0|Borosilicate Glass|0.36|1|MTC|3
+TML-DW-015|GRIPPY Sports Water Bottle|DW|B|1|12.16|0.0|18.0|polypropelene|0.4|0|OASIS|
+TML-DW-016|Glass and Bamboo Bottle with Infuser|DW|B|1|15.0|0.0|26.0|Glass and bamboo|0.66|1|MTC, FOTOCAD, HAK  https://www.fotokad.a|3
+TML-DW-017|Eco-Friendly Ceramic Mug with Bamboo|DW|B|1|6.0|0.0|26.0|Ceramic and Bamboo|0.45|1|MTC|3
+TML-DW-018|Stainless Steel Bottle with Bamboo|DW|B|1|17.0|0.0|27.0|Stainless Steel|0.5|1|Jasani|3
+TML-DW-019|Anti-microbial Coffee Tumbler|DW|B|1|12.24|0.0|22.0|Stainless Steel|0.17|1|Jasani|3
+TML-DW-020|Insulated Glass Bottle with Filter|DW|B|1|12.0|0.0|20.0|Borosilicate Glass|0.0|1|AKFlash  https://akflash.com/product/atm|3
+TML-DW-021|Protein Shaker Bottle|DW|B|1|9.07|0.0|20.0|Plastic|0.18|1|Jasani|3
+TML-DW-022|Insulated Tumbler with Reusable Straw|DW|B|1|32.5|0.0|49.0|Stainless Steel|0.37|1|Jasani|3
+TML-DW-023|Hans Larsen Anti-spill Mug|DW|B|1|21.36|0.0|27.0|Stainless Steel|0.4|1|Jasani|3
+TML-DW-024|Glass Bottle with Cork Lid|DW|B|1|14.16|0.0|31.0|Borosilicate Glass with Cork Lid|0.7|1|Jasani https://www.jasani.ae/shop/dwen-3|3
+TML-DW-025|Bamboo Flask with Temperature Display|DW|B|1|20.0|0.0|37.0|Bamboo|0.43|1|MTC, FOTOCAD, AK FLASH  https://www.foto|3
+TML-DW-026|Bamboo Stainless Steel Bottle|DW|B|1|18.0|0.0|35.0|Bamboo|0.0|1|MTC|3
+TML-DW-027|BREW by Ocean Bottle|DW|B|1|114.96|0.0|155.0|Recycled Stainless Steel|0.42|1|Jasani|3
+TML-DW-028|Ocean Bottle|DW|B|1|115.0|0.0|200.0|Recycled Stainless Steel|0.42|1|Jasani https://www.jasani.ae/shop/dwob-2|3
+TML-DW-029|PU Leather Coasters - Set of 6|DW|B|1|13.0|0.0|26.0|PU Leather|0.0|1|AK FLASH|3
+TML-DW-030|Round Wooden Coasters - Set of 6|DW|B|1|20.0|0.0|32.0|Wood|0.0|1|AK FLASH  https://akflash.com/product/at|3
+TML-DW-031|Square Bamboo Coasters - Set of 4|DW|B|1|11.0|0.0|20.0|Bamboo|0.28|1|MTC|3
+TML-DW-032|Cork Tea Coasters - Set of 6|DW|B|1|1.0|0.0|12.0|Cork|0.05|1|MTC, FOTOCAD  https://mtc.ae/product/bra|3
+TML-DW-033|Sustainable Vacuum Insulated Bottle with Loop|DW|B|1|38.4|0.0|65.0|Stainless Steel|0.37|1|Jasani|3
+TML-DW-034|EcoSleek Water Bottle with Bamboo|DW|B|1|33.46|0.0|46.0|Stainless Steel|0.38|1|Jasani|3
+TML-DW-035|Electric Protein Shaker Bottle|DW|B|1|64.66|0.0|65.0|Plastic|0.39|1|Temu DRAGON MART  https://www.temu.com/a|7
+TML-DW-036|Bio-degradable Wheat Straw Mug|DW|B|1|5.0|0.0|10.0|Wheat fibre|0.0|1|Belfast|3
+TML-DW-037|Glass Water Bottle with Sleeve|DW|B|1|16.5|0.0|24.0|Borosilicate glass|0.0|1|Belfast|3
+TML-DW-038|Omizu Stainless Steel Vacuum Bottle|DW|B|1|19.0|0.0|26.0|Stainless steel|0.0|1|Belfast   https://www.jasani.ae/shop/dwg|3
+TML-DW-039|Sports Water Bottle|DW|B|1|12.0|0.0|19.0|PVC Tritan plastic|0.0|1|Belfast|3
+TML-DW-040|Bio-degradable Sports Water Bottle|DW|B|1|8.88|0.0|14.0|Plastic|0.11|1|Jasani|3
+TML-DW-041|Shot Glass|DW|B|1|6.0|0.0|10.0|Glass|0.5|1|Fufu Trading|3
+TML-DW-042|Ceramic Espresso Cup & Saucer|DW|B|1|6.0|0.0|11.0|Ceramic|0.2|1|MTC|3
+TML-DW-043|Stainless Steel Tumbler with Straw|DW|B|1|21.0|0.0|32.0|Stainless Steel|0.0|1|Belfast|3
+TML-DW-045|Frosted Glass Bottle with Straw|DW|B|1|8.0|0.0|15.0|Glass & Bamboo|0.36|1|MTC LUXARY  https://mtc.ae/product/glass|3
+TML-DW-046|Barolo Stainless Steel Bottle|DW|B|1|20.0|0.0|30.0||0.0|0|Belfast|3
+TML-DW-047|Wine Glass - Set of 2|DW|B|1|60.0|0.0|75.0|Glass|1.08|1|MTC|3
+TML-DW-048|Mini Espresso Cup & Saucer|DW|B|1|6.0|0.0|10.0|Ceramic|0.244|1|MTC LIYING KICTHEN  https://mtc.ae/produ|3
+TML-DW-049|Quoke Beer Bottle|DW|B|1|16.0|0.0|31.0|Stainless Steel|0.0|1|Belfast|3
+TML-DW-050|Starcof Beverage Mug|DW|B|1|19.0|0.0|27.0|Stainless Steel|0.0|1|Belfast|3
+TML-DW-051|Arabic Qahwa Coffee Cup|DW|B|1|40.0|0.0|56.0|Stainless Steel|0.136|1|MTC|3
+TML-DW-052|Hans Larsen Recycled Stainless Steel Bottle|DW|B|1|26.59|0.0|35.0|Stainless Steel & Cork|0.41|1|Jasani|3
+TML-DW-053|Orb Stainless Steel Bottle|DW|B|1|30.0|0.0|44.0|Stainless Steel|0.0|1|Belfast|3
+TML-DW-054|MALTA Reusable Wheat Straw Cup|DW|B|1|6.91|0.0|12.0|wheat straw Plastic|0.17|1|Jasani|3
+TML-DW-055|SKY Vacuum Insulated Water Bottle|DW|B|1|18.0|0.0|26.0|Stainless Steel|0.5|0|Jasani|3
+TML-DW-056|MOYA Black Sea Sustainable Bottle|DW|B|1|53.4|0.0|78.0|Stainless Steel|0.5|1|MOYA|3
+TML-DW-057|MOYA Blue Lagoon Sustainable Water Bottle|DW|B|1|53.4|0.0|78.0|Stainless Steel|0.5|1|MOYA|3
+TML-DW-058|HOPA Stainless Steel Water Bottle|DW|B|1|13.25|0.0|29.0|Stainless Steel|0.38|1|Jasani|3
+TML-DW-059|Love Mug Set|DW|B|1|10.0|0.0|16.0|Ceramic|0.67|1|MTC|3
+TML-DW-060|Circular Recycled Coffee Cup|DW|B|1|39.26|0.0|54.0|Paper Cup|0.27|1|Jasani|3
+TML-DW-061|Glass Mug with Bamboo Lid|DW|B|1|9.0|0.0|18.0|Glass and Wood|0.21|1|MTC|3
+TML-DW-062|Two-Tone Ceramic Mug with Spoon|DW|B|1|6.0|0.0|14.0|Ceramic|0.39|1|MTC|3
+TML-DW-063|STAN Tumbler with Straw|DW|B|1|20.0|0.0|32.0|Stainless Steel|0.52|1|MTC|3
+TML-DW-064|Hans Larsen Recycled Ceramic Tumbler|DW|B|1|17.71|0.0|32.0|ceramic  & polypropylene|0.55|1|Jasani|3
+TML-DW-065|Hans Larsen Recycled Glass Tumbler|DW|B|1|15.94|0.0|32.0|glass and polypropylene|0.37|1|Jasani|3
+TML-DW-066|TROOPER Sports Water Bottle|DW|B|1|20.0|0.0|35.0|Stainless steel|0.0|1|Belfast|3
+TML-DW-067|IGBO Sipper Tumbler|DW|B|1|19.0|0.0|32.0|Stainless steel|0.0|1|Belfast|3
+TML-DW-068|GALATI Stainless Steel Water Bottle|DW|B|1|19.44|0.0|35.0|Stainless steel|0.41|1|Jasani|3
+TML-DW-069|TAUNUS Soft Touch Insulated Water Bottle|DW|B|1|19.92|0.0|35.0|Stainless steel|0.47|1|Jasani|3
+TML-DW-070|CREIL Insulated Cork Water Bottle|DW|B|1|20.16|0.0|31.0|Stainless steel|0.37|1|Jasani|3
+TML-DW-071|FLOHA Glass Bottle with Sleeve|DW|B|1|13.2|0.0|25.0|Glass|0.44|1|Jasani|3
+TML-DW-072|Vortex Athletica Sports Water Bottle|DW|B|1|16.0|0.0|25.0|Stainless steel|0.5|1|FOTOKAD  https://www.fotokad.ae/vortex-a|3
+TML-DW-073|SHARE Stainless Steel Flask Set|DW|B|1|16.9|0.0|38.0|Stainless steel|0.44|1|Jasani|3
+TML-DW-074|OTG Lifestyle Bottle|DW|B|1|18.0|0.0|32.0|Stainless steel|0.5|0|EVENTGIFT|3
+TML-DW-075|The Anti-Spill Mug|DW|B|1|18.0|0.0|29.0|stainless steel|0.5|0|EVENT|3
+TML-DW-076|Metal Enamel Mug|DW|B|1|9.0|0.0|18.0|Metal|0.5|1|MAF|3
+TML-DW-077|Tray Coasters (Set of 6)|DW|B|1|16.0|0.0|42.0|Recycled PU|0.5|1|Event|3
+TML-DW-078|Travel Flask Bottle|DW|B|1|18.0|0.0|35.0|Stainless steel|0.5|0|Event|3
+TML-DW-079|Ceramic Mug with Clay Bottom|DW|B|1|9.0|0.0|12.0|Stainless steel and polypropylene|0.58|1|MTC https://mtc.ae/product/two-toned-cer|3
+TML-DW-080|Stanley Quencher Tumbler|DW|B|1|250.0|0.0|340.0|Stainless steel|0.0|1|Go Sports, Virgin Store, Amazon    https|3
+TML-DW-081|Stanley IceFlow Straw Tumbler|DW|B|1|130.0|0.0|280.0|Stainless steel|0.57|1|Ramrod, Go Sprts, Virgin Store, Amazon  |3
+TML-DW-082|BERN Recycled Tumbler with Straw|DW|B|1|37.92|0.0|54.0|Stainless steel|0.66|1|Jasani|3
+TML-DW-083|A5 Memo Bottle|DW|B|1|15.0|0.0|24.0|plastic|0.3|0|TEMU|7
+TML-DW-084|Camper Mug|DW|B|1|17.0|0.0|23.0|Stainless steel|0.2|1|BELFAST|3
+TML-DW-085|Cork Espresso Cup|DW|B|1|6.0|0.0|16.0|Cramic and cork|0.25|1|MTC , Eventgift   https://mtc.ae/product|3
+TML-DW-086|Stoneware Mug|DW|B|1|5.0|0.0|10.0|Cramic|0.3|1|ALPHA|3
+TML-DW-087|Glitter Mug|DW|B|1|6.0|0.0|12.0|Cramic|0.5|1|AL MAHIR|3
+TML-DW-088|FlexRing Water Bottle|DW|B|1|20.0|0.0|32.0|Stainless steel|0.34|1|MTC https://mtc.ae/product/double-wall-s|3
+TML-DW-089|RingFold Phone Holder Flask|DW|B|1|21.0|0.0|34.0|Stainless steel|0.36|1|MTC https://mtc.ae/product/double-wall-s|3
+TML-DW-090|Sling 2-in-1 Bottle|DW|B|1|23.0|0.0|36.0|Stainless steel|0.42|1|MTC  https://mtc.ae/product/multi-functi|3
+TML-DW-091|EcoWave Promotional Bottle|DW|B|1|5.5|0.0|12.0|RPET and cork|0.16|1|MTC https://mtc.ae/product/rpet-bottles-|3
+TML-DW-092|Wood Print Stainless Steel Bottle|DW|B|1|19.92|0.0|32.0|Stainless steel and wood|0.38|1|Jasani|3
+TML-DW-093|Circular Reusable Coffee Cup|DW|B|1|8.64|0.0|15.0|Paper Cup|0.19|1|Jasani|3
+TML-DW-094|Terra Two-Tone Mug|DW|B|1|5.0|0.0|9.0|Ceramic|0.36|1|MTC  https://mtc.ae/product/ceramic-mugs|3
+TML-DW-095|PureFit Glass Sports Bottle|DW|B|1|3.5|0.0|14.0|Inner Glass, Outer Plastic|0.34|1|MTC https://mtc.ae/product/sports-glass-|3
+TML-DW-096|Sevilla Mug with Coaster Lid|DW|B|1|7.49|0.0|14.0|ceramic|0.34|1|Jasani|3
+TML-DW-097|MOTIVATE Sports Water Bottle|DW|B|1|8.0|0.0|15.0|Plastic|0.21|1|MTC https://mtc.ae/product/motivational-|3
+TML-DW-098|ClearEco Transparent Bottle|DW|B|1|6.0|0.0|12.0|Plastic|0.17|1|MTC https://mtc.ae/product/rpet-transpar|3
+TML-DW-099|TriPod Water Bottle|DW|B|1|36.0|0.0|58.0|Durable plastic|0.48|1|EVENTStore|3
+TML-DW-100|Essentials Sports Water Bottle|DW|B|1|6.0|0.0|10.0|Aluminum|0.17|1|MTC https://mtc.ae/product/promotional-s|3
+TML-DW-101|EcoZen Water Bottle|DW|B|1|18.0|0.0|28.0|Stainless Steel|0.5|1|LuxuryTrdg  https://luxurytrd.com/?s=Cap|3
+TML-DW-102|BamBrew Coffee Mug|DW|B|1|6.0|0.0|12.0|Ceramic and Bamboo|0.45|1|MTC https://mtc.ae/product/ceramic-coffe|3
+TML-DW-103|CorkNest Coasters|DW|B|1|5.52|0.0|14.0|Cork|0.08|1|Jasani|3
+TML-DW-105|HydraPeak Sports Water Bottle|DW|B|1|19.68|0.0|45.0|stainless steel|0.5|1|JASANI https://www.jasani.ae/shop/dwhl-3|3
+TML-DW-106|GetFit Smart Water Bottle 2.0|DW|B|1|160.0|0.0|220.0|stainless steel|0.5|1|GENESIS GIFTS|3
+TML-DW-107|EXPLORER Travel Mug|DW|B|1|28.0|0.0|47.0|Stainless Steel|0.61|1|Event|3
+TML-DW-108|FLASKEE Travel Bottle|DW|B|1|18.0|0.0|30.0|Stainless Steel|0.57|1|Event|3
+TML-DW-109|Arabic Tea & Coffee Pot with Cups Set|DW|B|1|57.0|0.0|85.0|Stainless Steel|0.86|1|MTC|3
+TML-DW-110|Bamboo Flow Bottle|DW|B|1|19.0|0.0|30.0|Bamboo, metal|0.31|1|Shanhgai   Shanhgai  https://www.shangha|3
+TML-DW-111|Bullet Stainless Steel Bottle|DW|B|1|15.0|0.0|23.0|Stainless Steel|0.4|1|HAK|3
+TML-DW-112|Decanter Sports Bottle|DW|B|1|11.0|0.0|20.0|Stainless Steel|0.3|1|HAK|3
+TML-DW-113|Sierra Mini Tumbler|DW|B|1|13.0|0.0|22.0|Stainless Steel|0.3|1|HAK|3
+TML-DW-114|Can Coolers|DW|B|1|3.8|0.0|9.0||0.2|1|TEMU   https://www.temu.com/ae/25-pack-b|7
+TML-DW-115|Square Slate Coaster|DW|B|1|2.0|0.0|5.0||0.14|1|MTC shanghai  https://mtc.ae/product/pri|3
+TML-DW-116|SPRINT Sports Bottle|DW|B|1|7.0|0.0|13.0||0.5|0|LuxuryTrdg    https://luxurytrd.com/?s=H|3
+TML-DW-117|SafeSip Tumbler|DW|B|1|14.0|0.0|21.0||0.5|1|FOTOKAD    https://www.fotokad.ae/double|3
+TML-DW-118|CRYO Frosted Glass Bottle|DW|B|1|7.0|0.0|19.0||0.5|1|FOTOKAD   https://www.fotokad.ae/glass-b|3
+TML-DW-119|Colourful Mason Glass Jar|DW|B|1|6.0|0.0|9.0||0.5|0|FOTOKAD  https://www.fotokad.ae/sublimat|3
+TML-DW-120|Stanwell Tumbler|DW|B|1|20.0|0.0|36.0||0.57|1|EVENTStore   https://eventgift.net/produ|3
+TML-DW-121|Reusable Party Cups|DW|B|30|52.0|0.0|100.0||0.9|1|Amazon     https://www.amazon.ae/dp/B0DR|3
+TML-DW-122|Glossy Ceramic Cup|DW|B|1|2.75|0.0|5.0||0.23|1|MTC  https://mtc.ae/product/ceramic-cups|3
+TML-DW-123|Innovative 360 Cup|DW|B|1|16.5|0.0|36.0||0.36|1|Event    https://eventgift.net/product/3|3
+TML-DW-124|UrbanSip Mug with Lid|DW|B|1|22.0|0.0|33.0||0.5|0|Event    https://eventgift.net/product/s|3
+TML-DW-125|Latte Mug|DW|B|1|5.0|0.0|10.0||0.5|1|FOTOKAD  https://www.fotokad.ae/u-shaped|3
+TML-DW-126|Cento Thermal Flask|DW|B|1|19.68|0.0|30.0||0.42|1|Jasani    https://www.jasani.ae/shop/dwh|3
+TML-DW-127|Joud Coffee Gift Set|DW|B|1|36.0|0.0|63.0||0.57|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-128|Round Marble Coaster|DW|B|1|5.0|0.0|14.0||0.25|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-DW-129|Victora Espresso Cup|DW|B|1|14.0|0.0|21.0||0.85|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-DW-130|Vista Tumbler with Reusable Straw|DW|B|1|16.0|0.0|27.0||0.35|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-DW-131|Maggix Sports Bottle|DW|B|1|6.0|0.0|11.0||0.13|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-DW-132|Asobu Orb Bottle|DW|B|1|84.0|0.0|114.0||0.5|0|Oasis   https://www.oasiscatalog.ae/srch|7
+TML-DW-133|Clutch Bottle|DW|B|1|110.0|0.0|149.0||0.5|1|Oasis    https://www.oasiscatalog.ae/ite|7
+TML-DW-134|Asobu Urban Bottle|DW|B|1|78.0|0.0|102.0||0.5|0|Oasis   https://www.oasiscatalog.ae/item|7
+TML-DW-135|Globe Mug|DW|B|1|18.0|0.0|29.0||0.5|1|Oasis   https://www.oasiscatalog.ae/item|7
+TML-DW-136|Countryside Mug|DW|B|1|11.0|0.0|17.0||0.5|0|Oasis   https://www.oasiscatalog.ae/item|7
+TML-DW-137|Premium Glass Bottle|DW|B|1|12.0|0.0|17.0||0.5|1|Fotokad   https://www.fotokad.ae/premium|3
+TML-DW-138|IMPACT Ocean Bottle|DW|B|1|114.96|0.0|164.0||0.46|1|Jasani   https://www.jasani.ae/shop/dwob|3
+TML-DW-139|HydraFlip Tumbler|DW|B|1|9.0|0.0|16.0||0.27|1|MTC   https://mtc.ae/product/double-wall|3
+TML-DW-140|Ice Cream Cup|DW|D|100|250.0|0.0|375.0||0.5|1|Al bedaya MODEREN|5
+TML-DW-141|Smoothie Cup|DW|D|100|95.0|0.0|149.0||0.5|1|Al bedaya|5
+TML-DW-142|Glass Dropper Bottle|DW|D|30|60.0|0.0|90.0||0.5|1|Red Dot|4
+TML-DW-143|Beer Pint Glass|DW|B|1|39.0|0.0|55.0||2.3|1|Amazon    https://www.amazon.ae/dp/B015R|3
+TML-DW-144|Swiss Peak ELITE Flask|DW|B|1|43.2|0.0|57.0||0.71|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-145|FORZA Sustainable Tumbler|DW|B|1|18.72|0.0|26.0||0.47|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-146|Rivox Aluminum Bottle|DW|B|1|7.0|0.0|10.0||0.08|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-DW-147|Baraka Stainless Steel Bottle|DW|B|1|16.0|0.0|22.0|Stainless Steel|0.0|1|AK Flash|3
+TML-DW-148|Whiskey Glass|DW|B|1|10.0|0.0|45.0|Glass|2.44|1|Amazon   https://www.amazon.ae/dp/B0DMHX|3
+TML-DW-149|Champagne Flute Glass (Set of 2)|DW|B|1|36.0|0.0|95.0|Glass|0.4|1|Amazon  https://www.amazon.ae/PARACITY-C|3
+TML-DW-150|Beer Mug|DW|B|1|10.0|0.0|60.0|Glass|0.0|1|Amazon  https://www.amazon.ae/Freezer-Gl|3
+TML-DW-151|Resin Coaster|DW|B|1|20.0|0.0|20.0||0.0|0|TEMU|7
+TML-DW-152|Quench Bottle with Bamboo Lid|DW|B|1|15.0|0.0|22.0||0.37|1|HAK   https://www.hakgifts.com/products/|3
+TML-DW-153|Hydro Outdoor Mug|DW|B|1|14.5|0.0|20.0||0.34|1|HAK   https://www.hakgifts.com/products/|3
+TML-DW-154|Teleios Corporate Tumbler|DW|B|1|18.0|0.0|26.0||0.45|1|HAK    https://www.hakgifts.com/products|3
+TML-DW-155|Nordic Cork Mug|DW|B|1|28.08|0.0|40.0|Cork & Stainless Steel|0.18|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-156|SKROSS SmartTech Water Bottle|DW|B|1|71.95|0.0|95.0|Stainless Steel|0.48|1|Jasani  https://www.jasani.ae/shop/dwsk-|3
+TML-DW-157|HOPI 2-in-1 Hydration Bottle|DW|B|1|28.0|0.0|40.0|Stainless Steel|0.47|1|Event   https://eventgift.net/product/ho|3
+TML-DW-158|COZY Leather Tumbler|DW|B|1|20.0|0.0|28.0|Leather & Stainless Steel|0.36|1|Event   https://eventgift.net/product/co|3
+TML-DW-159|CAFFE Auto-Stir Coffee Mug|DW|B|1|23.95|0.0|32.0||0.35|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-160|NIMI Travel Mug|DW|B|1|8.21|0.0|12.0||0.18|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-161|DualSip Sports Water Bottle|DW|B|1|30.0|0.0|42.0||0.47|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-162|LAREN Voyager Mug|DW|B|1|26.88|0.0|38.0||0.28|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-DW-163|Transparent Plastic Bottle|DW|B|1|33.57|0.0|47.0||0.0|1|Temu   https://www.temu.com/ae/20pcs-lea|7
+TML-DW-164|Nomu Water Bottle with Bluetooth Speaker|DW|B|1|31.0|0.0|45.0||0.0|1|Belfast   https://belfast-uae.com/produc|3
+TML-DW-165|TeaTrek Bottle with Detachable Cup|DW|B|1|24.0|0.0|34.0||0.0|1|Belfast   https://belfast-uae.com/produc|3
+TML-DW-166|TriPod Sipper Bottle|DW|B|1|22.0|0.0|32.0||0.5|1|Luxury TRDG   https://luxurytrd.com/?s=M|3
+TML-DW-167|Square Marble Coasters (Set of 2)|DW|B|1|8.98|0.0|13.0||0.57|1|Jasani   https://www.jasani.ae/shop/csen|3
+TML-DW-168|Celsius Smart Coffee Tumbler|DW|B|1|13.0|0.0|18.0||0.27|1|MTC   https://mtc.ae/product/temperature|3
+TML-DW-169|Koro Sipper Tumbler|DW|B|1|19.0|0.0|30.0||0.51|1|Shanghai   https://www.shanghaigifts.net|3
+TML-DW-170|Mariner Stainless Steel Bottle|DW|B|1|13.73|0.0|20.0||0.33|1|Jasani   https://www.jasani.ae/shop/cate|3
+TML-DW-171|Pelican Thermal Bottle|DW|B|1|28.44|0.0|43.0||0.0|0|OASIS|
+TML-DW-172|MOSS Coffee Tumbler|DW|B|1|8.21|0.0|12.0||0.2|1|Jasani    https://www.jasani.ae/shop/dwg|3
+TML-DW-173|Nova Tumbler with Metal Straw|DW|B|1|16.0|0.0|25.0||0.34|1|MTC   https://mtc.ae/product/double-wall|3
+TML-DW-174|YETI Rambler Tumbler|DW|B|1|250.0|0.0|306.0||0.36|1|Amazon   https://www.amazon.ae/YETI-Insu|3
+TML-DW-175|Yeti Rambler Travel Mug|DW|B|1|183.0|0.0|256.0||0.45|0|Amazon    https://www.amazon.ae/YETI-Ram|3
+TML-DW-176|MOOV Sports Sipper Bottle|DW|B|1|24.1|0.0|36.0||0.57|1|Jasani   https://www.jasani.ae/shop/dwhl|3
+TML-DW-177|BREW Travel Tumbler|DW|B|1|9.0|0.0|28.0||0.28|0|FOTOKAD|3
+TML-DW-178|CALYPSO Geometric Tumbler|DW|B|1|19.0|0.0|35.0||0.46|1|EVENT|3
+TML-DW-179|Ocean Bottle 3-in-1 Gift Set|DW|B|1|153.36|0.0|204.0||0.46|1|Jasani|3
+TML-DW-182|Bottle with Bamboo Lid and Base|DW|B|1|0.0|0.0|30.0||0.5|0||3
+TML-DW-183|CHASE Tumbler with Rope Strap|DW|B|1|18.0|0.0|27.0||0.0|1|BELFAST|
+TML-CH-001|Baseball Cap|CH|B|1|4.0|0.0|18.0||0.5|1|TSHIRTMART, BAHRAM CAPS, ABDUL AZIZ CAPS|3
+TML-CH-002|Trucker Hat|CH|B|1|8.0|0.0|24.0||0.5|1|YUANYE CAPS, WILD & WICKY ATLANTIS|3
+TML-CH-003|Bucket Hat|CH|B|1|7.0|0.0|26.0||0.5|1|BAHRAM,MANUFACTURED|3
+TML-CH-004|Visor Cap|CH|B|1|4.0|0.0|17.0||0.5|1|TSHIRTMART, BAHRAM, WILD & WICKY|3
+TML-CH-005|New Era Cap|CH|B|1|99.0|0.0|150.0||0.5|1|GO SPORTS / HATSTORE|3
+TML-CH-006|Recycled Cotton Cap|CH|B|1|17.5|0.0|32.0|100% recycled cotton|0.5|1|MERCHLIST|3
+TML-CH-007|Beanie Hat|CH|B|1|8.0|0.0|14.0||0.5|1|WILD & WICKY CAPS|3
+TML-CH-008|Foam Trucker Cap|CH|B|1|4.0|0.0|22.0||0.5|1|TSHIRTMART, BAHRAM CAPS, ABDUL AZIZ CAPS|3
+TML-CH-009|Snapback Hat|CH|B|1|5.0|0.0|14.0||0.5|1|YUANYE CAPS, WILD & WICKY|3
+TML-CH-010|Sports Performance Cap|CH|B|1|19.44|0.0|35.0|65% Polyester - 35% Cotton|0.17|1|Jasani|3
+TML-CH-011|Denim Bucket Hat|CH|B|1|16.0|0.0|28.0||0.5|1|MANUFACTURED|3
+TML-CH-012|Fedora Straw Hat|CH|B|1|27.0|0.0|45.0||0.0|0|Temu|7
+TML-CH-014|Sports Headband|CH|B|1|4.32|0.0|14.0||0.0|1|Temu|7
+TML-CH-015|Vintage Dad Hat|CH|B|1|8.0|0.0|26.0||0.5|1|Yuanye caps / Dragon Mart|3
+TML-CH-016|Swimming Cap|CH|B|1|3.96|0.0|12.0||0.0|1|TEMU   https://www.temu.com/goods.html?_|7
+TML-CH-017|Suede Fedora Hat|CH|B|1|35.0|0.0|50.0||0.0|1|Temu  https://www.temu.com/ae/classic--f|7
+TML-CH-018|Yupoong Snapback Trucker Hat|CH|B|1|70.0|0.0|95.0||0.0|1|AMAZON   https://www.amazon.ae/Yupoong-M|3
+TML-CH-019|6 Panel Baseball Cap|CH|B|1|10.0|0.0|30.0||0.5|1|Yuanye Caps / Dragon Mart|3
+TML-CH-020|Athletic Cooling Cap|CH|B|1|17.0|0.0|26.0|100% Cotton|0.0|1|HAK|3
+TML-CH-021|Promotional Cap|CH|B|1|3.5|0.0|12.0||0.5|1|TSHIRTMART, BAHRAM CAPS, ABDUL AZIZ CAPS|3
+TML-CH-022|Camo Military Cap|CH|B|1|9.5|0.0|15.0||0.0|0|TEMU   https://www.temu.com/ae/camouflag|7
+TML-CH-023|Performance Stretch-Fit Cap|CH|B|1|19.06|0.0|27.0|95% Polyester - 5% Spandex|0.11|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-CH-024|Leather Baseball Cap|CH|B|1|20.0|0.0|38.0||0.0|1|Temu   https://www.temu.com/ae/pupu-adju|7
+TML-CH-025|Urban 7-Panel Cap|CH|B|1|12.0|0.0|18.0|100% Cotton|0.0|1|HAK   https://www.hakgifts.com/products/|3
+TML-CH-026|Nike Club Cap|CH|C|1|96.0|0.0|95.0||0.0|0|Amazon amazon.ae/Nike-Team-Classic-UNISE|3
+TML-CH-027|Yupoong Retro Trucker Mesh Cap|CH|B|1|61.0|0.0|90.0||0.09|1|Amazon  https://www.amazon.ae/Yupoong-Si|3
+TML-CH-028|STORM Textured Cap|CH|B|1|16.13|0.0|22.0|95% Polyester - 5% Spandex|0.11|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-CH-029|Christmas Santa Hat|CH|B|1|13.0|0.0|30.0||0.12|1|Amazon   https://www.amazon.ae/Goodern-C|3
+TML-BT-001|Canvas Tote Bag|BT|B|1|2.25|0.0|8.0|100% Canvas|0.07|1|MTC/HAK/FOTOCAD/JASANI   https://mtc.ae/|3
+TML-BT-002|Recycled Cotton Tote Bag|BT|B|1|5.18|0.0|16.0|100% Recycled Cotton|0.21|1|Jasani|3
+TML-BT-003|Jute and Cotton Tote Bag|BT|B|1|3.75|0.0|13.0||0.18|1|MTC  https://mtc.ae/product/jute-and-cot|2
+TML-BT-004|Classic Backpacks|BT|B|1|11.0|0.0|22.0||0.35|1|MTC https://mtc.ae/product/promotional-q|3
+TML-BT-005|Multi-functional Business Backpack|BT|B|1|15.0|0.0|36.0||0.5|1|AKFlash  https://akflash.com/product/ab-|3
+TML-BT-006|Multi-functional Travel Backpack|BT|B|1|23.0|0.0|36.0||0.5|1|AKFlash  https://akflash.com/product/ab-|3
+TML-BT-007|XDDESIGN Bobby Soft Anti-Theft Backpack|BT|B|1|110.4|0.0|220.0||0.18|1|Jasani|3
+TML-BT-008|XDDesign Recycled Laptop Backpack|BT|B|1|64.8|0.0|135.0||0.46|1|Jasani|3
+TML-BT-009|XDDesign Recycled Laptop Bag|BT|B|1|53.52|0.0|95.0||0.46|1|Jasani|3
+TML-BT-010|Polyester Drawstring Bag|BT|B|10|1.63|0.0|4.0||0.05|1|HAK, FOTOCAD, MTC, JASANI  https://www.h|3
+TML-BT-011|Cotton Drawstring Bag|BT|B|1|2.54|0.0|10.0||0.09|1|MTC, HAK,  JASANI  https://www.jasani.ae|3
+TML-BT-012|Gym Bag|BT|B|1|30.0|0.0|36.0||0.05|1|MTC  https://mtc.ae/product/gym-bags-wit|3
+TML-BT-013|Reusable Non-Woven Shopping Bag|BT|B|1|1.1|0.0|5.0||0.05|1|MTC, FOTOCAD, JASANI, HAK  https://mtc.a|3
+TML-BT-014|Reusable Shopping Bag - Two Tone|BT|B|1|2.0|0.0|5.0||0.05|1|MTC, FOTOCAD,HAK  https://www.hakgifts.c|3
+TML-BT-015|Jute Shopping Bag - Vertical|BT|B|1|2.0|0.0|6.0||0.17|0|MTC  https://mtc.ae/product/jute-bags-wi|3
+TML-BT-016|Jute Shopping Bag - Horizontal|BT|B|1|4.25|0.0|11.0||0.27|1|MTC/FOTOCAD  https://mtc.ae/product/prom|3
+TML-BT-017|Canvas Jute Bag with Button|BT|B|1|4.65|0.0|10.0||0.26|1|MTC https://mtc.ae/product/jute-shopping|3
+TML-BT-018|Jute and Cotton Beach Bag|BT|B|1|6.0|0.0|13.0||0.21|1|MTC https://mtc.ae/product/juco-beach-ba|3
+TML-BT-019|Laptop Sleeve Bag|BT|B|1|28.0|0.0|37.0||0.5|0|HAK|3
+TML-BT-020|Premium Laptop Bag|BT|B|1|42.0|0.0|65.0||0.5|0|JASANI|3
+TML-BT-021|Cabin Trolley Bag|BT|B|1|189.6|0.0|240.0||3.66|1|Jasani|3
+TML-BT-022|Recycled Office Backpack|BT|B|1|40.8|0.0|56.0||0.62|1|Jasani|3
+TML-BT-023|Recycled Laptop Bag|BT|B|1|78.24|0.0|112.0||0.57|1|Jasani|3
+TML-BT-024|Anti-microbial Business Backpack|BT|B|1|32.64|0.0|41.0||0.6|1|Jasani|3
+TML-BT-025|Cooler Lunch Bag|BT|B|1|9.22|0.0|14.0||0.19|1|Jasani|3
+TML-BT-026|Tote Beach Bag|BT|B|1|5.5|0.0|12.0||0.17|1|MTC https://mtc.ae/product/juco-tote-bea|3
+TML-BT-027|Recycled Cotton Duffel Gym Bag|BT|B|1|24.0|0.0|41.0||0.32|1|Jasani|3
+TML-BT-028|Jute Bag with Canvas Pocket|BT|B|1|6.53|0.0|14.0||0.29|1|Jasani, MTC  https://www.jasani.ae/shop?|3
+TML-BT-029|Jute and Cotton Zipper Pouch|BT|B|1|3.0|0.0|8.0||0.05|1|MTC  https://mtc.ae/product/jute-with-co|3
+TML-BT-030|Devon Anti-theft Backpack|BT|B|1|46.0|0.0|95.0||0.0|0|BELFAST|3
+TML-BT-031|Dicota Office Laptop Backpack|BT|B|1|58.0|0.0|80.0||0.0|0|BELFAST|3
+TML-BT-032|Corporal Executive Backpack|BT|B|1|65.0|0.0|78.0||0.0|0|Belfast|3
+TML-BT-033|Crusader Duffle Gym Bag|BT|B|1|46.0|0.0|64.0||0.0|1|Belfast|3
+TML-BT-034|Non-Woven Giveaway Bag|BT|B|10|1.85|0.0|4.0||0.05|0|MTC,HAK,FOTOKAD  https://www.fotokad.ae/|3
+TML-BT-035|Denim Tote Bag|BT|B|1|6.0|0.0|14.0||0.0|1|Fotocad https://www.fotokad.ae/denim-tot|3
+TML-BT-036|Recycled Toiletry Bag|BT|B|1|45.36|0.0|65.0||0.21|1|Jasani|3
+TML-BT-037|Recycled Tech Bag|BT|B|1|49.68|0.0|82.0||0.17|1|Jasani  https://www.jasani.ae/shop/hpsn-|3
+TML-BT-038|All-Over-Print Tote Bag|BT|B|1|10.0|0.0|22.0||0.5|1|Manufacture|3
+TML-BT-039|Canvas Shopper Bag|BT|B|1|5.0|0.0|9.0||0.1|1|MTC https://mtc.ae/product/laminated-cot|3
+TML-BT-040|XD DESIGN Anti-theft Backpack|BT|B|1|148.8|0.0|295.0||1.82|1|Jasani|3
+TML-BT-041|Canvas Backpack|BT|B|1|23.23|0.0|35.0||0.54|1|Jasani|3
+TML-BT-042|Mesh Shopping Tote Bag|BT|B|1|10.0|0.0|13.0||0.5|0|EVENT STORE|3
+TML-BT-043|Zipper Cotton Tote Bag|BT|B|1|10.0|0.0|19.0||0.5|1|CUSTOM MADE|3
+TML-BT-044|Two Tone Tote Bag|BT|B|1|12.0|0.0|19.0||0.5|1|CUSTOM MADE|3
+TML-BT-045|Grocery Shopper Bag with Pocket|BT|B|1|13.0|0.0|19.0||0.5|1|CUSTOM MADE|3
+TML-BT-046|Shoe Bag|BT|B|1|2.0|0.0|5.0||0.5|1|Red dot|3
+TML-BT-047|Laundry Bag|BT|B|1|8.0|0.0|12.0||0.5|1|MANUFACTURE GREEN SEA DRAGONMART|3
+TML-BT-048|Cooper Cotton Backpack|BT|B|1|18.0|0.0|25.0||0.39|1|MTC https://mtc.ae/product/black-cotton-|3
+TML-BT-049|LUBIN Crossbody Travel Bag|BT|B|1|20.21|0.0|36.0||0.26|1|Jasani|3
+TML-BT-050|BREE Trolley Backpack|BT|B|1|102.72|0.0|145.0||2.97|1|Jasani|3
+TML-BT-051|ROVER Cabin Trolley Bag|BT|B|1|104.64|0.0|160.0||3.3|1|Jasani|3
+TML-BT-052|DuoTone Backpack|BT|B|1|13.0|0.0|24.0||0.31|1|MTC  https://mtc.ae/product/two-toned-ba|3
+TML-BT-053|DuoTone Cosmetic Bag|BT|B|1|2.5|0.0|12.0||0.03|1|MTC  https://mtc.ae/product/cotton-canva|3
+TML-BT-054|Carto Shopping Trolley Bag|BT|B|1|5.0|0.0|14.0||0.39|1|MTC  https://mtc.ae/product/portable-tro|3
+TML-BT-055|LUNA Mini Cotton & Jute Bag|BT|B|1|2.69|0.0|8.0||0.08|1|Jasani|3
+TML-BT-056|Cotton & Jute Drawstring Bag|BT|B|1|3.26|0.0|6.0||0.14|1|Jasani|3
+TML-BT-057|Chic Essentials Pouch|BT|B|1|11.0|0.0|18.0||0.5|0|EVENT Store|3
+TML-BT-058|EcoChic Shopper Bag|BT|B|1|10.0|0.0|18.0||1.78|1|Event|3
+TML-BT-059|GymBud Duffle Bag|BT|B|1|27.0|0.0|38.0||9.35|1|Event|3
+TML-BT-060|Summit Laptop Backpack|BT|B|1|31.68|0.0|46.0||0.94|1|Jasani|3
+TML-BT-061|Juco Tote Bag|BT|B|1|11.0|0.0|20.0||0.0|0|Event|3
+TML-BT-062|Crossbody Sling Travel Bag|BT|B|1|25.0|0.0|48.0|25.35 x 8.45 cm|0.0|1|EVENT Store https://eventgift.net/produc|3
+TML-BT-063|VINGA Wash Bag|BT|B|1|31.25|0.0|48.0|Nubuck PU Leather|0.27|1|Jasani|3
+TML-BT-064|GoLite Promotional Backpack|BT|B|1|7.63|0.0|12.0||0.35|1|Jasani|3
+TML-BT-065|Jute Cooler Lunch Bag|BT|B|1|8.16|0.0|14.0||0.13|1|Jasani|3
+TML-BT-066|Boswell Multifunctional Business Backpack|BT|B|1|50.0|0.0|70.0||0.5|1|LUXURY TRDG  https://luxurytrd.com/?s=BO|3
+TML-BT-067|Volta Leather Duffle Bag|BT|B|1|110.0|0.0|160.0||0.0|1|Belfast|3
+TML-BT-068|Golf Shoe Bag|BT|B|1|20.64|0.0|40.0||0.0|1|Jasani|3
+TML-BT-069|EcoGlam Cosmetic Pouch|BT|B|1|3.07|0.0|10.0||0.02|1|Jasani|3
+TML-BT-070|Voyager Cabin Trolley Bag|BT|B|1|75.31|0.0|95.0||2.97|1|Jasani|3
+TML-BT-071|CAMDEN Felt Laptop Sleeve with Charger|BT|B|1|29.14|0.0|45.0||0.37|1|Jasani|3
+TML-BT-072|Ocean Series Rolltop Backpack|BT|B|1|74.78|0.0|110.0||0.62|1|Jasani|3
+TML-BT-073|TechGuard Laptop Sleeve|BT|B|1|23.62|0.0|36.0||0.3|1|Jasani|3
+TML-BT-074|VERSA 2-in-1 Messenger & Tote Bag|BT|B|1|35.14|0.0|54.0||0.64|1|JASANI https://www.jasani.ae/shop?search|3
+TML-BT-075|Jute Storage Pouch|BT|B|1|2.25|0.0|6.0||0.04|1|MTC  https://mtc.ae/product/natural-jute|3
+TML-BT-076|Crypto Leather & Fabric Backpack|BT|B|1|45.0|0.0|67.0||0.0|1|HAK|3
+TML-BT-077|Contra Anti-theft Backpack|BT|B|1|99.0|0.0|180.0||1.0|1|HAK|3
+TML-BT-078|URBAN Office Backpack|BT|B|1|59.0|0.0|85.0||0.83|1|HAK|3
+TML-BT-079|Keister Cooler Lunch Bag|BT|B|1|10.0|0.0|20.0||0.08|1|HAK|3
+TML-BT-080|DuoTone Cooler Lunch Bag|BT|B|1|12.0|0.0|22.0||0.5|1|HAK|3
+TML-BT-081|Yoga Tote Bag|BT|B|1|6.14|0.0|35.0|100% Laminated Cotton|0.35|0|JASANI|3
+TML-BT-082|Versa Travel Laptop Backpack|BT|B|1|70.0|0.0|89.0||0.5|0|LUXURY TRDG  https://luxurytrd.com/shop/|3
+TML-BT-083|Orbit Business Travel Backpack|BT|B|1|45.0|0.0|67.0||0.5|1|LUXURY TRDG   https://luxurytrd.com/shop|3
+TML-BT-084|Couture Jute Bag|BT|B|1|3.0|0.0|5.0|100% Jute|0.5|1|HAK|3
+TML-BT-085|Jute Drawstring Pouch|BT|B|20|2.0|0.0|3.0|100% Jute|0.03|1|MTC  https://mtc.ae/product/jute-drawstr|3
+TML-BT-086|CrocSkin Laptop Sleeve|BT|B|1|28.0|0.0|40.0||0.5|1|Event Store|3
+TML-BT-087|Travel Body Bag|BT|B|1|25.0|0.0|54.0||0.0|1|EVENT Store|3
+TML-BT-088|TravelPro Convertible Bag|BT|B|1|46.0|0.0|99.0||1.66|1|Event Store|3
+TML-BT-089|Reflective Drawstring Bag|BT|B|10|6.09|0.0|9.0||0.0|0|OASIS|
+TML-BT-090|Recycled Cotton Organizer Pouch|BT|B|20|2.0|0.0|3.0||0.17|1|Shanghai Gifts  https://www.shanghaigift|3
+TML-BT-091|Portiva Laptop Sleeve|BT|B|1|22.0|0.0|31.0||0.5|1|Luxury Trading  https://luxurytrd.com/sh|3
+TML-BT-092|Cotton Toiletry Bag|BT|B|1|6.0|0.0|11.0||0.5|0|Oasis  https://www.oasiscatalog.ae/item/|7
+TML-BT-093|City Commuter Backpack|BT|B|1|24.0|0.0|33.0||0.5|1|Oasis  https://www.oasiscatalog.ae/item/|7
+TML-BT-094|Folding Tote Bag|BT|B|1|3.0|0.0|4.0||0.5|1|Oasis  https://www.oasiscatalog.ae/item/|7
+TML-BT-095|Classic Drawstring Duffle Bag|BT|B|1|6.7|0.0|10.0||0.11|1|Jasani  https://www.jasani.ae/shop?searc|3
+TML-BT-096|Commuter Laptop Backpack|BT|B|1|57.12|0.0|86.0||0.86|1|Jasani  https://www.jasani.ae/shop?order|3
+TML-BT-097|Strava Executive Backpack|BT|B|1|58.0|0.0|80.0||0.0|0|Belfast  https://belfast-uae.com/product|3
+TML-BT-098|Crochet Beach Tote Bag|BT|B|1|17.0|0.0|45.0||0.5|0|Temu|7
+TML-BT-099|Ranger Water Resistant Laptop Backpack|BT|B|1|49.0|0.0|68.0||0.0|1|HAK   https://www.hakgifts.com/products/|3
+TML-BT-100|Tripster Travel Backpack|BT|B|1|35.0|0.0|49.0||0.67|1|MTC   https://mtc.ae/product/travel-back|3
+TML-BT-101|Titan Tote Bag|BT|B|1|12.0|0.0|17.0|Reinforced 1680D PU Leather|0.28|1|Event  https://eventgift.net/product/o-t|3
+TML-BT-102|Hobo Grocery Cotton Tote Bag|BT|B|1|5.0|0.0|7.0|100% Cotton|0.23|1|MTC   https://mtc.ae/product/cotton-hobo|3
+TML-BT-103|VINGA Laptop Case|BT|B|1|36.0|0.0|50.0|Nubuck PU Leather|0.36|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-BT-104|Neo Multi-Pocket Pouch|BT|B|1|9.0|0.0|13.0||0.12|1|Event   https://eventgift.net/product/o-|3
+TML-BT-105|Campo Jute Cooler Bag|BT|B|1|12.0|0.0|17.0||0.29|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-BT-106|SKROSS® Travel - Alpha Holdall Duffel Bag|BT|B|1|121.68|0.0|170.0||1.26|1|Jasani   https://www.jasani.ae/shop/dbsk|3
+TML-BT-107|TREK Laptop Backpack|BT|B|1|59.0|0.0|84.0||0.81|1|HAK   https://www.hakgifts.com/products/|3
+TML-BT-108|Jute Goodie Bag|BT|B|1|6.5|0.0|9.0|Laminated Jute|0.32|1|HAK   https://www.hakgifts.com/products/|3
+TML-BT-109|Transparent Chic Tote Bag|BT|B|1|14.0|0.0|20.0||0.0|0|Temu  https://www.temu.com/ae/gift-for-h|7
+TML-BT-110|Transparent Zipper Tote Bag|BT|B|1|36.0|0.0|50.0||0.0|0|Amazon Temu  https://www.temu.com/ae/cle|7
+TML-BT-111|KAHRO Sports Duffle Bag|BT|B|1|12.24|0.0|18.0||0.4|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-BT-112|Corporate Luxe Laptop Bag|BT|B|1|58.0|0.0|80.0||0.5|1|LXRY Trading   https://luxurytrd.com/sho|3
+TML-BT-113|Voyager Travel Pouch|BT|B|1|25.0|0.0|36.0||0.4|1|Event   https://eventgift.net/product/rp|3
+TML-BT-114|Hamza Travel Pouch|BT|B|1|39.0|0.0|54.0||0.4|1|Event   https://eventgift.net/product/rp|3
+TML-BT-115|Onda Roll Up Backpack|BT|B|1|57.0|0.0|80.0||0.9|1|Event   https://eventgift.net/product/on|3
+TML-BT-116|OfficePro Executive Backpack|BT|B|1|51.0|0.0|95.0||2.3|1|Event   https://eventgift.net/product/rp|3
+TML-BT-117|Amara Mini Purse|BT|C|1|21.13|0.0|32.0||0.1|1|Temu   https://www.temu.com/ae/-compact-|7
+TML-BT-118|Fresha Promotional Lunch Bag|BT|B|1|13.0|0.0|22.0||0.17|1|Shanghai   https://www.shanghaigifts.net|3
+TML-BT-119|Cooler Bag with Temperature Display|BT|B|1|32.0|0.0|44.0||0.5|0|Event   https://eventgift.net/product/rp|3
+TML-BT-120|Nomad Backpack|BT|B|1|31.0|0.0|44.0||3.57|1|Event   https://eventgift.net/product/cl|3
+TML-BT-121|LEON Buckle Backpack|BT|B|1|47.18|0.0|66.0|100% Polyester|0.9|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-BT-122|Quibble Canvas Jute Pouch|BT|B|1|3.0|0.0|4.0||0.44|1|Shanghai   https://www.shanghaigifts.net|3
+TML-BT-123|ARLO Cotton Zipper Pouch|BT|B|1|2.64|0.0|6.0|Recycled cotton - laminated Jute|0.08|1|Jasani   https://www.jasani.ae/shop/cten|3
+TML-BT-124|Meridian Expandable Travel Backpack|BT|B|1|45.0|0.0|64.0|100% cotton|0.74|1|MTC   https://mtc.ae/product/multipurpos|3
+TML-BT-125|Axis Promotional Backpack|BT|B|1|19.06|0.0|27.0|100% Polyester|0.59|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-BT-126|Tablet Sleeve Bag|BT|B|1|14.0|0.0|20.0||0.5|1|LXRY Trading   https://luxurytrd.com/?s=|3
+TML-BT-127|Hustle Laptop Backpack|BT|B|1|48.48|0.0|68.0||0.88|1|Jasani   https://www.jasani.ae/shop/cate|3
+TML-BT-128|PIONEER Laptop Sleeve Bag|BT|B|1|20.0|0.0|28.0|100% Polyester|0.5|1|HAK   https://www.hakplus.com/index.php?|3
+TML-BT-129|Eclipse Smart Travel Backpack|BT|B|1|146.0|0.0|156.0||4.8|1|Eventgift   https://eventgift.net/produc|3
+TML-BT-130|Skyline Travel Wallet|BT|B|1|29.5|0.0|44.0||0.2|1|Event https://eventgift.net/product/rpet|3
+TML-BT-131|Vanta Signature Pouch|BT|B|1|27.0|0.0|38.0||0.46|1|Eventgift    https://eventgift.net/produ|3
+TML-BT-132|Madison Cosmetic & Makeup Pouch|BT|B|1|8.0|0.0|12.0||0.06|1|MTC   https://mtc.ae/product/cosmetic-po|3
+TML-BT-133|VINGA Essentials Sling Bag|BT|B|1|23.04|0.0|32.0|84% Cotton - 16% Polyester|0.16|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-BT-134|Maison All-Day Tote Bag|BT|B|1|28.45|0.0|38.0||0.0|1|TEMU   https://www.temu.com/ae/1pc-perso|7
+TML-BT-135|Atelier Tote Bag|BT|B|1|39.3|0.0|52.0||0.0|1|TEMU    https://www.temu.com/ae/customiz|7
+TML-BT-136|Explorer Travel Sling Bag|BT|B|1|38.0|0.0|54.0||0.5|1|Event   https://eventgift.net/product/o-|3
+TML-BT-137|GLAM Cosmetic Makeup Bag|BT|B|1|11.04|0.0|24.0||0.0|1|JASANI|3
+TML-BT-139|City Sling Bag|BT|B|1|34.0|0.0|50.0||0.3|1|Event https://eventgift.net/product/o-sn|3
+TML-BT-140|Canvas Stationery Pouch|BT|B|1|2.6|0.0|4.0||0.5|1|HAK https://www.hakgifts.com/products/j9|3
+TML-BT-143|Felt Tote Bag|BT|C|1|16.25|0.0|24.0||0.0|0|TEMU|5
+TML-BT-144|Pocket Denim Tote Bag|BT|B|1|27.0|0.0|35.0|100% Denim|0.3|0|TEMU|5
+TML-BT-145|Riviera Handbag|BT|B|1|21.14|0.0|45.0||0.0|0|TEMU|5
+TML-BT-146|Oversized Daily Tote Bag|BT|B|1|14.5|0.0|22.0|100% cotton|0.3|1|OASIS|2
+TML-OA-001|Bath Towel|OA|B|1|17.0|0.0|29.0|100% Terry Cotton|0.5|1|Goodwill, Lagoon, cotton EMPIRE|3
+TML-OA-002|Face Towel|OA|B|1|2.0|0.0|6.0|100% Terry Cotton|0.5|1|Goodwill, Lagoon, cotton EMPIRE|3
+TML-OA-003|Hand Towel|OA|B|1|7.0|0.0|22.0|100% Terry Cotton|0.5|1|Goodwill, Lagoon, cotton EMPIRE|3
+TML-OA-004|Business Cards - Matte|OA|D|1|85.0|0.0|95.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-005|Rubber Mouse Pad|OA|B|1|3.0|0.0|9.0||0.13|1|MTC, FOTOCAD  https://mtc.ae/product/rec|3
+TML-OA-006|Mouse Pad with Wrist Support|OA|B|1|8.0|0.0|10.0||0.0|1|AK FLASH, FOTOCAD  https://www.fotokad.a|3
+TML-OA-007|Mouse Pad with Wireless Charger|OA|B|1|18.0|0.0|36.0||0.15|1|MTC https://mtc.ae/product/fast-wireless|3
+TML-OA-008|A5 Notebook with PU Leather|OA|B|1|2.9|0.0|8.0|PU Leather|0.3|1|AK FLASH,FOTOCAD,MTC,HAK  https://mtc.ae|3
+TML-OA-009|Executive Notebook with Wireless Charging|OA|B|1|25.44|0.0|65.0||0.41|0|Jasani|3
+TML-OA-010|Multi-functional Office Organizer with Wireless Charger|OA|B|1|56.0|0.0|85.0||0.5|1|AKFlash   https://akflash.com/product/ao|3
+TML-OA-011|Promotional Plastic Pens|OA|B|10|3.19|0.0|4.0||0.01|1|MTC  https://mtc.ae/product/maxema-flow-|3
+TML-OA-012|Eco-friendly Coffee Pen|OA|B|10|0.75|0.0|4.0||0.01|1|MTC  https://mtc.ae/product/coffee-pens-|3
+TML-OA-013|Pin Button Badge|OA|B|10|1.7|0.0|4.0||0.01|1|MTC  https://mtc.ae/?s=pin+button+badge&|3
+TML-OA-014|Eco-friendly Button Badge|OA|B|10|1.0|0.0|5.0||0.01|1|MTC https://mtc.ae/product/eco-friendly-|3
+TML-OA-015|Bamboo Metal Keychain|OA|B|10|3.0|0.0|4.0||0.03|1|MTC, HAK, Fotocad  https://www.hakgifts.|3
+TML-OA-016|Stress Balls|OA|B|10|1.4|0.0|5.0||0.03|1|HAK, FOTOCAD, MTC, PRINTOGRAPH, ASHBI  h|3
+TML-OA-017|Promotional Sunglasses|OA|B|1|4.51|0.0|9.0||0.03|1|jassani MTC, Fotocad  https://mtc.ae/pro|3
+TML-OA-018|Eco-friendly Sunglasses|OA|B|1|4.03|0.0|9.0||0.05|1|Jasani|3
+TML-OA-019|Recycled Business Laptop Organizer|OA|B|1|28.5|0.0|36.0||0.5|0|Jasani|3
+TML-OA-020|Recycled Laptop Case and Workstation|OA|B|1|57.6|0.0|78.0|RPET - Leather|0.82|1|Jasani|3
+TML-OA-021|Round Metal Keychain|OA|B|10|2.0|0.0|4.0||0.03|0|MTC/Fotocad  https://mtc.ae/product/roun|3
+TML-OA-022|Satin Sash|OA|B|1|4.0|0.0|10.0||0.5|1|MANUFACTURED|3
+TML-OA-023|Circle Stickers|OA|B|100|80.0|0.0|176.0||0.5|1|MODERN PRINTING|3
+TML-OA-023-1|Rectangle Stickers|OA|B|100|120.0|0.0|182.0||0.5|1|MODERN PRINTING|3
+TML-OA-023-2|Square Stickers|OA|B|100|70.0|0.0|176.0||0.5|1|MODERN PRINTING|3
+TML-OA-023-3|Oval Stickers|OA|B|100|120.0|0.0|182.0||0.5|1|MODERN PRINTING|3
+TML-OA-023-4|Rounded Corner Stickers|OA|B|100|70.0|0.0|95.0||0.5|1|MODERN PRINTING|3
+TML-OA-024|Silicone Wristband|OA|B|10|0.45|0.0|2.0||0.005|1|MTC, FOTOCAD, HAK  https://mtc.ae/produc|3
+TML-OA-025|Roll Up Banner|OA|B|1|100.0|0.0|175.0||0.5|1|Modern Printing, Lotus Printing|3
+TML-OA-026|Star Crystal Trophy with Wooden Base|OA|B|1|63.0|0.0|125.0||1.7|1|MTC https://mtc.ae/product/star-shaped-c|3
+TML-OA-027|Cuboid Trophy with Wooden Base|OA|B|1|57.0|0.0|119.0||1.8|1|MTC https://mtc.ae/product/cuboid-shaped|3
+TML-OA-028|Crystal Trophy with Black Base|OA|B|1|52.0|0.0|119.0||1.7|1|MTC https://mtc.ae/product/crystal-glass|3
+TML-OA-029|Promotional Teddy Bear|OA|B|1|18.0|0.0|41.0||0.27|1|Shanghai, MTC https://www.shanghaigifts.|3
+TML-OA-030|Swiss Peak Executive Stylus Pen|OA|B|1|11.04|0.0|14.0||0.05|0|Jasani|3
+TML-OA-031|Swiss Peak Premium Metal Pen|OA|B|1|4.22|0.0|9.0||0.02|0|JASANI  https://www.jasani.ae/shop/wisw-|3
+TML-OA-032|Golf Balls - Set of 3|OA|B|1|13.97|0.0|29.0||0.0|1|Jasani|3
+TML-OA-033|Stainless Steel Lunch Box with Bamboo Lid|OA|B|1|16.0|0.0|35.0||0.34|1|MTC  https://mtc.ae/product/stainless-st|3
+TML-OA-034|Recycled A5 Notebook with Pen|OA|B|1|3.5|0.0|8.0||0.22|1|MTC  https://mtc.ae/product/recycled-pro|3
+TML-OA-035|Glass Lunch Box with Bamboo Lid|OA|B|1|14.0|0.0|26.0||0.86|1|MTC  https://mtc.ae/product/glass-lunch-|3
+TML-OA-036|Car Sun Shade|OA|B|1|5.25|0.0|9.0||0.15|1|MTC, FOTOCAD, HAK, JASANI, FOTOCAD  http|3
+TML-OA-037|Phone Ring Holder|OA|B|10|3.5|0.0|5.0||0.5|1|AK FLASH, FOTOCAD  https://www.fotokad.a|3
+TML-OA-038|Silicone Phone Card Holder|OA|B|10|2.0|0.0|4.0||0.012|1|AK FLASH, MTC https://mtc.ae/product/sil|3
+TML-OA-039|Playing Cards (Pack of 52)|OA|B|1|100.0|0.0|150.0||0.5|1|Modern Printing|5
+TML-OA-040|Spiral Notebook with Sticky Note and Pen|OA|B|1|3.9|0.0|9.0||0.18|1|MTC  https://mtc.ae/product/spiral-noteb|3
+TML-OA-041|Office Notebook with Phone Pocket|OA|B|1|9.0|0.0|13.0||0.5|1|AKFlash  https://akflash.com/product/an-|3
+TML-OA-042|Executive A5 Office Notebook|OA|B|1|10.0|0.0|19.0||0.5|1|AK FLASH|3
+TML-OA-043|Dorniel Design A5 Notebook|OA|B|1|8.5|0.0|21.0||0.33|1|MTC  https://mtc.ae/?s=DORNIEL&post_type|3
+TML-OA-044|Moleskine 2026 Daily Planner Notebook|OA|B|1|66.24|0.0|94.0||0.0|1|Jasani|3
+TML-OA-045|Moleskine Large Ruled Notebook|OA|B|1|40.8|0.0|115.0||0.26|1|Jasani|3
+TML-OA-046|Notebook with Metal Pen|OA|B|1|7.58|0.0|16.0||0.3|1|Jasani|3
+TML-OA-047|Recycled Spiral Notebook|OA|B|1|5.0|0.0|9.0||0.24|1|MTC  https://mtc.ae/product/a5-spiral-no|3
+TML-OA-048|Premium Eco-Friendly Notebook Organizer|OA|B|1|37.78|0.0|54.0||0.55|1|Jasani  https://www.jasani.ae/shop?searc|3
+TML-OA-049|Premium Metal Pen - Gift Set of 2|OA|B|1|94.56|0.0|138.0||0.33|1|Jasani|3
+TML-OA-050|Executive Metal Pen|OA|B|10|5.38|0.0|9.0||0.03|1|Jasani|3
+TML-OA-051|Uma Metal Pens|OA|B|1|8.02|0.0|11.0||0.02|1|Jasani|3
+TML-OA-052|Uma Plastic Pens|OA|B|10|1.1|0.0|4.0||0.009|1|Jasani|3
+TML-OA-053|ETERNITY Bamboo Pencil|OA|B|10|1.68|0.0|3.0||0.01|1|Jasani|3
+TML-OA-054|Performance Yoga Mat|OA|B|1|63.0|0.0|95.0||0.98|1|Jasani|3
+TML-OA-055|Metal Luggage Tag|OA|B|1|29.76|0.0|41.0||0.5|1|Jasani|3
+TML-OA-056|Table and Hand Flags|OA|B|1|15.0|0.0|22.0||0.5|1|Fotocad (Flag Stand) 4 star for flag|3
+TML-OA-057|Lanyard with ID Badge|OA|B|1|5.0|0.0|6.0||0.5|1|Al Wassel Printing|4
+TML-OA-058|Advertising Banner Flags|OA|B|1|480.0|0.0|2250.0||0.5|1|Al Bedyah Printing, Modern Printing|4
+TML-OA-059|Rocketbook Smart Reusable Notebook|OA|B|1|110.0|0.0|140.0||0.15|1|Rocketbook, Amazon  amazon.ae/dp/B06ZXWV|4
+TML-OA-060|Promotional Bathroom Slippers|OA|B|10|3.0|0.0|4.0||0.5|1|Goodwill, Lagoon|3
+TML-OA-061|Garment Bag|OA|B|1|8.0|0.0|13.0||0.5|1|Manufacture|3
+TML-OA-062|Table Napkins|OA|B|1|6.0|0.0|9.0||0.5|1|Goodwill, Lagoon|3
+TML-OA-063|Eco-friendly Metal Pen|OA|B|1|9.65|0.0|14.0||0.06|1|Jasani|3
+TML-OA-064|Eco-friendly Lunch Box with Cutlery|OA|B|1|10.0|0.0|26.0||0.44|1|MTC  https://mtc.ae/product/branded-lunc|3
+TML-OA-065|Yoga Mat|OA|B|1|15.0|0.0|32.0||0.5|1|Sky Touch|3
+TML-OA-066|Neon LED Sign Board|OA|B|1|525.0|0.0|550.0||0.5|1|Chinamall|5
+TML-OA-067|Plantable Pencils|OA|B|1|8.0|0.0|13.0|Wood|0.04|1|MTC  https://mtc.ae/product/plantable-a-|3
+TML-OA-068|Twisted Plastic Pen|OA|B|10|0.5|0.0|1.0|Plastic|0.01|1|MTC  https://mtc.ae/product/twisted-desi|3
+TML-OA-069|Recycled Plastic Pen|OA|B|10|2.86|0.0|4.0|Recycled Plastic|0.01|1|MTC  https://mtc.ae/product/recycled-pen|3
+TML-OA-070|Scroll Rubber Office Pen|OA|B|10|0.63|0.0|2.0|Metal and Rubber|0.0|1|HAK https://www.hakgifts.com/products/a0|3
+TML-OA-071|Bean Bags|OA|B|1|325.0|0.0|420.0||0.5|1|RIGHT CONCEPT TRADING|7
+TML-OA-072|Bamboo Notebook & Pen Set|OA|B|1|15.5|0.0|25.0||0.46|1|MTC  https://mtc.ae/product/bamboo-journ|3
+TML-OA-073|Bamboo Rectangle Keychain|OA|B|10|2.5|0.0|5.0||0.01|1|MTC  https://mtc.ae/product/bamboo-metal|3
+TML-OA-074|Recycled Stainless Steel Pen|OA|B|1|3.9|0.0|6.5||0.04|1|MTC  https://mtc.ae/product/recycled-sta|3
+TML-OA-075|Custom Printed Mousepad with Mobile and Pen Holder|OA|B|1|14.0|0.0|22.0||0.27|1|MTC  https://mtc.ae/product/multi-functi|3
+TML-OA-076|Recycled A5 Coffee Notebook|OA|B|1|5.5|0.0|10.0||0.28|1|MTC  https://mtc.ae/product/a5-size-coff|3
+TML-OA-077|Flame Crystal &  Marble Award|OA|B|1|77.0|0.0|129.0||1.09|1|MTC  https://mtc.ae/product/flame-shaped|3
+TML-OA-078|Beach Towel|OA|B|1|27.0|0.0|38.0||0.5|1|Normal - Goodwill, Lagoon  Sublimation- |3
+TML-OA-079|Business Cards - Glossy (Pack of 100)|OA|D|1|85.0|0.0|95.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-1|Standard Business Cards (pack of 100)|OA|D|1|75.0|0.0|95.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-2|Rounded Corner Business Cards|OA|D|100|110.0|0.0|150.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-3|Square Business Cards|OA|D|100|75.0|0.0|95.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-4|Circle Business Cards|OA|D|100|75.0|0.0|95.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-5|Leaf Business Cards|OA|D|100|62.5|0.0|425.0|350 GSM Paper|0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-6|Eco-friendly Kraft Business Cards|OA|D|100|80.0|0.0|180.0||0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-079-7|Plastic Business Cards|OA|D|100|160.0|0.0|299.0||0.5|1|MODERN, AL BEDYAH, LOTUS PRINTING|3
+TML-OA-080|Socks|OA|B|1|15.0|0.0|30.0||0.5|1|A&A|4
+TML-OA-081|Custom Anti-Stress Cube|OA|B|10|1.4|0.0|5.0||0.03|1|MTC, HAK, Fotocad, Ashbi, Printograph  h|3
+TML-OA-082|Crayons Pack|OA|B|10|1.25|0.0|5.0||0.06|1|MTC  https://mtc.ae/product/children-pro|3
+TML-OA-083|Open Toe Bathroom Slippers|OA|B|10|3.0|0.0|4.0||0.5|1|Goodwill, Lagoon Trading|3
+TML-OA-084|Table Cover Runner|OA|B|1|75.0|0.0|120.0||0.5|1|Manufacture|3
+TML-OA-085|Umbrella|OA|B|1|12.0|0.0|19.0||0.35|1|Jasani|3
+TML-OA-086|Die-cut Stickers|OA|B|100|200.0|0.0|500.0||0.5|1|MODERN PRINTING, LOTUS PRINTING|3
+TML-OA-087|Post-It Sticky Notes|OA|B|100|500.0|0.0|900.0||0.5|1|AL BEDYAH|3
+TML-OA-088|Ecoband Recycled Notebook Set|OA|B|1|9.0|0.0|13.0||0.0|0|Belfast|3
+TML-OA-089|Recycled Colour Pencils|OA|B|1|4.0|0.0|8.0||0.0|1|Belfast|3
+TML-OA-090|Oud & Vanilla Scented Candles|OA|B|1|10.0|0.0|16.0||0.68|1|MTC|3
+TML-OA-091|Recycled PU Soft Cover Notebook|OA|B|1|6.38|0.0|11.0||0.22|1|Jasani|3
+TML-OA-092|Magnetic iPhone Card Holder|OA|B|1|8.35|0.0|12.0||0.04|1|Jasani|3
+TML-OA-093|Pillow Cover|OA|B|1|7.0|0.0|25.0||0.5|1|Manufacture - Goodwill|3
+TML-OA-094|Jenga Game Set|OA|B|1|10.0|0.0|17.0|Wooden Blocks with Canvas Bag|0.4|1|Jasani, Fotocad, Belfast  https://www.ja|3
+TML-OA-095|Cork Textured A5 Notebook & Pen Set|OA|B|1|6.48|0.0|12.0|Cork|0.32|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-096|Eco-Friendly Wooden Crystal Trophy|OA|B|1|79.0|0.0|135.0|Wood & Crystal|1.19|1|MTC  https://mtc.ae/product/wooden-cryst|3
+TML-OA-097|A5 Fabric Notebook with Phone Holder|OA|B|1|15.0|0.0|23.0||0.5|1|Belfast|3
+TML-OA-098|Desk Memo Cube|OA|B|1|4.56|0.0|25.0||0.34|1|Jasani|3
+TML-OA-099|Wooden Yoyo|OA|B|10|2.0|0.0|5.0||0.03|1|MTC, FOTOCAD, BELFAST  http://mtc.ae/pro|3
+TML-OA-100|Printed Balloons|OA|B|100|250.0|0.0|400.0||0.5|1|Ahlaan Printing (MOQ-100 Pcs)|3
+TML-OA-101|Beach Padel Set|OA|B|1|5.09|0.0|18.0||0.3|1|Jasani|3
+TML-OA-102|Eco-Friendly Stone Paper A5 Notebook|OA|B|1|10.0|0.0|15.0||0.5|1|Jasani|3
+TML-OA-103|Full-Colour Luggage Tag|OA|B|100|7.0|0.0|11.0||0.5|1|MODERN PRINTING, LOTUS PRINTING|4
+TML-OA-104|2026 Wall Calendar|OA|B|100|450.0|0.0|1600.0||0.5|1|MODERN PRINTING, LOTUS PRINTING|7
+TML-OA-105|2026 Desk Calendar|OA|B|100|400.0|0.0|1400.0||0.5|1|MODERN PRINTING, LOTUS PRINTING|7
+TML-OA-106|RHULE Softcover A5 Notebook|OA|B|1|6.96|0.0|13.0||0.23|1|Jasani|3
+TML-OA-107|BISTRA Star Wooden Trophy|OA|B|1|80.0|0.0|135.0||0.0|1|Belfast|3
+TML-OA-108|GORYL Round Trophy|OA|B|1|60.0|0.0|109.0||0.0|1|Belfast|3
+TML-OA-109|BODEN Metal Ball Pen|OA|B|10|3.7|0.0|8.0||0.03|1|Jasani|3
+TML-OA-110|Warlock Premium Office Pen|OA|B|1|20.0|0.0|30.0||0.0|0|Belfast|3
+TML-OA-111|Grabb Metal Ballpoint Pen|OA|B|1|9.0|0.0|18.0||0.0|1|Belfast|3
+TML-OA-112|Groupo Office Ballpoint Pen|OA|B|10|6.0|0.0|8.0||0.0|1|Belfast|3
+TML-OA-113|Bukhoor Oudh Fragrance Gift Set|OA|B|1|15.0|0.0|26.0||0.5|0|JASANI|3
+TML-OA-114|The Duo Pen|OA|B|1|6.0|0.0|13.0||0.03|1|Event|3
+TML-OA-115|Phone Pop Socket|OA|B|10|1.25|0.0|5.0||0.005|1|MTC, AK FLASH  https://mtc.ae/product/ro|3
+TML-OA-116|Softi Office Desk Organizer|OA|B|1|36.0|0.0|65.0||0.86|1|Event|3
+TML-OA-117|Crystal Globe Trophy|OA|B|1|130.0|0.0|179.0||2.7|1|MTC https://mtc.ae/product/crystal-globe|3
+TML-OA-118|Magnetic Metal Name Badges|OA|B|10|3.0|0.0|5.0||0.01|1|MTC  https://mtc.ae/product/lens-cover-n|3
+TML-OA-119|FRIDA Bamboo Pen|OA|B|10|0.75|0.0|3.0||0.01|1|MTC  https://mtc.ae/product/promotional-|3
+TML-OA-120|Spiral Notebook|OA|B|50|25.0|0.0|38.0||0.5|1|MODERN  PRINTING, LOTUS PRINTING|7
+TML-OA-121|ETERNITY Reusable Notebook & Pen Set|OA|B|1|18.72|0.0|28.0||0.32|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-122|BOTTO - Giftology 5-in-1 Multi-functional Bottle Opener|OA|B|1|5.02|0.0|8.0||0.06|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-123|Promotional Notebook &amp; Bottle Gift Set|OA|B|1|32.25|0.0|55.0||1.3|1|MTC https://mtc.ae/product/gift-sets-gs-|3
+TML-OA-124|Recycled A6 Notepad|OA|B|1|4.5|0.0|8.0||0.12|1|MTC  https://mtc.ae/product/recycled-not|3
+TML-OA-125|Rocketbook Mini Smart Reusable Notebook|OA|B|1|70.0|0.0|119.0||0.0|1|Amazon   https://www.amazon.ae/dp/B07CZ5|3
+TML-OA-126|Falcon Plush Toy|OA|B|1|27.0|0.0|40.0||0.12|1|MTC https://mtc.ae/product/falcon-plush-|3
+TML-OA-127|Ghaf Seed Plantable Kit|OA|B|1|10.0|0.0|16.0||0.06|1|MTC https://mtc.ae/product/plantable-kit|3
+TML-OA-128|Rixos Rubber & Metal Stylus Pen|OA|B|1|5.0|0.0|9.0||0.04|1|MTC https://mtc.ae/product/stylus-metal-|3
+TML-OA-129|Blitz Ballpoint Pen with Bamboo Grip|OA|B|10|1.7|0.0|3.0||0.013|1|MTC https://mtc.ae/product/push-button-b|3
+TML-OA-130|RPET Office Portfolio|OA|B|1|39.0|0.0|54.0||0.5|0|Events Store  https://eventgift.net/prod|3
+TML-OA-131|Jotter 2-in-1 Notebook|OA|B|1|19.0|0.0|30.0||0.45|1|Event|3
+TML-OA-132|Zen Anti-bacterial Pen|OA|B|10|0.6|0.0|1.0||0.008|0|Event|3
+TML-OA-133|Wooden Horizontal Plaque|OA|B|1|38.0|0.0|90.0||1.61|1|MTC https://mtc.ae/product/wooden-plaque|3
+TML-OA-134|Wooden Vertical Plaque|OA|B|1|38.0|0.0|90.0||1.61|1|MTC  https://mtc.ae/product/wooden-perso|3
+TML-OA-135|Round Crystal and Marble Award|OA|B|1|110.0|0.0|159.0||1.62|1|MTC  https://mtc.ae/product/round-crysta|3
+TML-OA-136|Petal Highlighter|OA|B|1|1.7|0.0|6.0||0.04|1|HAK|3
+TML-OA-137|EcoNote A5 Notebook|OA|B|10|3.99|0.0|8.0||0.3|1|MTC  https://mtc.ae/product/eco-friendly|3
+TML-OA-138|Dorniel A5 Leather Notebook|OA|B|1|8.5|0.0|15.0||0.33|1|MTC https://mtc.ae/product/dorniel-a5-pu|3
+TML-OA-139|Metallic A5 Notebook|OA|B|1|4.7|0.0|12.0||0.27|1|Jasani|3
+TML-OA-140|Essentials Laptop Backpack|OA|B|1|22.56|0.0|36.0|100% Polyester|0.5|1|Jasani|3
+TML-OA-141|Kiddie Case Pouch|OA|B|1|11.0|0.0|22.0||0.0|1|Event|3
+TML-OA-142|Linen A5 Travel Notebook|OA|B|1|15.0|0.0|26.0||0.34|1|Event|3
+TML-OA-143|Memora Notebook|OA|B|1|17.0|0.0|30.0||0.42|1|Event|3
+TML-OA-144|MIJAS Metal Pen|OA|B|10|3.19|0.0|6.0||0.04|1|JASANI  https://www.jasani.ae/shop?searc|3
+TML-OA-145|EcoStar Sustainable Trophy|OA|B|1|47.52|0.0|72.0||0.7|1|Jasani|3
+TML-OA-146|Sugarcane Paper A5 Notebook|OA|B|1|5.66|0.0|12.0||0.3|1|Jasani|3
+TML-OA-147|ElitePlanner A5 Notebook|OA|B|1|10.0|0.0|48.0||0.4|0|Event|3
+TML-OA-148|ZenSpace Desk Organizer|OA|B|1|70.0|0.0|95.0||0.8|1|Event|3
+TML-OA-149|Leather Tissue Box|OA|B|1|22.0|0.0|35.0||0.58|1|MTC https://mtc.ae/product/pu-leather-ti|3
+TML-OA-150|Eco-Neutral A5 Notebook - Cardboard Cover|OA|B|10|1.92|0.0|5.0||0.09|1|Jasani   https://www.jasani.ae/shop?orde|3
+TML-OA-151|Luxor Leather Desk Pad|OA|B|1|22.99|0.0|35.0|RCS certified - Recycled PU|0.25|1|Jasani|3
+TML-OA-152|Glass Medal|OA|B|1|9.0|0.0|18.0||0.18|1|MTC https://mtc.ae/product/glass-medals/|3
+TML-OA-153|Azure Fabric Notebook|OA|B|1|10.0|0.0|18.0||0.0|1|Luxury Trdg/ Belfast   https://luxurytrd|3
+TML-OA-154|Prism Plastic Pen|OA|B|10|1.0|0.0|2.0||0.5|1|Luxury Trdg|3
+TML-OA-155|NOTIVA Notebook w/ Pen Slot|OA|B|1|10.0|0.0|17.0||0.0|1|Belfast|3
+TML-OA-156|DeskUp Laptop Stand|OA|B|1|15.89|0.0|26.0|94% ABS - PU|0.19|1|Jasani|3
+TML-OA-157|KORU Metal & Leather Pen|OA|B|1|11.71|0.0|18.0|Recycled leather|0.05|1|Jasani|3
+TML-OA-158|TIMO Twist Metal Pen|OA|B|10|3.84|0.0|8.0||0.02|1|Jasani|3
+TML-OA-159|RETRO Crystal Award|OA|B|1|165.0|0.0|240.0||1.46|1|MTC|3
+TML-OA-160|Bamboo Magnetic Name Badge|OA|B|10|2.98|0.0|6.0|FSC-certified bamboo|0.019|1|Jasani|3
+TML-OA-161|Leatherette A5 Diary|OA|B|1|8.26|0.0|15.0||0.28|1|Jasani|3
+TML-OA-162|CROSS Calais Pen|OA|B|1|57.6|0.0|85.0||0.17|1|Jasani|3
+TML-OA-163|Fruit Paper A5 Notebook Set|OA|B|1|8.69|0.0|15.0||0.36|1|Jasani|3
+TML-OA-164|Titan Metal Pen|OA|B|1|9.0|0.0|14.0||0.03|1|Event|3
+TML-OA-165|Plush Metal Pen|OA|B|1|7.5|0.0|12.0||0.0|1|Event|3
+TML-OA-166|Stellar Metal Pen|OA|B|1|5.0|0.0|35.0||0.02|1|Event|3
+TML-OA-167|Metrix Metal Pen|OA|B|1|3.5|0.0|8.0||0.02|1|Event|3
+TML-OA-168|Josette A5 Notebook|OA|B|1|6.0|0.0|11.0||0.0|1|HAK|3
+TML-OA-169|Ecoflex A5 Leather Notebook|OA|B|1|5.0|0.0|10.0||0.14|1|HAK|3
+TML-OA-170|Ekri Roller Pen|OA|B|1|8.0|0.0|12.0||0.04|1|HAK|3
+TML-OA-171|Hikma Notebook & Pen Corporate Gift Set|OA|B|1|7.75|0.0|16.0||0.0|1|HAK|3
+TML-OA-172|Gazette Felt & Bamboo A5 Notebook|OA|B|1|4.5|0.0|10.0||0.27|1|HAK|3
+TML-OA-173|Fabric Key Chain|OA|B|1|4.0|0.0|8.0||0.5|1|Manufacture GoldStar|3
+TML-OA-174|PenLite USB & Metal Pen|OA|B|1|28.0|0.0|39.0||0.5|1|LUXURY TRADING|3
+TML-OA-175|Navigator 10W Magsafe Organizer|OA|B|1|97.0|0.0|127.0||0.5|1|LUXURY TRADING|3
+TML-OA-176|EcoVolt Mousepad|OA|B|1|27.0|0.0|54.0||0.5|1|LUXURY TRADING|3
+TML-OA-177|Ravello Metal Pen|OA|B|10|3.89|0.0|6.0||0.03|1|Jasani https://www.jasani.ae/shop?search|3
+TML-OA-178|Berlin Bamboo Charging Cable (3-in-1)|OA|B|1|13.0|0.0|24.0||0.5|1|LUXURY TRADING|3
+TML-OA-179|Tower Crystal Award|OA|B|1|60.0|0.0|90.0||1.6|1|MTC  https://mtc.ae/product/tower-shaped|3
+TML-OA-180|Rechargeable LED Name Badge|OA|B|1|28.0|0.0|42.0||0.0|1|fotocad  https://www.fotokad.ae/recharge|3
+TML-OA-181|Dog Plush Toy|OA|B|1|20.0|0.0|30.0||0.0|1|fotocad  https://www.fotokad.ae/dog-plus|3
+TML-OA-182|Spectrum Multi-Coloured Pen|OA|B|1|6.0|0.0|12.0||0.02|1|Event|3
+TML-OA-183|Rabbit Plush Toy|OA|B|1|20.0|0.0|30.0||0.0|0|Fotocad|3
+TML-OA-184|PointX Presentation Clicker|OA|B|1|44.0|0.0|68.0||0.3|1|Amazon    https://www.amazon.ae/Gnker-Po|3
+TML-OA-185|Desky Pen Holder & MagSafe Charger|OA|B|1|35.0|0.0|75.0||0.28|1|Event|3
+TML-OA-186|DoodleBox Coloring Set|OA|B|1|3.0|0.0|5.0||0.03|1|fotocad https://www.fotokad.ae/color-pen|3
+TML-OA-187|InkMate Metal Pen|OA|B|1|4.5|0.0|8.0||0.0|1|HAK|3
+TML-OA-188|Pocket Bamboo Notebook|OA|B|1|2.75|0.0|5.0||1.0|1|HAK|3
+TML-OA-189|Breast Cancer Awareness Pin Badge|OA|B|50|2.5|0.0|5.0||0.009|1|MTC  https://mtc.ae/product/breast-cance|3
+TML-OA-190|EcoTime Wall Clock|OA|B|1|15.0|0.0|23.0||0.52|1|MTC    https://mtc.ae/product/round-bamb|3
+TML-OA-191|Leather USB Keychain|OA|B|1|13.5|0.0|20.0||0.03|1|MTC    https://mtc.ae/product/leather-ke|3
+TML-OA-192|OCTA Signature Pen|OA|B|1|5.0|0.0|15.0||0.37|1|Event  https://eventgift.net/product/all|3
+TML-OA-193|Twist Lux Executive Pen|OA|B|1|5.0|0.0|12.0||0.03|1|Event   https://eventgift.net/product/tw|3
+TML-OA-194|Wheaty Pen|OA|B|10|1.0|0.0|2.0||0.01|1|Event    https://eventgift.net/product/w|3
+TML-OA-195|Plastic ID Badge|OA|B|100|350.0|0.0|500.0||0.0|1|MTC   https://www.customink.com/products|3
+TML-OA-196|Scribe Gunmetal Pen|OA|B|10|5.5|0.0|8.0||0.5|1|HAK https://www.hakgifts.com/products/ea|3
+TML-OA-197|Lanyard with Metal Hook|OA|B|10|2.0|0.0|5.0||0.5|1|HAK   https://www.customink.com/products|3
+TML-OA-198|Retractable Reel Badge|OA|B|10|1.25|0.0|2.0||0.01|1|MTC   https://www.printonline.ae/persona|3
+TML-OA-199|Eco-Friendly Cotton Lanyards|OA|B|10|2.0|0.0|3.0||0.02|1|MTC   https://mtc.ae/product/organic-cot|3
+TML-OA-200|Name Insert Badges|OA|B|1|5.0|0.0|8.0||0.01|1|MTC   https://mtc.ae/product/insert-name|3
+TML-OA-201|Desk Name Plate|OA|B|1|15.0|0.0|22.0||0.13|1|MTC   https://mtc.ae/product/desk-sign-h|3
+TML-OA-202|Mini Loyalty Stamps|OA|B|1|70.0|0.0|105.0||0.5|1|MODERN PRINTING    https://www.vistaprin|3
+TML-OA-203|Letterhead|OA|B|100|300.0|0.0|450.0||0.5|1|MODERNE PRINTING    https://www.vistapri|3
+TML-OA-204|Certificate Holder|OA|B|1|18.0|0.0|30.0||0.5|1|Luxury Trdg   https://luxurytrd.com/shop|3
+TML-OA-205|Crystal Trophy with Metal Star|OA|B|1|28.0|0.0|42.0||0.98|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-206|Gold Teamwork Trophy|OA|B|1|32.0|0.0|52.0||0.0|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-207|Moon Stone Plaque Award|OA|B|1|65.0|0.0|97.0||0.21|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-208|Blackstone Crystal Trophy|OA|B|1|60.0|0.0|90.0||0.15|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-209|Milestone Star Wooden Trophy|OA|B|1|50.0|0.0|75.0||0.15|0|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-210|Rising Star Wooden Trophy|OA|B|1|45.0|0.0|67.0||0.92|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-211|Magic Leather Card Holder|OA|B|1|15.0|0.0|22.0||0.0|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-212|UniReel 3-in-1 Charging Cable|OA|B|1|5.0|0.0|8.0||0.05|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-213|Nory Bamboo Pen|OA|B|10|2.0|0.0|3.0||0.5|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-214|Square Plastic Badge Reel|OA|B|10|1.5|0.0|2.0||0.11|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-215|WorkFlow Organizer|OA|B|1|7.0|0.0|8.0||0.34|1|Shanghai Giifts   https://www.shanghaigi|3
+TML-OA-216|A6 Notebook|OA|B|10|2.5|0.0|9.0||0.5|1|Oasis   https://www.oasiscatalog.ae/item|7
+TML-OA-217|A7 Notebook|OA|B|10|3.0|0.0|9.0||0.5|1|Oasis   https://www.oasiscatalog.ae/item|7
+TML-OA-218|A6 Spiral Notebook|OA|B|10|4.0|0.0|5.0||0.5|1|Oasis   https://www.oasiscatalog.ae/item|7
+TML-OA-219|Wooden Luggage Tag|OA|B|20|4.0|0.0|5.0||0.5|1|Fotokad  https://www.fotokad.ae/wooden-l|3
+TML-OA-220|Golden Feather Excellence Award|OA|B|1|28.0|0.0|45.0||0.0|1|Shanghai|3
+TML-OA-221|POWER Metal Ballpoint Pen|OA|B|1|5.38|0.0|8.0||0.03|1|Jasani   https://www.jasani.ae/shop/wimp|3
+TML-OA-222|Diamond Crystal Award|OA|B|1|17.5|0.0|25.0||1.6|1|MTC   https://mtc.ae/product/crystal-bra|3
+TML-OA-223|Multi-Connectivity Gift Set|OA|B|1|119.0|0.0|167.0||0.5|0|Jasani   https://www.jasani.ae/shop/gspb|3
+TML-OA-224|ReNote A5 Felt Journal|OA|B|1|6.0|0.0|9.0||0.32|1|Event|3
+TML-OA-225|Soft Leather A5 Notebook|OA|B|1|3.75|0.0|8.0||0.27|1|MTC   https://mtc.ae/product/soft-pu-lea|3
+TML-OA-226|Mashrabiya Plaque Award|OA|B|1|95.0|0.0|134.0||0.0|1|Fotokad   https://www.fotokad.ae/executi|3
+TML-OA-227|Cork Lanyard|OA|B|10|2.59|0.0|5.0||0.02|1|Jasani   https://www.jasani.ae/shop/lyen|3
+TML-OA-228|Forever Rose Gift Box|OA|B|1|60.0|0.0|84.0||0.23|1|MTC  https://mtc.ae/product/flower-gift-|3
+TML-OA-229|Gold Star Trophy|OA|B|1|32.0|0.0|49.0||0.0|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-230|Fabric Mouse Pad with Wireless Charger|OA|B|1|25.0|0.0|49.0||0.5|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-231|A5 Hard Cover Notebook with Pen|OA|B|1|8.54|0.0|16.0||0.37|1|Jasani   https://www.jasani.ae/shop/cate|3
+TML-OA-232|Gravity Desk Pen|OA|B|1|17.0|0.0|24.0||0.26|1|Event   https://eventgift.net/product/de|3
+TML-OA-233|Luxe Onboarding Gift Set|OA|B|1|57.0|0.0|80.0||1.6|1|Event   https://eventgift.net/product/em|3
+TML-OA-234|Plantable Flower Seed Balls|OA|B|50|18.0|0.0|28.0||0.5|1|Plantshop   https://www.plantshop.me/ae-|3
+TML-OA-235|Moderna A5 Fabric Notebook|OA|B|1|6.5|0.0|9.0||0.35|1|Event    https://eventgift.net/product/o|3
+TML-OA-236|Wooden Obelisk Trophy|OA|B|1|47.0|0.0|66.0||0.5|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-237|Clip Pen|OA|B|10|2.6|0.0|4.0||0.02|1|Event   https://eventgift.net/product/cl|3
+TML-OA-238|BrewMate Espresso Kit|OA|B|1|180.0|0.0|252.0||1.3|1|Event   https://eventgift.net/product/es|3
+TML-OA-239|Sail Shape Award Trophy|OA|B|1|40.0|0.0|56.0||0.0|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-OA-240|Titleist Pro V1 Golf Balls|OA|B|1|285.0|0.0|400.0||0.5|1|titleist  https://www.titleist.com/produ|3
+TML-OA-241|Guarda 4-in-1 Utility Keychain|OA|B|1|5.35|0.0|7.0||0.05|1|Jasani   https://www.jasani.ae/shop/mskc|3
+TML-OA-242|A6 Craft Notebook Set|OA|B|10|3.0|0.0|4.0||0.0|1|Shanghai   https://www.shanghaigifts.net|3
+TML-OA-243|Hand-Shaped Highlighter|OA|B|10|2.25|0.0|4.0||0.04|1|HAK   https://www.hakplus.com/promotiona|3
+TML-OA-244|Prestige Leather Frame Award|OA|B|1|45.0|0.0|63.0||1.21|1|MTC  https://mtc.ae/product/two-toned-pu|3
+TML-OA-245|A5 Flap Notebook|OA|B|1|12.0|0.0|17.0||0.5|1|Event   https://eventgift.net/product/no|3
+TML-OA-246|Matrix A5 Notebook|OA|B|1|12.0|0.0|17.0||0.11|1|HAK   https://www.hakplus.com/index.php?|3
+TML-OA-247|Eternal Recognition Stone Trophy|OA|B|1|80.0|0.0|112.0||0.0|1|Shanghai   https://www.shanghaigifts.net|3
+TML-OA-248|Shukr Stone Trophy|OA|B|1|80.0|0.0|112.0||0.0|1|Shanghai  https://www.shanghaigifts.net/|3
+TML-OA-249|Workplace Starter Gift Set|OA|B|1|20.0|0.0|28.0||0.0|0|Shanghai   https://www.shanghaigifts.net|3
+TML-OA-250|Teddy Keychain|OA|B|1|8.0|0.0|25.0||0.0|1|Fotokad   https://www.fotokad.ae/teddy-k|3
+TML-OA-251|Soft Lanyard with Hook|OA|B|10|2.4|0.0|4.0||0.02|0|Fotokad  https://www.fotokad.ae/rope-lan|3
+TML-OA-252|Gunmetal Keychain|OA|B|10|2.5|0.0|5.0||0.05|1|MTC    https://mtc.ae/product/metal-keyc|3
+TML-OA-253|Blitz Gold Star Award|OA|B|1|110.0|0.0|135.0||0.0|1|Belfast  https://belfast-uae.com/product|3
+TML-OA-254|Zephyr Crystal & Wood Trophy|OA|B|1|38.0|0.0|52.0||0.11|1|Shanghai  https://www.shanghaigifts.net/|3
+TML-OA-255|Futuristic NFC Pen|OA|B|10|3.5|0.0|5.0||0.02|1|Event   https://eventgift.net/product/nf|3
+TML-OA-256|ProDesk Office Gift Set|OA|B|1|21.0|0.0|30.0||0.62|1|MTC  https://mtc.ae/product/premium-offi|3
+TML-OA-257|ORLI Digital Detox Wooden Dice|OA|B|1|5.62|0.0|8.0||0.06|1|Jasani   https://www.jasani.ae/shop/gmen|3
+TML-OA-258|Cross Coventry Rollerball Pen|OA|B|1|48.0|0.0|67.0||0.16|1|JASANI   https://www.jasani.ae/shop/wicr|3
+TML-OA-259|Bamboo Notebook with Pen|OA|B|1|3.9|0.0|6.0||0.23|1|MTC   https://mtc.ae/product/bamboo-note|3
+TML-OA-260|GRABA Metal Ball Pen|OA|B|10|1.41|0.0|3.0||0.02|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-261|DeskMate A5 Notebook|OA|B|1|20.0|0.0|28.0||0.44|1|Event  https://eventgift.net/product/not|3
+TML-OA-262|Hexa Fidget Spinner Pen|OA|B|10|4.5|0.0|6.0||0.02|1|Event   https://eventgift.net/product/he|3
+TML-OA-263|E-Sports Gaming Mousepad|OA|B|1|24.0|0.0|34.0||0.4|1|Amazon   https://www.amazon.ae/TEDNETGO-|3
+TML-OA-264|Atom Spiral Notebook|OA|B|1|9.0|0.0|18.0||0.0|0|Temu BELFAST   https://www.temu.com/ae/4|7
+TML-OA-265|Chrome Metal Pen|OA|B|10|5.0|0.0|8.0||0.0|1|HAK   https://www.hakgifts.com/products/|3
+TML-OA-266|Cork Craft Pen|OA|B|10|1.0|0.0|3.0||0.01|1|MTC   https://mtc.ae/product/wheat-straw|3
+TML-OA-267|Metal Push Pen|OA|B|10|1.25|0.0|3.0||0.0|1|HAK   https://www.hakgifts.com/products/|3
+TML-OA-268|Belmonte Metal & Leather Keychain|OA|B|10|4.37|0.0|6.0||0.04|1|Jasani  https://www.jasani.ae/shop/mskc-|3
+TML-OA-269|Classic Highlighter|OA|B|10|1.58|0.0|3.0||0.02|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-270|Decorative Artificial Plant|OA|B|1|6.48|0.0|9.0||0.1|1|Jasani   https://www.jasani.ae/shop/mssp|3
+TML-OA-271|Bolt Ballpen|OA|B|10|1.25|0.0|3.0||0.02|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-272|Signature Document Folder|OA|B|1|28.0|0.0|40.0||0.5|1|Belfast   https://belfast-uae.com/produc|3
+TML-OA-273|Launchpad Office Gift Set|OA|B|1|18.77|0.0|28.0||0.7|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-274|UAE Flag Rosette|OA|B|10|1.0|0.0|3.0||0.02|1|MTC   https://mtc.ae/product/uae-flag-ro|3
+TML-OA-275|Bamboo Phone Dock|OA|B|1|3.85|0.0|6.0||0.12|1|MTC   https://mtc.ae/product/bamboo-mobi|3
+TML-OA-276|Ghaf Seed Plantable Pencil|OA|B|10|3.5|0.0|6.0||0.009|1|MTC   https://mtc.ae/product/ghaf-seed-p|3
+TML-OA-277|Iceberg Crystal Award|OA|B|1|49.0|0.0|68.0||2.42|1|MTC  https://mtc.ae/product/iceberg-desi|3
+TML-OA-278|GRIP MASTER Magnetic Phone Holder|OA|B|1|32.0|0.0|45.0||0.13|1|Event   https://eventgift.net/product/gr|3
+TML-OA-279|Bergmund 10K Powerbank Portfolio|OA|B|1|76.32|0.0|106.0|RCS-certified recycled PU|0.9|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-280|UAE Flag Pin Badge|OA|B|100|4.15|0.0|6.0||0.01|1|MTC|3
+TML-OA-281|UAE Flag Ribbon Badge|OA|B|1|3.5|0.0|6.0||0.02|1|MTC|3
+TML-OA-282|TouchPoint Stylus Pen|OA|B|10|1.25|0.0|3.0||0.01|1|MTC|3
+TML-OA-283|MAG3 Wireless Charger Card Holder|OA|B|1|28.32|0.0|40.0||0.2|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-284|AVRON Wireless Charger Desk Tray|OA|B|1|41.33|0.0|58.0||0.3|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-285|MASSA Aluminum Ball Pen|OA|B|10|2.4|0.0|4.0|RCS-certiﬁed recycled aluminum|0.02|1|Jasani   https://www.jasani.ae/shop/wimp|3
+TML-OA-286|Leather Lanyard with ID Card Holder|OA|B|1|4.5|0.0|6.0||0.05|1|MTC   https://mtc.ae/product/foldable-id|3
+TML-OA-287|Round Metal Reel Badge|OA|B|10|3.5|0.0|5.0||0.03|1|MTC   https://mtc.ae/product/round-metal|3
+TML-OA-288|Round Crystal Clock Award|OA|B|1|110.0|0.0|154.0||2.38|1|MTC   https://mtc.ae/product/round-cryst|3
+TML-OA-289|Verde Leather & Bamboo A5 Notebook|OA|B|1|6.0|0.0|8.0||0.29|1|Shanghai Gifts https://www.shanghaigifts|3
+TML-OA-290|Xylo Wood & Crystal Trophy|OA|B|1|40.0|0.0|56.0||0.97|1|Shanghai Gifts https://www.shanghaigifts|3
+TML-OA-291|Sadu A5 Notebook|OA|B|1|12.0|0.0|18.0||0.33|1|MTC|3
+TML-OA-292|Slate Brainstorm Notebook|OA|B|1|12.0|0.0|18.0||0.5|1|Luxury Trdg   https://luxurytrd.com/shop|3
+TML-OA-293|ID Cardholder with Reel Badge|OA|B|1|12.34|0.0|18.0|GRS-certified recycled PU|0.07|1|Jasani  https://www.jasani.ae/shop/categ|3
+TML-OA-294|Wood Tissue Box|OA|B|1|12.0|0.0|45.0||0.5|0|Amazon   https://www.amazon.ae/dp/B0C57T|3
+TML-OA-295|Acrylic Keychain (Pack od 100)|OA|B|1|250.0|0.0|375.0||0.5|1|ASIM|3
+TML-OA-296|Halo White Stylus Pen|OA|B|10|1.35|0.0|3.0||0.02|1|MTC|3
+TML-OA-297|WelcomePro Office Gift Set|OA|B|1|27.0|0.0|45.0||0.0|0|HAK   https://www.hakgifts.com/products/|3
+TML-OA-298|Halo Black Stylus Pen|OA|B|10|1.35|0.0|3.0||0.02|1|MTC|3
+TML-OA-299|PlanetDesk Office Gift Set|OA|B|1|44.16|0.0|62.0||0.4|1|Jasani   https://www.jasani.ae/shop/cate|3
+TML-OA-300|Metal Business Card Holder|OA|B|1|4.5|0.0|7.0||0.05|1|MTC|3
+TML-OA-301|Mindful Productivity Gift Set|OA|B|1|77.42|0.0|110.0||0.5|0|Jasani   https://www.jasani.ae/shop/cate|3
+TML-OA-302|HappyHues Color Pencils (Set of 6)|OA|B|10|1.06|0.0|3.0||0.02|1|Jasani   https://www.jasani.ae/shop/stgl|3
+TML-OA-303|Workday Office Gift Set|OA|B|1|26.0|0.0|36.0||0.67|1|MTC|3
+TML-OA-304|MagStand Card Wallet|OA|B|1|10.32|0.0|15.0||0.04|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-305|ThinkDesk Tech Kit|OA|B|1|47.0|0.0|78.0||0.5|1|Luxury TRG   https://luxurytrd.com/shop/|3
+TML-OA-306|StartSmart Office Giftset|OA|B|1|20.16|0.0|28.0||0.75|1|Jasani  https://www.jasani.ae/shop/categ|3
+TML-OA-307|ATHAR Electric Bukhoor|OA|B|1|90.0|0.0|130.0||0.0|0|HAK https://www.hakplus.com/Ramadan-and-|3
+TML-OA-308|Inkstone Metallic Pen|OA|B|10|1.75|0.0|3.0||0.02|1|HAK https://www.hakgifts.com/products/j9|3
+TML-OA-309|Diplomat Metal Pen|OA|B|1|15.0|0.0|22.0||0.04|1|MTC   https://mtc.ae/product/dorniel-pen|3
+TML-OA-310|SoftTouch Metal Pen with Stylus|OA|B|10|1.35|0.0|3.0||0.02|1|MTC   https://mtc.ae/product/stylus-meta|3
+TML-OA-311|Bamboo Phone Stand|OA|B|10|2.9|0.0|4.0||0.06|1|MTC    https://mtc.ae/product/bamboo-pho|3
+TML-OA-312|Premium Metal Roller Pen in Gift Box|OA|B|1|31.45|0.0|0.0||0.0|0|Please Enquire from Ma'am Taruna|3
+TML-OA-313|Arc Crystal Award|OA|B|1|85.0|0.0|97.0||3.94|1|MTC   https://mtc.ae/product/crystal-awa|3
+TML-OA-314|A6 Notebook with PU Leather|OA|B|10|2.5|0.0|4.0||0.13|1|MTC AK FLASH   https://mtc.ae/product/pu|3
+TML-OA-315|TRIODE 4 in 1 Foldable Wireless Charging Station|OA|B|1|33.6|0.0|54.0||0.0|0|JASANI|3
+TML-OA-316|Number One Crystal Trophy|OA|B|1|79.0|0.0|110.0||2.29|1|MTC   https://mtc.ae/product/crystal-gla|3
+TML-OA-317|Textured Hardcover A5 Notebook with Bookmark|OA|B|1|5.5|0.0|8.0||0.29|1|MTC   https://mtc.ae/product/hard-cover-|3
+TML-OA-318|Arabic Bisht Style A5 Notebook|OA|B|1|15.0|0.0|22.0||0.32|1|MTC   https://mtc.ae/product/arabic-bish|3
+TML-OA-319|Scented Amber Wood Candle|OA|B|1|7.0|0.0|15.0||0.196|1|MTC   https://mtc.ae/product/scented-can|3
+TML-OA-320|A5 Cork Cover Notebook|OA|B|1|5.0|0.0|12.0||0.3|1|MTC SHANGHAI     https://mtc.ae/product/|3
+TML-OA-321|Bamboo Spiral Notebook with Pen|OA|B|1|7.0|0.0|12.0||0.0|1|Fotokad    https://www.fotokad.ae/eco-fr|3
+TML-OA-322|Luxe A5 Notebook & Pen Gift Set|OA|B|1|20.0|0.0|28.0||0.0|1|Fotokad   https://www.fotokad.ae/premium|3
+TML-OA-323|SVEN Metal Ballpoint Pen|OA|B|10|3.07|0.0|6.0||0.02|1|Jasani   https://www.jasani.ae/shop?orde|3
+TML-OA-324|HALL Metal Pen|OA|B|10|4.42|0.0|8.0||0.04|1|Jasani   https://www.jasani.ae/shop?orde|3
+TML-OA-325|AERO Twist Metal Pen|OA|B|1|6.91|0.0|11.0||0.03|1|Jasani    https://www.jasani.ae/shop?sea|3
+TML-OA-326|Bonnie Metal Pen|OA|B|10|5.0|0.0|10.0||0.03|1|HAK   https://www.hakgifts.com/products/|3
+TML-OA-327|Picasso Inkless Pen|OA|B|10|4.0|0.0|7.0||0.0|1|Fotokad   https://www.fotokad.ae/picasso|3
+TML-OA-328|Wooden Digital Desk Clock|OA|B|1|27.0|0.0|40.0||0.16|1|MTC  https://mtc.ae/product/triangular-w|3
+TML-OA-329|Camel Plush Toy|OA|B|1|27.0|0.0|36.0||0.27|1|MTC  https://mtc.ae/product/promotional-|3
+TML-OA-330|Aegis A5 Leather Notebook|OA|B|1|8.5|0.0|14.0||0.3|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-OA-331|Double Hook Lanyard|OA|B|10|2.0|0.0|4.0||0.5|1|Al Wassel Printing|4
+TML-OA-332|Ignite Crystal Award|OA|B|1|35.0|0.0|62.0||0.82|1|MTC   https://mtc.ae/product/flame-shape|3
+TML-OA-334|Dual Tip Ballpoint pen|OA|B|10|2.0|0.0|4.0||0.5|1|Bossman|3
+TML-OA-335|Classic Pen Box|OA|B|10|0.67|0.0|4.0||0.5|0|Jasani    https://www.jasani.ae/shop/pb-|3
+TML-OA-336|Access Card Holder|OA|B|10|1.5|0.0|4.0||0.01|1|MTC   https://mtc.ae/product/rigid-pvc-c|3
+TML-OA-338|Leather Notebook with Pocket|OA|B|1|9.5|0.0|15.0||0.36|1|Shanghai   https://www.shanghaigifts.net|3
+TML-OA-339|Marigold Seed Plantable Kit|OA|B|1|6.34|0.0|10.0||0.08|1|Jasani   https://www.jasani.ae/shop/gken|3
+TML-OA-340|Metal Pens Twist Action Matte Finish|OA|B|1|3.5|0.0|6.0||0.03|1|MTC   https://mtc.ae/product/metal-pens-|3
+TML-OA-341|Pin Metal Name Badge|OA|B|10|4.0|0.0|6.0||0.02|1|MTC   https://mtc.ae/product/metal-name-|3
+TML-OA-343|Fabric Wristbands PACK OF 10|OA|B|1|35.0|0.0|56.0||0.0|1|Fotokad   https://www.fotokad.ae/fabric-|3
+TML-OA-344|Leather & Suede Pen Box|OA|B|1|8.0|0.0|13.0||0.0|1|MTC   https://mtc.ae/product/black-pen-b|3
+TML-OA-345|Wilson Tour Velocity Golf Ball Set|OA|C|1|120.0|0.0|0.0||0.0|1|Please Enquire from Ma'am Taruna|
+TML-OA-346|Crystal Diamond Award|OA|B|1|15.0|0.0|22.0||0.35|1|MTC   https://mtc.ae/product/crystal-dia|3
+TML-OA-347|Executive Leather Portfolio|OA|B|1|25.0|0.0|38.0||0.76|1|MTC   https://mtc.ae/product/leather-por|3
+TML-OA-348|Crest Crystal Award|OA|B|1|34.0|0.0|50.0||1.3|1|MTC   https://mtc.ae/product/crystal-awa|3
+TML-OA-349|Reel Badge Lanyard with Safety Lock|OA|B|10|2.5|0.0|4.0||0.02|1|MTC   https://mtc.ae/product/promotional|3
+TML-OA-350|Counter Pen with Secure Chain|OA|B|1|6.0|0.0|10.0||0.5|1|MTC|3
+TML-OA-351|Bamboo Pen Holder|OA|B|1|32.0|0.0|48.0||0.27|1|MTC   https://mtc.ae/product/bamboo-pen|3
+TML-OA-353|Customized Acrylic trophy|OA|B|1|40.0|0.0|60.0||0.0|0|ASIM, Saeed Screen Printing|
+TML-OA-354|Digital Scale Calculator|OA|B|10|2.88|0.0|4.0||0.1|0|Jasani https://www.jasani.ae/shop/stpc-7|3
+TML-OA-355|Ring Metal USB Flash Drive (4, 8, 16, 32, 64)|OA|B|1|10.25|0.0|15.0||0.5|1|AKFLASH  https://akflash.com/product/af-|3
+TML-OA-356|Eco friendly Notebook|OA|B|1|13.0|0.0|25.0||0.5|1|AKFLASH  https://akflash.com/product/ace|3
+TML-OA-357|Square Crystal Trophy with Wooden Base|OA|B|1|52.0|0.0|119.0||1.75|1|MTC  https://mtc.ae/product/square-cryst|3
+TML-OA-358|Wireless Charger Pad|OA|B|1|32.0|0.0|100.0||0.27|1|MTC  https://mtc.ae/product/bamboo-pen-h|3
+TML-OA-360|Monolith Corporate Trophy|OA|B|1|37.52|0.0|56.0||0.0|0|OASIS|3
+TML-OA-361|STELLAR Crystal Trophy with Metal Star|OA|B|1|60.0|0.0|90.0||0.0|1|BELFAST|3
+TML-OA-362|Metal Epoxy badge|OA|B|10|3.0|0.0|10.0||0.0|1|Coverage Gifts|3
+TML-OA-363|Maison Executive A5 Organizer|OA|B|1|32.0|0.0|48.0||0.0|1|SHANGHAI|3
+TML-OA-364|BOTTO Bottle Opener (5-in-1)|OA|B|1|5.02|0.0|12.0||0.0|1|JASANI|3
+TML-OA-366|Dorniel A5 PU Notebook with Magnetic Flap|OA|B|1|8.5|0.0|13.0||0.0|0|MTC|3
+TML-OA-367|TIMBER Desk Organizer|OA|B|1|9.65|0.0|28.0||0.0|1|JASANI|3
+TML-OA-369|Custom Plaque Award|XX|B|1|130.0|0.0|178.0||0.0|1|SAEED|
+TML-PP-001|Printed Mailer Boxes|PM|D|100|17.8|0.0|24.0||0.5|1|Modern Printing|7
+TML-PP-002|Printed Product Boxes|PM|D|350|400.0|0.0|4200.0||0.5|1|Bedaya|7
+TML-PP-003|Eco-Friendly Kraft Mailer Boxes|BP|D|350|2480.0|0.0|2600.0||0.5|1|Bedaya|7
+TML-PP-004|Printed Sleeve Mailer Boxes|BP|D|100|9.8|0.0|14.0||0.5|1|Bedaya|4
+TML-PP-005|Printed Cardboard Shipping Boxes|PM|D|350|675.0|0.0|2800.0||0.5|1|Bedaya|7
+TML-PP-006|Printed Drawer Gift Boxes|BP|D|100|15.0|0.0|30.0||0.5|1|Bedaya, Modern Printing|7
+TML-PP-007|Magnetic Gift Boxes|BP|D|100|24.8|0.0|40.0||0.5|1|Bedaya|7
+TML-PP-008|Cardboard Tube Box|BP|D|1000|0.0|0.0|0.0||0.5|0|Ask Arun|7
+TML-PP-009|Poly Mailer Bags|PM|D|10000|0.15|0.0|1.0||0.5|1|Zetun|10
+TML-PP-010|Poly Mailer Bag with Handle|PM|D|10000|0.3|0.0|1.0||0.5|1|Zetun|10
+TML-PP-011|Kraft Mailer Bags|PM|D|100|2.5|0.0|4.0||0.5|1|Bedaya, Modern Printing|5
+TML-PP-012|Muslin Bags|PM|B|10|2.0|0.0|5.0||0.5|1|Green Sea Heng Xing Trading FZC0|3
+TML-PP-013|Printed Kraft Paper Bags|PM|D|100|13.0|0.0|18.0||0.5|1|Bedaya, Modern Printing|5
+TML-PP-014|Printed Luxury Shopping Bags|PM|D|100|15.9|0.0|22.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-015|Printed Envelopes|PM|D|100|5.0|0.0|7.0||0.5|1|Bedaya, Modern Printing|3
+TML-PP-016|Printed Flyers|PM|D|100|1.2|0.0|3.0||0.5|1|Bedaya, Modern Printing|3
+TML-PP-017|Printed Brochures & Leaflets|PM|D|100|3.0|0.0|4.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-018|Printed Books & Booklets|PM|D|100|3.0|0.0|5.0||0.5|1|Bedaya, Modern Printing|7
+TML-PP-019|Printed Invitation & Greeting Cards|PM|D|50|80.0|0.0|300.0||0.5|1|Bedaya, Modern Printing|3
+TML-PP-020|Printed Hang Tags|PM|D|100|0.6|0.0|0.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-021|Double Wall Paper Cup|PM|D|100|3.5|0.0|6.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-022|Single Wall Paper Cup|PM|D|100|2.5|0.0|4.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-023|Double Wall Coffee Cup with Lid|PM|D|100|3.5|0.0|4.9||0.5|1|Bedaya, Modern Printing|4
+TML-PP-024|Single Wall Paper Cup with Lid|PM|D|100|2.5|0.0|4.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-025|Paper Cup Sleeve|PM|D|100|4.0|0.0|6.0||0.5|1|Bedaya Modern Printing|3
+TML-PP-026|Promotional Wall Posters|PM|D|100|1.9|0.0|3.0||0.5|1|Modern Printing|3
+TML-PP-027|Canvas Photo Frames|PM|D|1|60.0|0.0|350.0||0.5|1|SUJEET|4
+TML-PP-028|Recognition Certificates|PM|D|20|65.0|0.0|120.0||0.5|1|Modern Printing|3
+TML-PP-029|Gift Vouchers & Coupons|PM|D|50|490.0|0.0|650.0||0.5|1|Bedaya, Modern Printing|3
+TML-PP-030|Promotional Table Tent Cards|PM|D|100|7.0|0.0|10.0||0.5|1|Bedaya|3
+TML-PP-031|Stamps|PM|D|1|70.0|0.0|150.0||0.5|1|Modern|3
+TML-PP-032|Promotional Foam Board|PM|D|1|105.0|0.0|350.0||0.5|1|Modern|3
+TML-PP-033|Paper Tissues & Cocktail Napkins|PM|D|500|380.0|0.0|500.0||0.5|1|Bedaya|3
+TML-PP-034|Jigsaw Puzzle|PM|D|1|6.0|0.0|12.0||0.02|1|MTC  https://mtc.ae/?s=puzzle&post_type=|3
+TML-PP-035|Repeat Backdrop Banner|PM|D|1|1320.0|0.0|1950.0||0.5|1|Bedaya|5
+TML-PP-036|Key Card Holder|PM|D|100|400.0|0.0|560.0||0.5|1|Bedaya, Modern Printing|4
+TML-PP-037|Promotional Postcards|PM|D|100|50.0|0.0|190.0||0.5|1|Bedaya, Modern Printing|3
+TML-PP-038|Tyvek Disposable Wristbands|PM|D|100|1.0|0.0|100.0||0.005|1|MTC https://mtc.ae/?s=Tyvek+Wristbands+W|3
+TML-PP-039|Velvet Ring Box|BP|B|1|3.0|0.0|22.0||0.0|0|Temu  https://www.temu.com/ae/15pcs-bohe|7
+TML-PP-040|Mini Jewellery Box|BP|B|1|4.9|0.0|11.0||0.0|1|Temu    https://www.temu.com/goods.html?|7
+TML-PP-041|Color Paper Bags|PM|D|100|1300.0|0.0|1650.0||0.5|1|Modern Printing|4
+TML-PP-042|Bakery Bags|PM|D|100|800.0|0.0|1000.0||0.5|1|Bedaya|4
+TML-PP-043|Pizza Boxes|BP|D|100|900.0|0.0|1000.0||0.5|1|Bedaya|4
+TML-PP-044|Ribbon|PM|D|1|40.0|0.0|56.0||0.5|1|Modern Printing|4
+TML-PP-045|Acrylic Table Sign|PM|B|1|25.0|0.0|56.0||0.5|1|Saeed Screen Printing, Asim|4
+TML-PP-046|Gift Set Packaging with Magnet Flap|BP|D|1|15.31|0.0|22.0||0.4|1|Jasani   https://www.jasani.ae/shop/gspb|7
+TML-PP-047|Magnetic Gift Box|BP|D|1|14.0|0.0|20.0||0.56|1|MTC   https://mtc.ae/product/foldable-gi|7
+TML-PP-048|Leather Watch Box|BP|D|1|10.61|0.0|30.0||0.0|1|Temu   https://www.temu.com/ae/single-wa|7
+TML-PP-049|Hanging Backdrop Banner|PM|D|1|320.0|0.0|600.0||0.5|1|Bedaya|4
+TML-PP-051|Notebook & Pen Gift Box|BP|B|1|4.0|0.0|7.0||0.5|1|HAK   https://www.hakgifts.com/products/|3
+TML-PP-052|Burger Box|BP|D|100|680.0|0.0|1020.0||0.5|1|Bedaya  Modern|5
+TML-PP-053|French Fries Pouch|BP|D|100|550.0|0.0|825.0||0.5|1|Bedaya  Modern|5
+TML-PP-054|Printed Door Tag|PM|D|100|0.0|0.0|0.0||0.5|0|Modern|5
+TML-PP-055|Water Bottle Tag|PM|D|100|0.0|0.0|0.0||0.5|0|Modern|5
+TML-TA-001|Bamboo Pop Socket|TT|C|10|2.3|0.0|5.0||0.006|1|Jasani|3
+TML-TA-002|Wooden USB Stick|TT|C|1|13.44|0.0|21.0||0.01|1|Jasani|3
+TML-TA-003|Speaker with Wireless Charger|TT|C|1|35.0|0.0|45.0||0.36|1|MTC  https://mtc.ae/product/bluetooth-sp|3
+TML-TA-004|3-in-1 Bamboo Charging Station|TT|C|1|53.0|0.0|75.0||0.5|0|Jasani|3
+TML-TA-005|Charging Cable (4 in 1)|TT|C|1|7.0|0.0|21.0||0.04|1|AK FLASH, HAK|3
+TML-TA-006|Magnetic Wireless Powerbank - 8000mAh|TT|C|1|42.0|0.0|49.0||0.5|1|AK FLASH|3
+TML-TA-007|Fast Charging Stand (3 In 1)|TT|C|1|42.0|0.0|59.0||0.5|1|AK FLASH|3
+TML-TA-008|Bluetooth Speaker with Light-up Logo|TT|C|1|27.0|0.0|45.0||0.5|1|AK FLASH|3
+TML-TA-009|Travel Adapter with Powerbank (2 in 1)|TT|C|1|63.0|0.0|83.0||0.5|0|Jasani|3
+TML-TA-010|Travel Adapter with Speaker and Powerbank|TT|C|1|55.0|0.0|73.0||0.5|0|Jasani|3
+TML-TA-011|Recycled Bluetooth Headphone|TT|C|1|52.8|0.0|78.0|RCS-certified recycled plastic and FSC-certified bamboo|0.3|1|Jasani|3
+TML-TA-012|Wireless Eco-friendly Power bank 8000mAh|TT|C|1|25.0|0.0|55.0||0.26|1|MTC https://mtc.ae/product/wireless-powe|3
+TML-TA-013|Recycled Bluetooth Speaker|TT|C|1|30.72|0.0|46.0|RCS-certified recycled plastic and FSC-certified bamboo|0.3|1|Jasani   https://www.jasani.ae/shop/itsp|3
+TML-TA-014|Recycled 15W Wireless Charging Pad|TT|C|1|16.42|0.0|29.0||0.09|1|Jasani|3
+TML-TA-015|Bamboo 5W Wireless Charging Pads|TT|C|1|12.0|0.0|29.0||0.1|1|MTC https://mtc.ae/product/bamboo-wirele|3
+TML-TA-016|Powerbank with Inbuilt Cables - 8000mAh|TT|C|1|21.0|0.0|45.0||0.21|1|MTC  https://mtc.ae/product/powerbank-wi|3
+TML-TA-017|Bamboo Powerbank with Light-up Logo - 10000 mAh|TT|C|1|28.0|0.0|55.0||0.5|1|AKFlash  https://akflash.com/product/ak-|3
+TML-TA-018|Bamboo Charging Cable (5-in-1)|TT|C|1|10.66|0.0|24.0|RCS-certified recycled plastic and FSC-certified bamboo|0.04|1|Jasani|3
+TML-TA-019|Bamboo Bluetooth Speaker|TT|C|1|16.0|0.0|35.0||0.14|1|MTC  https://mtc.ae/product/bamboo-bluet|3
+TML-TA-020|Mousepad Organizer with Wireless Charger|TT|C|1|28.0|0.0|45.0||0.36|1|MTC SHANGHAI https://mtc.ae/product/mous|3
+TML-TA-021|Apple Air Tag|TT|C|1|110.0|0.0|150.0||0.5|1|MoveTouch|3
+TML-TA-022|Apple AirPods (4th Gen)|TT|C|1|440.0|0.0|699.0||0.0|1|MoveTouch - Amazon  https://www.amazon.a|3
+TML-TA-023|Oslo Recycled Wireless Charger & Cable Set|TT|C|1|25.58|0.0|35.0||0.07|1|Jasani|3
+TML-TA-024|Metal USB with Key Ring|TT|C|1|12.0|0.0|14.0||0.01|1|AK FLASH MTC  https://mtc.ae/product/met|3
+TML-TA-025|ELECTRA Wireless Charging Mousepad|TT|C|1|28.0|0.0|40.0||0.41|1|MTC https://mtc.ae/product/rpet-wireless|3
+TML-TA-026|Wireless 15W Phone Charging Station|TT|C|1|42.0|0.0|60.0||0.17|1|MTC https://mtc.ae/product/foldable-wire|3
+TML-TA-027|Mini Flashlight|TT|C|1|5.0|0.0|10.0||0.07|1|MTC https://mtc.ae/product/flashlight/|3
+TML-TA-028|SKROSS World Travel Adapter|TT|C|1|76.56|0.0|115.0||0.2|1|Jasani|3
+TML-TA-029|Mr. Travel Cable|TT|C|1|15.0|0.0|34.0||0.0|1|Event|3
+TML-TA-030|JBL Clip 4 Speaker|TT|C|1|140.0|0.0|190.0||0.5|1|Movetouch|3
+TML-TA-031|Yoyo Speaker|TT|C|1|30.0|0.0|48.0||0.06|1|Event|3
+TML-TA-032|MagSafe Battery Powerbank|TT|C|1|36.0|0.0|54.0||0.0|0|Event|3
+TML-TA-033|Corkley Speaker|TT|C|1|30.0|0.0|78.0||0.5|0|Event|3
+TML-TA-034|VoltView 10k Powerbank|TT|C|1|20.0|0.0|30.0||0.25|1|MTC  https://mtc.ae/product/powerbank-wi|3
+TML-TA-035|EcoPower Multi-Cable Set|TT|C|1|14.0|0.0|22.0||0.07|1|MTC https://mtc.ae/product/multi-chargin|3
+TML-TA-036|Sleek MagSafe Powerbank|TT|C|1|40.0|0.0|75.0||0.0|1|Event|3
+TML-TA-037|iPhone Cover Case|TT|C|1|25.0|0.0|75.0||0.5|0|TEMU|7
+TML-TA-038|CAPSULE Mini Powerbank|TT|C|1|28.37|0.0|45.0||0.15|0|Jasani|3
+TML-TA-039|Swivel USB Flash Drive|TT|C|1|11.0|0.0|13.0||0.03|1|MTC  https://mtc.ae/product/silver-swive|3
+TML-TA-040|MagFlip USB|TT|C|1|18.0|0.0|24.0||0.03|1|MTC  https://mtc.ae/product/otg-usb-in-g|3
+TML-TA-041|SoundCharge Duo Speaker & Charger|TT|C|1|32.0|0.0|46.0||0.5|1|Belfast|3
+TML-TA-042|TriCharge Pro Station|TT|C|1|42.0|0.0|65.0||0.25|1|MTC JASSANI  https://mtc.ae/product/fold|3
+TML-TA-043|GlidePro Mouse|TT|C|1|13.0|0.0|22.0||0.5|1|LUXURYTRDG|3
+TML-TA-044|Scalify Digital Luggage Scale|TT|C|1|10.32|0.0|18.0||0.17|1|Jasani|3
+TML-TA-045|ChargeHub 10K Powerbank|TT|C|1|49.44|0.0|75.0||0.5|0|Jasani|3
+TML-TA-046|JetEase Pillow & Eyemask Set|TT|C|1|25.92|0.0|44.0||0.37|1|Jasani|3
+TML-TA-047|TravelVault Passport Cover|TT|C|1|10.06|0.0|35.0|PU + Polyester|0.0|1|TEMU  https://www.temu.com/ae/high-quali|7
+TML-TA-048|Leather Luggage Tag|TT|C|1|11.0|0.0|20.0||0.0|0|TEMU  https://www.temu.com/ae/pack-of-5-|7
+TML-TA-049|ChargeMate 10K Powerbank|TT|C|1|65.0|0.0|95.0||0.0|1|Event|3
+TML-TA-050|BOLT Powerbank & Card Holder|TT|C|1|61.0|0.0|120.0||0.28|1|EVENTS Store https://eventgift.net/produ|3
+TML-TA-051|RISE Smart Clock & Wireless Charger|TT|C|1|34.56|0.0|53.0||0.32|0|Jasani|3
+TML-TA-052|Webcam Cover|TT|C|10|0.62|0.0|3.0||0.0|1|Jasani|3
+TML-TA-053|Voltive Wireless Charging Stand|TT|C|1|20.0|0.0|30.0||0.18|0|MTC|3
+TML-TA-054|PowerBreeze 5-in-1 Fan & Powerbank|TT|C|1|15.98|0.0|30.0||0.5|1|Jasani|3
+TML-TA-055|Ring Power Bank|TT|C|1|36.0|0.0|66.0||0.18|1|Event   https://eventgift.net/product/ri|3
+TML-TA-056|Bendi Car Phone Holder|TT|C|1|20.0|0.0|33.0||0.2|1|Event   https://eventgift.net/product/be|3
+TML-TA-057|Memori 3-in-1 Card Holder Powerbank|TT|C|1|37.68|0.0|57.0||0.18|1|JASANI   https://www.jasani.ae/shop/itpb|3
+TML-TA-058|Disco Bluetooth Speaker|TT|C|1|29.0|0.0|40.0||0.53|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-TA-059|Flux Wireless Speaker & Charger|TT|C|1|33.0|0.0|46.0||0.0|0|Shanghai Gifts   https://www.shanghaigif|3
+TML-TA-060|Earphones with Protective Case|TT|C|1|9.0|0.0|12.0||0.04|1|MTC   https://mtc.ae/product/earphones-w|3
+TML-TA-061|Keychain Airtag Holder|TT|C|10|5.52|0.0|8.0||0.02|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-TA-062|Portable Karaoke Speaker Set|TT|C|1|38.3|0.0|55.0||0.64|1|Jasani   https://www.jasani.ae/shop/itsp|3
+TML-TA-063|Lantern with Wireless Speaker|TT|C|1|34.56|0.0|62.0||0.6|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-TA-064|Memora Wireless Charger Phone Stand|TT|C|1|26.26|0.0|38.0||0.14|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-TA-065|KIEL Electronics Cleaning Kit|TT|C|1|6.72|0.0|10.0||0.07|1|Jasani   https://www.jasani.ae/shop?&sea|3
+TML-TA-066|Specta Universal Travel Adapter|TT|C|1|33.0|0.0|46.0||0.12|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-TA-067|GlobeMate Travel Adapter|TT|C|1|14.78|0.0|26.0||0.14|1|Jasani   https://www.jasani.ae/shop/tagl|3
+TML-TA-068|BeatVibe Headphone|TT|C|1|25.0|0.0|35.0||0.57|1|Event   https://eventgift.net/product/be|3
+TML-TA-069|Sonic Soundbar Speaker|TT|C|1|57.0|0.0|80.0||0.74|1|EVENT STORE   https://eventgift.net/prod|3
+TML-TA-070|Portable Travel Kettle|TT|C|1|40.0|0.0|56.0||0.56|1|Event Store   https://eventgift.net/prod|3
+TML-TA-071|Portable Power Blender|TT|C|1|61.0|0.0|85.0||0.83|1|Event Store  https://eventgift.net/produ|3
+TML-TA-072|VibeStation Multi-functional Speaker|TT|C|1|36.0|0.0|50.0||0.4|1|Event    https://eventgift.net/product/c|3
+TML-TA-073|Cork & Wheat Straw Charging Cable|TT|C|1|10.0|0.0|17.0||0.53|1|Shanghai   https://www.shanghaigifts.net|3
+TML-TA-074|Travel Blanket with Pouch|TT|C|1|11.9|0.0|35.0||0.3|1|Jasani   https://www.jasani.ae/shop/tagl|3
+TML-TA-075|BURLY 10K Powerbank|TT|C|1|23.0|0.0|32.0||0.3|0|HAK   https://www.hakgifts.com/products/|3
+TML-TA-077|PowerNest 3-in-1 Charging Station|TT|C|1|60.0|0.0|84.0||0.34|1|MTC   https://mtc.ae/product/3-in-1-rota|3
+TML-TA-078|Mini Powerbank 5000 mAh|TT|C|1|14.0|0.0|20.0||0.17|1|MTC  AK FLASH   https://mtc.ae/product/m|3
+TML-TA-079|Lumify Passport Cover with Tracker|TT|C|1|45.0|0.0|62.0||0.09|1|Event   https://eventgift.net/product/ro|3
+TML-TA-080|ANTIQ Speaker|TT|C|1|22.0|0.0|30.0||0.29|1|Event  https://eventgift.net/product/ant|3
+TML-TA-081|TELLARO 360° Phone Stand|TT|C|1|7.49|0.0|10.0||0.13|1|Jasani   https://www.jasani.ae/shop/itgl|3
+TML-TA-082|ZEPHYR 4-in-1 Fan|TT|C|1|23.52|0.0|32.0||0.15|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-TA-083|Charging Kit in Leather Pouch|TT|C|1|16.0|0.0|22.0||0.04|1|MTC   https://mtc.ae/product/charging-ca|3
+TML-TA-084|VOLT Mini Travel Adapter|TT|C|1|32.0|0.0|45.0||0.01|1|Event   https://eventgift.net/product/po|3
+TML-TA-085|BambooPort Travel Adaptor|TT|C|1|32.0|0.0|45.0||0.12|1|MTC   https://mtc.ae/product/universal-t|3
+TML-TA-086|Spectra 10K Light Up Powerbank|TT|C|1|25.0|0.0|40.0||0.27|1|Shanghai  https://www.shanghaigifts.net/|3
+TML-TA-087|GLOW Universal Travel Adapter|TT|C|1|36.0|0.0|68.0||0.5|1|AK Flash|3
+TML-TA-088|Keyfetch Smart Keychain|TT|C|10|2.88|0.0|5.0||0.008|1|Jasani  https://www.jasani.ae/shop/mskf-|3
+TML-TA-089|ROMA Mag Cardholder|TT|C|1|28.27|0.0|40.0||0.05|1|Jasani   https://www.jasani.ae/shop/itsn|3
+TML-TA-090|Keyring Powerbank|TT|C|1|39.0|0.0|55.0||0.0|1|HAK   https://www.hakplus.com/new-produc|3
+TML-TA-091|BOLT 10K Powerbank Charger|TT|C|1|37.0|0.0|52.0||0.5|1|AK Flash|3
+TML-TA-092|Mobile Selfie Ring Light|TT|C|1|22.0|0.0|35.0||0.05|1|Amazon    https://www.amazon.ae/XINBAOHO|3
+TML-TA-093|Magsafe LightUp Powerbank|TT|C|1|33.0|0.0|46.0||0.22|1|Shanghai   https://www.shanghaigifts.net|3
+TML-TA-094|Voyager Luggage Scale|TT|C|1|8.5|0.0|14.0||0.17|1|JASANI   https://www.jasani.ae/shop?sear|3
+TML-TA-095|GoVolt 20K Powerbank|TT|C|1|95.0|0.0|135.0||0.0|1|HAK   https://www.hakplus.com/new-produc|3
+TML-TA-096|Mini Pill Powerbank|TT|C|1|16.0|0.0|28.0||0.0|1|AKFLASH|3
+TML-TA-097|iPower 10K MagSafe Powerbank|TT|C|1|60.0|0.0|98.0||0.24|1|Event   https://eventgift.net/product/ip|3
+TML-TA-098|TRACE Leather Passport with Tracker|TT|C|1|41.0|0.0|58.0||0.145|1|Event   https://eventgift.net/product/fi|3
+TML-TA-099|Voyager Passport Cover with Luggage Tag|TT|C|1|15.0|0.0|22.0||0.0|0|Fotokad   https://www.fotokad.ae/rfid-pa|3
+TML-TA-100|Tile by Life360 Mate|TT|C|1|99.0|0.0|150.0||0.009|1|Amazon  https://www.amazon.ae/dp/B0D632M|3
+TML-TA-101|iPower 5K MagSafe Powerbank|TT|C|1|52.0|0.0|78.0||0.17|1|Event Store   https://eventgift.net/prod|3
+TML-TA-102|AI Smart Glasses|TT|C|1|62.0|0.0|99.0||0.235|1|Event   https://eventgift.net/product/ai|3
+TML-TA-103|Digital Business NFC Card|TT|C|1|18.72|0.0|28.0||0.01|1|Jasani   https://www.jasani.ae/shop?sear|3
+TML-TA-104|PowerBase 3-in-1 Charging Hub|TT|C|1|43.2|0.0|62.0||0.0|1|JASANI|3
+TML-TA-105|FINDY Bag Tracker|TT|C|1|26.0|0.0|39.0||0.03|1|Event|3
+TML-TA-106|Pocket Selfie Ring Light with MagSaf|TT|C|1|18.0|0.0|27.0||0.07|0|MTC  https://mtc.ae/product/pocket-selfi|3
+TML-TA-107|Fast Charging 10K Digital Powerbank|TT|C|1|35.0|0.0|53.0||0.17|0|MTC  https://mtc.ae/product/fast-chargin|3
+TML-TA-109|NUVO Wireless Earbuds|TT|C|1|25.44|0.0|38.0||0.0|1|Jasani|3
+TML-TA-110|Eco-friendly Bluetooth Speaker|TT|C|1|20.0|0.0|45.0||0.5|1|AKFLASH  https://akflash.com/product/a-1|3
+TML-TA-111|Bamboo Wireless Powerbank|TT|C|1|25.0|0.0|60.0||0.22|1|MTC https://mtc.ae/product/bamboo-wirele|3
+TML-TA-112|Dorniel 15W Wireless Charger & Alarm Clock|TT|C|1|55.0|0.0|82.0||0.0|0|MTC|3
+TML-TA-113|Multi-functional Desk Lamp with 15W Fast Wireless Charger|TT|C|1|52.0|0.0|78.0||0.0|0|MTC|3
+TML-TA-114|LOGIK Transparent Wireless Mouse|TT|C|1|24.29|0.0|36.0||0.0|1|JASANI|3
+TML-TA-115|CASEY Multi-Charging Cable Kit|TT|C|1|8.64|0.0|26.0||0.0|0|JASANI|3
+TML-TE-001|Exhibition Stand (18-20sqm)|TE|D|1|0.0|0.0|1000.0||0.5|0|Levo|
+TML-TE-002|Exhibition Stand (30-50 sqm)|TE|D|1|0.0|0.0|1000.0||0.5|0|Levo|
+TML-TE-003|Exhibition Stand (50-100 sqm)|TE|D|1|0.0|0.0|1000.0||0.5|0|Levo|
+TML-TE-004|Exhibition Stand (100+ sqm)|TE|D|1|0.0|0.0|1000.0||0.5|0|Levo|
+TML-TE-005|Double Decker Exhibition Stand|TE|D|1|0.0|0.0|1000.0||0.5|0|Levo|
+TML-GS-001|Eco Office Gift Set|GS|C|1|7.2|0.0|13.0||0.2|1|Jasani|3
+TML-GS-002|Hans Larsen Drinkware Gift Set - Glass Jar with 2 Tumblers|GS|C|1|56.64|0.0|88.0||1.19|1|Jasani|3
+TML-GS-003|Hans Larsen Drinkware Gift Set - Insulated Bottle and Tumbler|GS|C|1|78.72|0.0|125.0|21.0 x 25.2 cm|1.2|1|Jasani|3
+TML-GS-004|Lunch Box Set - Stainless Steel Lunch Box and Bottle|GS|C|1|49.54|0.0|68.0||0.78|1|Jasani|3
+TML-GS-005|Executive Gift - Set of 5|GS|C|1|52.0|0.0|75.0||0.0|1|MTC|3
+TML-GS-006|Office Gift Set|GS|C|1|34.0|0.0|55.0||0.0|1|MTC https://mtc.ae/product/gift-sets-gs-|3
+TML-GS-007|Exercise Kit - Resistance Tube and Skipping Rope|GS|C|1|14.98|0.0|25.0||0.25|1|Jasani|3
+TML-GS-008|Exercise Kit - Resistance Band and Skipping Rope|GS|C|1|13.1|0.0|25.0||1.68|1|Jasani|3
+TML-GS-009|EcoLux Recycled Leather Gift Set|GS|C|5|137.86|0.0|190.0||0.0|0|Jasani|3
+TML-GS-010|Eco Essentials Gift Set|GS|C|5|79.63|0.0|135.0||0.0|1|Jasani|3
+TML-GS-011|Active Athlete Gift Set|GS|C|5|64.99|0.0|90.0||0.5|1|Jasani|3
+TML-GS-012|Voyager Business Travel Gift Set|GS|C|5|278.0|0.0|360.0||0.5|0|JASANI https://www.jasani.ae/shop/gspb-9|3
+TML-GS-013|New Hire Essentials Gift Set|GS|C|5|67.54|0.0|95.0||0.0|1|Jasani|3
+TML-GS-014|DeskMaster Office Essentials Gift Set|GS|C|5|150.0|0.0|185.0||0.0|0|JASANI https://www.jasani.ae/shop/gspb-9|3
+TML-GS-015|Eternal Faith Gift Set|GS|C|5|153.07|0.0|195.0||0.0|1|Jasani|3
+TML-GS-016|Retro Vibe Gift Set|GS|C|5|105.6|0.0|140.0||0.0|1|Jasani|3
+TML-GS-017|Onboarding Stationery Gift Set|GS|C|5|42.77|0.0|70.0||0.0|1|Jasani|3
+TML-GS-018|Eco-Conscious Office Kit|GS|C|5|54.82|0.0|82.0||0.0|0|Jasani|3
+TML-GS-019|ExecutiveEdge Corporate Gift Set|GS|C|1|18.0|0.0|35.0||0.6|1|HAK|3
+TML-GS-020|Productivity Corporate Gift Set|GS|C|1|51.0|0.0|129.0||0.0|0|HAK|3
+TML-GS-021|Workday Essentials Office Gift Set|GS|C|1|64.5|0.0|90.0||0.0|1|HAK|3
+TML-GS-022|EliteDesk Office Gift Set|GS|C|1|41.0|0.0|60.0||0.5|1|JASANI|3
+TML-GS-023|NOIR Notebook & Pen Writing Set|GS|C|1|26.64|0.0|40.0||0.7|1|JASANI|3
+TML-GS-024|LAUTA Giftology Set|GS|C|1|25.44|0.0|40.0||0.85|1|Jasani|3
+TML-GS-025|Bamboo Gift - Set of 4|GS|C|1|53.0|0.0|84.0||0.5|0|AKFLASH  https://akflash.com/product/asa|3
+TML-GS-026|REGENT On-Boarding Set|GS|C|1|18.14|0.0|30.0||0.57|0|Jasani|3
+TML-GS-027|Workday Power Kit|GS|C|1|63.25|0.0|95.0||1.36|1|MTC|3
+TML-GS-028|Scented Candle and Aroma Reed Diffuser Gift Set|GS|C|1|25.0|0.0|38.0||0.51|1|MTC|3
+TML-GS-030|Cross Bailey Classic Black Journal Gift Set|GS|C|1|109.92|0.0|165.0||1.62|0|Jasani   https://www.jasani.ae/shop/gscr|3
+TML-GS-031|Premium 5-Piece Professional Gift Set|GS|C|1|40.0|0.0|60.0||0.0|0|Event   https://eventgift.net/product/bu|3
+TML-GS-033|Cross Calais™ Ballpoint Hardcover Gift Set|GS|C|1|93.6|0.0|140.0||0.67|0|Jasani https://www.jasani.ae/shop?search|3
+TML-GS-034|Eco Friendly Gift - Set of 4|GS|C|1|61.0|0.0|84.0||0.5|1|AKFLASH|3
+TML-GS-035|Eco Friendly Gift - Set of 6|GS|C|1|81.0|0.0|100.0||0.5|1|AKFLASH|3
+TML-GW-001-WHT|Plain Gift Packaging Box with Magnetic Flap White|GS|C|1|6.0|0.0|43.0||0.22|1|MTC  https://mtc.ae/product/plain-gift-p|3
+TML-GW-001-BLK|Plain Gift Packaging Box with Magnetic Flap Black|GS|C|1|6.0|0.0|43.0||0.22|1|MTC  https://mtc.ae/product/plain-gift-p|3
+TML-GW-001-BRW|Plain Gift Packaging Box with Magnetic Flap Brown|GS|C|1|6.0|0.0|43.0||0.22|1|MTC  https://mtc.ae/product/plain-gift-p|3
+TML-HW-001|Cotton Bathrobe|HW|B|1|57.0|0.0|70.0||0.5|1|LAGOON TRADING, GOODWILL TRADING, COTTON|3
+TML-HW-002|Satin Robe|HW|B|1|45.0|0.0|55.0||0.0|1|Amazon   https://www.amazon.ae/dp/B0CW9C|3
+TML-HW-003|Wooden Hangers (Set of 6)|HW|B|1|15.0|0.0|21.0||0.5|1|LAGOON TRADING, GOODWILL TRADING, COTTON|3
+TML-HW-004|Wooden Cutting Board|HW|B|1|11.0|0.0|25.0||0.5|1|DAY TO DAY|3
+TML-HW-005|SAJADA Suede Prayer Mat with Pouch|HW|B|1|52.8|0.0|92.0||0.97|1|Jasani|3
+TML-HW-006|Magic Sequin Cushion|HW|B|1|10.0|0.0|30.0||0.5|1|MAF|3
+TML-HW-007|Silk Sleep Mask|HW|B|1|5.45|0.0|9.0||0.0|0|TEMU  https://www.temu.com/goods.html?_b|7
+TML-HW-008|Slide Sandals|HW|B|1|35.0|0.0|45.0||0.5|1|ALI BABA|15
+TML-HW-009|Flip Flop Slippers|HW|B|1|30.0|0.0|40.0||0.5|1|ALI BABA|15
+TML-HW-010|Christmas Stockings|HW|B|1|20.0|0.0|35.0||0.5|0|TEMU  https://www.temu.com/ae/12pcs-pack|7
+TML-HW-011|EcoGlam Pocket Mirror|HW|B|1|4.03|0.0|8.0||0.09|1|Jasani|3
+TML-HW-012|ALBA Bamboo Cutlery Set|HW|B|1|3.46|0.0|8.0|Bamboo items in cotton pouch|0.03|1|Jasani|3
+TML-HW-013|First Aid Survival Kit|HW|B|1|24.0|0.0|38.0||0.5|1|LuxuryTrdg  https://luxurytrd.com/shop/w|3
+TML-HW-014|Pickleball Paddle Set|HW|B|1|20.88|0.0|36.0||0.65|1|Jasani|3
+TML-HW-015|BENTO Lunch Box|HW|B|1|22.22|0.0|38.0||0.39|1|Jasani|3
+TML-HW-016|Wooden Drawing Set|HW|B|1|11.0|0.0|24.0||0.3|1|Event Gift                              |3
+TML-HW-017|ATTAR Incense Bakhoor Burner|HW|B|1|50.0|0.0|70.0||0.48|1|MTC                                     |3
+TML-HW-018|Glasses Pouch Holder|HW|B|1|5.0|0.0|20.0||0.0|1|TEMU  https://www.temu.com/ae/10-soft--c|7
+TML-HW-019|Prayer Mat with Pouch|HW|B|1|8.0|0.0|15.0||0.22|1|MTC                                     |3
+TML-HW-020|Cotton Jumping Rope|HW|B|1|14.11|0.0|20.0|44.0 x 24.5 cm|0.17|1|Jasani|3
+TML-HW-021|Portable Hand Fan|HW|B|1|4.27|0.0|14.0||0.08|1|Jasani|3
+TML-HW-022|Wooden Tic-Tac-Toe Set|HW|B|1|2.98|0.0|9.0||0.02|1|Jasani|3
+TML-HW-023|Rechargeable Mini Hand Fan|HW|B|1|13.06|0.0|21.0||0.13|1|Jasani|3
+TML-HW-024|Aroma Diffuser Humidifier|HW|B|1|15.0|0.0|21.0||0.5|1|AK Flash  https://akflash.com/product/hm|3
+TML-HW-025|SwissStyle 12-in-1 Pocket Knife|HW|B|1|8.88|0.0|14.0||0.35|1|Jasani|3
+TML-HW-026|Charcuterie Cheese Board|HW|B|1|10.99|0.0|16.0||0.14|1|Jasani|3
+TML-HW-027|Florina Secure Cardholder Wallet|HW|B|1|11.9|0.0|18.0||0.11|1|Jasani|3
+TML-HW-028|Essentials Wallet|HW|B|1|14.21|0.0|23.0||0.12|1|Jasani  https://www.jasani.ae/shop/mwgl-|3
+TML-HW-029|EcoBite Cutlery Set|HW|B|1|2.75|0.0|5.0||0.07|1|MTC                                     |3
+TML-HW-030|Tasbih Prayer Beads|HW|B|1|15.0|0.0|22.0||0.0|1|Fotocad   https://www.fotokad.ae/premium|3
+TML-HW-031|EcoStand Horizontal Photo Frame|HW|B|1|10.0|0.0|15.0||0.0|1|fotocad                                 |3
+TML-HW-032|EcoStand Vertical Photo Frame|HW|B|1|10.0|0.0|15.0||0.0|1|fotocad                                 |3
+TML-HW-033|Sports Cooling Towel|HW|B|1|5.0|0.0|8.0||0.0|1|fotocad   , 4 star                      |3
+TML-HW-034|Aroma Incense Burner|HW|B|1|150.0|0.0|225.0||0.0|0|Event Gift                              |3
+TML-HW-035|GLOW Wooden Photo Frame|HW|B|1|28.0|0.0|42.0||0.0|1|Fotocad                                 |3
+TML-HW-036|Ball Ornaments (Set of 3)|HW|B|1|6.0|0.0|18.0||0.0|0|Amazon|3
+TML-HW-037|Paper Hand Fan|HW|B|1|4.56|0.0|20.0||0.06|1|Jasani https://www.jasani.ae/shop/hfgl-9|3
+TML-HW-038|Tennis Balls|HW|B|1|13.0|0.0|20.0||0.0|1|Amazon sky touch    https://www.amazon.a|3
+TML-HW-039|Yumbox Kids Lunch Box|HW|B|1|149.0|0.0|208.0||0.5|0|Inkmash   https://inkmash.com/product/yu|3
+TML-HW-040|Arabic Oudh Scented Candle|HW|B|1|9.12|0.0|15.0||0.27|1|Jasani    https://www.jasani.ae/shop?sea|3
+TML-HW-041|Table Handbag Hook|HW|B|1|4.75|0.0|8.0||0.04|1|Jasani   https://www.jasani.ae/shop/msbh|3
+TML-HW-042|Rubiks Cube|HW|B|1|6.0|0.0|8.0||0.09|1|Fotokad, Mtc   https://www.fotokad.ae/ma|3
+TML-HW-043|Magnetic Sand Timer|HW|B|1|14.0|0.0|21.0||0.23|1|MTC|3
+TML-HW-044|Bamboo Measuring Tape|HW|B|1|8.0|0.0|12.0||0.5|1|Shanghai Gifts   https://www.shanghaigif|3
+TML-HW-045|Shower Curtain|HW|B|1|17.0|0.0|49.0||0.5|1|LAGOON TRADING, GOODWILL TRADING, COTTON|3
+TML-HW-046|Table Placemat (Set of 4)|HW|B|1|18.18|0.0|38.0||0.0|1|TEMU  https://www.temu.com/ae/set-of-6--|7
+TML-HW-047|Flashlight Keychain|HW|B|10|2.0|0.0|3.0||0.5|1|Oasis|7
+TML-HW-048|Keychain Bottle Opener|HW|B|10|2.0|0.0|3.0||0.5|1|Oasis   https://www.oasiscatalog.ae/item|7
+TML-HW-049|Oven Mitt|HW|B|1|6.0|0.0|9.0||0.5|1|Oasis   https://www.oasiscatalog.ae/item|7
+TML-HW-050|Electric Massage Gun|HW|B|1|24.0|0.0|42.0||0.0|1|JASANI|7
+TML-HW-051|Ice Bucket|HW|B|1|62.47|0.0|75.0||0.0|1|Temu   https://www.temu.com/goods.html?_|7
+TML-HW-052|Pennant Flag|HW|B|1|10.0|0.0|65.0||0.5|1|TEMU https://www.temu.com/ae/3--canvas-b|7
+TML-HW-053|Vertical Photo Frame|HW|B|1|30.0|0.0|42.0||0.5|0|Vista Print   https://www.vistaprint.com|5
+TML-HW-054|Horizontal Photo Frame|HW|B|1|30.0|0.0|42.0||0.5|0|Vista Print   https://www.vistaprint.com|5
+TML-HW-055|Mini White Board|HW|B|10|2.75|0.0|4.0||0.05|0|MTC|3
+TML-HW-056|Portable Humidifier X|HW|B|1|9.55|0.0|14.0||0.12|1|Jasani  https://www.jasani.ae/shop?searc|3
+TML-HW-057|Cigar Cutter|HW|B|1|7.79|0.0|28.0||0.0|1|Temu   https://www.temu.com/ae/1pc-premi|7
+TML-HW-058|Porto Foldable Outdoor Chair|HW|B|1|450.0|0.0|599.0||0.5|1|Mid Ocean  https://www.midocean.com/expo|3
+TML-HW-059|Double Decker Lunchbox|HW|B|1|10.0|0.0|14.0||0.16|1|Shanghai Gifts  https://www.shanghaigift|3
+TML-HW-060|Golf Towel with Carabiner Clip|HW|B|1|10.0|0.0|14.0|78% Polyester - 22% Polyamide|0.5|1|Temu    https://www.temu.com/ae/4pcs-sup|7
+TML-HW-061|Wooden Maze Board Game|HW|B|1|5.0|0.0|8.0||0.09|1|MTC|3
+TML-HW-062|Ceramic Bowls (Set of 6)|HW|B|1|49.0|0.0|60.0||1.32|1|Amazon  https://www.amazon.ae/Yedio-Porc|3
+TML-HW-063|Ceramic Plates (Set of 6)|HW|B|1|50.0|0.0|85.0||0.45|1|Amazon    https://www.amazon.ae/DELLING-|3
+TML-HW-064|Ceramic Serving Bowl (Set of 2)|HW|B|1|97.0|0.0|110.0||2.22|1|Amazon  https://www.amazon.ae/DOWAN-Serv|3
+TML-HW-065|Soup & Salad Bowl (Set of 4)|HW|B|1|59.0|0.0|80.0||2.1|1|Amazon  https://www.amazon.ae/Masroo-Pla|3
+TML-HW-066|Domino Game Set|HW|B|1|3.0|0.0|5.0||0.12|1|MTC|3
+TML-HW-067|Rectangle Pocket Mirror|HW|B|1|3.8|0.0|5.0||0.07|1|MTC   https://mtc.ae/product/rectangle-p|3
+TML-HW-068|Herringbone Wool Scarf|HW|B|1|28.32|0.0|40.0||0.42|1|Jasani  https://www.jasani.ae/shop/apsn-|3
+TML-HW-069|LUNA Skin Care Gift Set|HW|B|1|15.26|0.0|22.0||0.36|1|Jasani   https://www.jasani.ae/shop/gswp|3
+TML-HW-070|Self-Closing Leather Wallet|HW|B|1|22.18|0.0|36.0||0.0|1|Temu   https://www.temu.com/ae/self-clos|7
+TML-HW-071|Multi-functional Tool Card|HW|B|10|4.0|0.0|6.0||0.03|1|MTC   https://mtc.ae/product/multi-funct|3
+TML-HW-072|Electric Lunch Box|HW|B|1|57.12|0.0|80.0||0.82|1|Jasani   https://www.jasani.ae/shop/cate|3
+TML-HW-073|Satin Scarf & Shawl|HW|B|1|12.0|0.0|18.0||0.5|1|MANUFACTURE|3
+TML-HW-074|Camping Mat|HW|B|1|12.0|0.0|20.0||0.5|1|Sky touch   https://skytouch-uae.com/pro|3
+TML-HW-075|Car Air Freshener|HW|B|1|4.0|0.0|12.0||0.5|1|Al Kateeb   https://makeup.ae/en/search/|3
+TML-HW-076|Bamboo Hair Brush|HW|B|1|17.0|0.0|24.0||0.08|1|Amazon   https://www.amazon.ae/Huachi-De|3
+TML-HW-077|Mint Tinbox|HW|B|1|16.0|0.0|24.0||0.5|1|Shassgift   https://www.shassgift.com/pr|3
+TML-HW-078|TRIO Travel Cutlery Set|HW|B|1|18.0|0.0|27.0||0.0|0|BELFAST|
+TML-HW-079|Fridge Magnets (100 pcs) 9 x 4|HW|B|1|4.0|0.0|10.0||0.5|1|MODERN PRINTING PRESS|4
+TML-HW-080|BrightMinds Pencil & Crayons Set|HW|B|10|2.83|0.0|4.0||0.08|1|Jasani   https://www.jasani.ae/shop/stgl|3
+TML-HW-081|Adjustable Phone Stand|HW|B|1|4.5|0.0|6.0||0.13|1|MTC|3
+TML-HW-082|CAMPER Outdoor Folding Chair|HW|B|1|22.0|0.0|32.0||0.0|1|TEMU - Out Door Gear LLC   https://www.t|7
+TML-HW-083|Aroma Reed Diffuser|HW|B|1|15.0|0.0|24.0||0.34|1|MTC   https://mtc.ae/product/aroma-reed-|3
+TML-HW-084|TURBO Rechargeable Hand Fan|HW|B|1|19.0|0.0|28.0||0.15|0|Amazon   https://www.amazon.ae/ACHAS-Por|3
+TML-HW-085|FINDY Key Organizer|HW|B|1|31.0|0.0|44.0||0.05|1|Event   https://eventgift.net/product/fi|3
+TML-HW-086|Bottle Opener with Magnet|HW|B|1|30.0|0.0|42.0||0.03|1|Amazon   https://www.amazon.ae/Magnetic-|3
+TML-HW-087|LISBON Clip Keychain|HW|B|10|3.36|0.0|6.0||0.04|1|Jasani    https://www.jasani.ae/shop/msk|3
+TML-HW-088|Round Porcelain Ashtray|HW|B|1|9.0|0.0|12.0||0.13|1|Amazon   https://www.amazon.ae/Porcelett|3
+TML-HW-089|Wooden Pencil|HW|B|10|0.25|0.0|2.0||0.006|1|HAK https://www.hakgifts.com/products/a0|3
+TML-HW-090|Jade Face Roller with Wooden Handle|HW|B|1|4.37|0.0|7.0||0.72|0|Jasani https://www.jasani.ae/shop/wpfr-3|3
+TML-HW-091|KRITAK - Giftology Set of Multipurpose Tools|HW|B|1|22.08|0.0|35.0||0.29|0|JASANI https://www.jasani.ae/shop/mtgs-2|3
+TML-HW-092|Eco-neutral 2-in-1 Wooden Games Box|HW|B|1|5.57|0.0|9.0||0.0|0|JASANI|3
+TML-HW-093|Creed Aventus Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-094|Divot Tool With Ball Marker|HW|B|1|22.56|0.0|0.0||0.0|0|JASANI|3
+TML-HW-095|KRANJI Set of 30 Golf Tees|HW|B|1|14.98|0.0|0.0||0.0|0|JASANI|3
+TML-HW-096|Dior Sauvage Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-097|Bleu De Chanel Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-098|YSL Myslf Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-099|Tom Ford Oud Wood Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-100|Chanel Coco Mademoiselle Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-101|Dior J’adore Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-102|Prada Paradoxe Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-103|YSL Libre Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-104|Jo Malone English Pear Inspired Perfume|HW|B|1|44.0|0.0|65.0||0.0|1|Esscents perfumes|3
+TML-HW-105|T PUZZLE – Wooden Puzzle|HW|B|1|0.0|0.0|0.0||0.0|0|EVENT GIFT|3
+TML-HW-106|Classic Pine Wood Puzzle|HW|B|1|0.0|0.0|0.0||0.0|0|EVENT GIFT|3
+TML-HW-107|ChicView Women’s Sunglasses|HW|B|1|8.75|0.0|25.0||0.0|1|Amazon|3
+TML-HW-108|Football Keychain|HW|B|1|3.5|0.0|12.0||0.0|1|SHANGHAI|3
+TML-HW-109|PORTO Leather & Metal Keychain|HW|B|10|3.6|0.0|9.0||0.04|1|JASANI|3
+TML-HW-110|Timber Desk Clock|HW|B|1|27.0|0.0|45.0||0.0|1|MTC|3
+TML-PS-001|Fleece Joggers with Pockets|PS|A|1|22.0|0.0|35.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-PS-002|Fleece Shorts with Pockets|PS|A|1|18.0|0.0|30.0|100% Cotton|0.5|1|MANUFACTURE|3
+TML-PS-004|Swim Shorts|PS|A|1|16.0|0.0|40.0|97%polyster 3%elastane|0.5|1|MANUFACTURE|3
+TML-PS-006|Leggings|PS|C|1|46.43|0.0|70.0|97% Polyster - 3% Elastane|0.5|1|Temu   https://www.temu.com/goods.html?_|7
+TML-PS-007|Nike Dri-Fit Park Shorts|PS|C|1|70.0|0.0|150.0|100% Recycled Polyester|0.5|1|Nike.ae   https://www.nike.ae/en/dri-fit|3
+TML-PM-001|Pet Tag|PE|B|1|5.0|0.0|18.0||0.07|1|AMAZON    https://www.amazon.ae/Stainles|3
+TML-PM-002|Dog T-shirt|PE|A|1|20.0|0.0|29.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-PM-003|Dog Hoodie|PE|A|1|25.0|0.0|39.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-PM-004|Dog Bandana|PE|A|1|6.0|0.0|19.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-PM-005|Pet Food Bowl|PE|B|1|27.19|0.0|50.0||0.5|1|TEMU  temu.com/goods.html?_bg_fs=1&goods|7
+TML-PM-006|Pet Feeding Mat|PE|B|1|23.39|0.0|40.0|Rubber - Diatom Mud|0.0|1|Temu    https://www.temu.com/goods.html?|7
+TML-KC-001|Baby Onesie|KC|C|1|10.0|0.0|24.0|100% cotton|0.5|1|Landmark|3
+TML-KC-002|Kid's Short Sleeve Tshirt|KC|A|1|6.0|0.0|21.0|100% cotton|0.5|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-KC-003|Kid's Long Sleeve Tshirt|KC|A|1|11.0|0.0|26.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-004|Kids Short Sleeve V Neck Tshirt|KC|A|1|9.0|0.0|25.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-005|Kids Long Sleeve V-Neck T-shirt|KC|A|1|10.0|0.0|29.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-006|Kid's Polo Shirt|KC|A|1|11.0|0.0|27.0|100% cotton|0.5|1|FOUR SQUARE SANDHU,BLUZ,APEX,MANUFACTURE|3
+TML-KC-007|Kids Long Sleeve Polo|KC|A|1|14.0|0.0|32.0|60% Cotton - 40% Polyester|0.5|1|MANUFACTURE|3
+TML-KC-008|Kid's Cotton Short|KC|A|1|12.0|0.0|29.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-009|Kid's Pullover Sweater|KC|A|1|20.0|0.0|36.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-010|Kid's Baseball Cap|KC|A|1|4.0|0.0|17.0||0.5|1|TSHIRTMART, ABDUL AZIZ, BAHRAM CAPS|3
+TML-KC-011|Kid's Quaterzip Sweater|KC|A|1|20.0|0.0|39.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-012|Kid's Full Zipper Hoodie|KC|A|1|22.0|0.0|42.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-013|Kid's Hoodie|KC|A|1|22.0|0.0|42.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-014|Foldable Frisbee|KC|B|5|1.7|0.0|5.0|RPET|0.012|1|Jasani|3
+TML-KC-015|Baby Romper|KC|C|1|14.0|0.0|23.0|100% cotton|0.5|1|Landmark|3
+TML-KC-016|Baby Bibs|KC|C|1|8.0|0.0|14.0|100% cotton|0.5|1|Landmark|3
+TML-KC-017|Kid's Zipper Polo Cotton  Shirt|KC|A|1|14.0|0.0|27.0|60% Cotton - 40% Polyester|0.5|1|MANUFACTURE|3
+TML-KC-018|Kids Tank Top|KC|A|1|12.0|0.0|22.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-019|Kids Raglan Long Sleeve T-shirt|KC|A|1|14.0|0.0|26.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-020|Kids Raglan Short Sleeve T-shirt|KC|A|1|12.0|0.0|24.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-021|Kids Recycled Eco-Friendly T-shirt|KC|A|1|12.0|0.0|22.0|100% recycled cotton|0.5|1|MANUFACTURE|3
+TML-KC-022|Kids Recycled Eco-Friendly Polo Shirt|KC|A|1|14.0|0.0|37.0|100% recycled cotton|0.5|1|MANUFACTURE|3
+TML-KC-023|Kids Short Sleeve Crop Top|KC|A|1|12.0|0.0|37.0|100% cotton|0.5|1|MANUFACTURE|3
+TML-KC-024|Kids Zipper Jacket|KC|A|1|24.0|55.0|54.0|100% cotton|0.5|0|MANUFACTURE|3
+TML-KC-025|Kids Apron|KC|A|1|11.0|0.0|35.0||0.0|1|MANUFACTURE|3
+TML-KC-026|Kids Oversize Tshirt|KC|A|1|0.0|0.0|0.0||0.0|1|MANUFACTURE|3
+TML-KC-027|Kid's Varsity Jacket|KC|A|1|39.0|0.0|72.0||0.0|1|MANUFACTURE|3
+TML-KC-028|Kids Activewear Tank Top|KC|A|1|10.0|0.0|34.0||0.0|1|MANUFACTURE|3
+TML-KC-029|Kid's Tracksuit|KC|A|1|42.0|0.0|59.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|3
+TML-KC-030|Kids Dri-Fit Sports Jersey|KC|A|1|14.0|0.0|32.0|50% cotton 50% polyster|0.5|1|MANUFACTURE|3
+TML-FC-001|Pistachio Knafeh Chocolate Bar by Varak|FC|D|10|38.0|0.0|70.0||0.5|1|VARAK|3
+TML-FC-002|Lotus Biscoff Chocolate Bar by Varak|FC|D|10|38.0|0.0|70.0||0.5|1|VARAK|3
+TML-FC-003|Hazelnut Crunch Chocolate Bar by Varak|FC|D|10|38.0|0.0|70.0||0.5|1|VARAK|3
+TML-FC-004|Coconut Matcha Chocolate Bar by Varak|FC|D|10|38.0|0.0|70.0||0.5|1|VARAK|3
+TML-FC-005|Bateel Dates Gift Box|FC|D|10|50.0|0.0|70.0||0.5|1|Bateel   https://bateel.com/en_ae/palm.h|3
+TML-FC-006|Honey Jar|FC|D|50|22.0|0.0|32.0||0.5|1|JAYA|3
+TML-FC-007|Patchi Chocolates|FC|D|80|3.5|0.0|5.0||0.5|1|Patchi   https://patchi.com/en/ourcreati|4
+TML-FC-008|Fortune Cookies with Custom Message|FC|D|100|7.5|0.0|17.0||0.5|1|TAO'S DEN|5`;
+
+var P=PDATA.split("\n").map(function(l){
+  var x=l.split("|");
+  return{sku:x[0]||"",title:x[1]||"",cc:x[2]||"",type:x[3]||"",moq:parseInt(x[4])||1,
+    cost:parseFloat(x[5])||0,prem:parseFloat(x[6])||0,web:parseFloat(x[7])||0,
+    mat:x[8]||"",wt:parseFloat(x[9])||0,stock:x[10]==="1",sup:x[11]||"",tl:x[12]||"",
+    cat:CM[x[2]]||x[2]||""};
+}).filter(function(p){return p.sku&&p.title;});
+
+// ── IMAGE FETCHING — themerchlist.com WooCommerce API ────────────────────
+var ICACHE={};
+function loadImg(p,cb){
+  if(ICACHE[p.sku]!==undefined){cb(ICACHE[p.sku]);return;}
+  ICACHE[p.sku]=null;
+  var apiUrl="https://themerchlist.com/wp-json/wc/store/v1/products?search="+encodeURIComponent(p.title)+"&per_page=1";
+  fetch(PROX+encodeURIComponent(apiUrl),{signal:AbortSignal.timeout(8000)})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      try{
+        var data=JSON.parse(d.contents||"[]");
+        if(Array.isArray(data)&&data[0]&&data[0].images&&data[0].images[0]&&data[0].images[0].src){
+          ICACHE[p.sku]=data[0].images[0].src;cb(ICACHE[p.sku]);return;
+        }
+      }catch(e){}
+      // Fallback: scrape themerchlist.com product page
+      var pgUrl="https://themerchlist.com/customize/"+encodeURIComponent(p.title.toLowerCase().replace(/[^a-z0-9]+/g,"-"))+"/";
+      fetch(PROX+encodeURIComponent(pgUrl),{signal:AbortSignal.timeout(6000)})
+        .then(function(r2){return r2.json();})
+        .then(function(d2){
+          try{
+            var h=d2.contents||"";
+            var m=h.match(/"src":"(https:\/\/themerchlist\.com\/wp-content\/uploads\/[^"]+\.(?:jpg|jpeg|png|webp))"/i);
+            if(!m)m=h.match(/class="[^"]*wp-post-image[^"]*"[^>]*src="([^"]+)"/);
+            if(m&&m[1]){ICACHE[p.sku]=m[1];cb(m[1]);return;}
+          }catch(e){}
+          ICACHE[p.sku]=false;cb(false);
+        }).catch(function(){ICACHE[p.sku]=false;cb(false);});
+    }).catch(function(){ICACHE[p.sku]=false;cb(false);});
+}
+
+var S={u:false,tab:"calc",q:"",cf:"ALL",gf:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,fq:"",fr:null,fl:false};
+
+function updOut(){
+  var el=document.getElementById("OA");if(!el)return;
+  var p=S.si!==null?P[S.si]:null;
+  if(!p||isC(p)||!p.web||!p.cost){el.innerHTML="";return;}
+  var pmO=PMS.find(function(m){return m.id===S.pm;});
+  var cur=calcP(p,S.pm,S.sd,S.pr,qt(S.qty));
+  if(!cur){el.innerHTML="<p style='color:red;font-size:12px'>Cannot calculate — check pricing data.</p>";return;}
+  var dp=cur.px,total=dp*S.qty,vat=total*.05;
+  var st=!pmO||pmO.f?"":S.sd+" side"+(S.sd>1?"s":"");
+  var pt=S.pm==="none"?"no print":(pmO.n+(st?" ("+st+")":""));
+  var mc=cur.m>=30?"#16a34a":cur.m>=20?"#ca8a04":"#dc2626";
+  var qC=cur.locked?(cur.px>cur.li*0.8?"cap":"bad"):"ok";
+  var qL=cur.locked&&cur.px>cur.li*0.8?"Floor price applied":cur.locked?"Below web price":"Quote price";
+  var qLC=cur.locked&&cur.px>cur.li*0.8?"w":cur.locked?"r":"ok";
+  // Screen recommender
+  var rec="";
+  if(S.qty>=50&&S.pm!=="screen"&&S.pm!=="none"){
+    var pms2=gpm(p);
+    if(pms2.find(function(m){return m.id==="screen";})){
+      var sc2=calcP(p,"screen",S.sd,S.pr,qt(S.qty));
+      if(sc2&&sc2.px<cur.px-0.5){
+        var sv=(cur.px-sc2.px).toFixed(2),sp=((1-sc2.px/cur.px)*100).toFixed(0);
+        rec="<div class='tip' data-ta='screen'><div class='ti'>\uD83D\uDCA1</div><div><div class='tt'>Switch to Screen Print \u2014 save AED "+sv+"/unit</div><div class='ts'>"+sp+"% cheaper \u00B7 AED "+sc2.px.toFixed(2)+"/unit \u00B7 MOQ 50</div></div></div>";
+      }
+    }
+  }
+  var quickH=QUICK_UNITS.map(function(u){var l=u>=1000?(u/1000)+"K":u;return"<button class='qu-btn"+(S.qty===u?" on":"")+"' data-qu='"+u+"' type='button'>"+l+"</button>";}).join("");
+  var email="Hi,\n\nThank you for your enquiry with Merchlist!\n\nFor "+S.qty.toLocaleString()+" units of "+p.title+" with "+pt+", your price is "+aed(dp)+" per unit.\n\nSubtotal: "+aed(total)+"\nVAT (5%): "+aed(vat)+"\nTotal inc. VAT: "+aed(total+vat)+"\n\nLet me know if you would like to proceed!\n\nBest regards,\nMerchlist Team";
+  el.innerHTML=
+    "<div class='qty-row'>"+
+      "<div class='qty-wrap'>"+
+        "<button class='qty-btn' id='qm' type='button'>\u2212</button>"+
+        "<input class='qty-inp' type='text' inputmode='numeric' pattern='[0-9]*' id='qI' value='"+S.qty+"'>"+
+        "<button class='qty-btn' id='qp' type='button'>+</button>"+
+      "</div>"+
+      "<span class='qty-lbl'>"+(S.qty<p.moq?"<span class='er'>\u26A0 Below MOQ ("+p.moq+")</span>":"units")+"</span>"+
+    "</div>"+
+    "<div class='quick-units'>"+quickH+"</div>"+
+    "<div class='qbox "+qC+"'>"+
+      "<div class='q-head'>"+
+        "<div><div class='q-lbl "+qLC+"'>"+qL+"</div><div class='q-val'>"+aed(dp)+"<span>/ unit</span></div></div>"+
+        "<div class='q-mgn'><div class='ml'>Margin</div><div class='mv' style='color:"+mc+"'>"+cur.m.toFixed(1)+"%</div></div>"+
+      "</div>"+
+      (cur.locked?"<div class='q-note "+(cur.px>cur.li*0.8?"w":"r")+"'>"+(cur.px>cur.li*0.8?"Margin protector applied \u2014 limited discount available.":"\u26A0 Cost floor ("+aed(cur.fl)+") exceeds web price ("+aed(cur.li*0.8)+"). Needs repricing.")+"</div>":"")+
+      (rec?"<div class='tips'>"+rec+"</div>":"")+
+      "<div class='q-totals'>"+
+        "<div class='q-tot'><div class='tl'>Subtotal</div><div class='tv'>"+aed(total)+"</div></div>"+
+        "<div class='q-tot'><div class='tl'>VAT 5%</div><div class='tv'>"+aed(vat)+"</div></div>"+
+        "<div class='q-tot'><div class='tl'>Total inc. VAT</div><div class='tv' style='color:#16a34a'>"+aed(total+vat)+"</div></div>"+
+      "</div>"+
+    "</div>"+
+    "<div class='cd tight' style='margin-top:12px;margin-bottom:0'>"+
+      "<div class='sec-lbl'>\uD83D\uDCE7 Quote (Email / WhatsApp)</div>"+
+      "<div class='email-box' id='eBox'>"+he(email).replace(/\n/g,"<br>")+"</div>"+
+      "<div class='copy-row'><button class='copy-btn' id='cBtn' type='button'>Copy Quote</button></div>"+
+    "</div>";
+  // Wire events
+  var qIn=document.getElementById("qI");
+  document.getElementById("qm").onclick=function(){if(S.qty>1){S.qty--;qIn.value=S.qty;updOut();}};
+  document.getElementById("qp").onclick=function(){S.qty++;qIn.value=S.qty;updOut();};
+  qIn.oninput=function(){
+    var raw=this.value.replace(/[^0-9]/g,""),v=parseInt(raw)||0,pos=this.selectionStart;
+    S.qty=v;updOut();
+    var e2=document.getElementById("qI");
+    if(e2){e2.focus();try{e2.setSelectionRange(pos,pos);}catch(x){}}
+  };
+  qIn.onblur=function(){if(!S.qty){S.qty=0;this.value=0;}};
+  document.querySelectorAll("[data-qu]").forEach(function(te){te.onclick=function(){S.qty=parseInt(te.getAttribute("data-qu"));render(true);};});
+  document.querySelectorAll("[data-ta]").forEach(function(te){te.onclick=function(){if(te.getAttribute("data-ta")==="screen"){S.pm="screen";render(true);}};});
+  document.getElementById("cBtn").onclick=function(){
+    navigator.clipboard.writeText(document.getElementById("eBox").innerText).then(function(){
+      document.getElementById("cBtn").textContent="Copied \u2713";document.getElementById("cBtn").classList.add("done");
+      setTimeout(function(){document.getElementById("cBtn").textContent="Copy Quote";document.getElementById("cBtn").classList.remove("done");},2000);
+    });
+  };
+}
+
+function buildFinder(){
+  if(S.fl)return "<div class='fload'>Searching\u2026</div>";
+  var r=S.fr;if(!r)return "";
+  var good=r.filter(function(x){return x.score>=0.25;});
+  if(!good.length)return "<div class='fno'><div class='ic'>\uD83D\uDD0D</div><h3>No match found</h3><p>This product may not be in the catalogue.</p><div class='pill'>Contact Procurement Team</div></div>";
+  return "<div class='fres'>"+good.map(function(x){
+    var sc=Math.round(x.score*100),bg=sc>=80?"#16a34a":sc>=60?"#ca8a04":"#6b7280",g=gridOf(x.p),gn=g==="S"?"Softline":g==="H"?"Hardline":"Custom";
+    return "<div class='fmatch'><div class='fscore' style='background:"+bg+"'>"+sc+"%</div>"+
+      "<div class='fmi'><div class='fmt'>"+he(x.p.title)+"</div>"+
+      "<div class='fms'>"+he(x.p.sku)+" \u00B7 "+he(x.p.cat)+" <span class='bd "+g+"' style='padding:1px 6px;border-radius:12px;font-size:9px'>"+gn+"</span></div></div>"+
+      "<button class='fuse' data-fu='"+P.indexOf(x.p)+"' type='button'>Use \u2192</button></div>";
+  }).join("")+"</div>";
+}
+
+
+// ── FUZZY SEARCH ─────────────────────────────────────────────────────────
+// Normalises input so "tshirt" matches "t-shirt", "polo shirt" matches "polo",
+// single-char typos are tolerated (Levenshtein ≤1 on individual words).
+function normStr(s){
+  return s.toLowerCase()
+    .replace(/[-_]/g,' ')        // t-shirt → t shirt
+    .replace(/\s+/g,' ')
+    .trim();
+}
+// Alias map: common alternate spellings / abbreviations
+var ALIASES={
+  'tshirt':'t shirt','tshirts':'t shirts',
+  'hoodie':'hoodies','hoodies':'hoodie',
+  'polo':'polo shirt','polos':'polo shirt',
+  'cap':'baseball cap','caps':'baseball cap',
+  'mug':'ceramic mug','bottle':'water bottle',
+  'bag':'tote bag','bags':'tote bag',
+  'notebook':'notebook','notepad':'notebook',
+  'pen':'ballpoint pen','pens':'metal pen',
+  'powerbank':'power bank','power bank':'powerbank',
+  'usb':'usb stick'
+};
+function expandQuery(q){
+  var n=normStr(q),words=n.split(' '),extra=[];
+  words.forEach(function(w){if(ALIASES[w])extra.push(ALIASES[w]);});
+  return [n].concat(extra);
+}
+function levenshtein(a,b){
+  if(a===b)return 0;if(!a.length)return b.length;if(!b.length)return a.length;
+  var m=[];
+  for(var i=0;i<=b.length;i++){m[i]=[i];for(var j=1;j<=a.length;j++){m[i][j]=i===0?j:Math.min(m[i-1][j]+1,m[i][j-1]+1,m[i-1][j-1]+(b[i-1]!==a[j-1]?1:0));}}
+  return m[b.length][a.length];
+}
+function fuzzyScore(haystack,queries){
+  var h=normStr(haystack),best=0;
+  queries.forEach(function(q){
+    // exact substring
+    if(h.indexOf(q)>=0){best=Math.max(best,1);return;}
+    // word-level fuzzy: all query words must match within distance 1
+    var qWords=q.split(' '),hWords=h.split(' ');
+    var allMatch=qWords.every(function(qw){
+      return hWords.some(function(hw){
+        if(hw.indexOf(qw)>=0||qw.indexOf(hw)>=0)return true;
+        if(qw.length>=4&&levenshtein(qw,hw)<=1)return true;
+        return false;
+      });
+    });
+    if(allMatch)best=Math.max(best,0.8);
+  });
+  return best;
+}
+function fuzzyFilter(products,query){
+  var queries=expandQuery(query);
+  var scored=products.map(function(p){
+    var ts=fuzzyScore(p.title,queries);
+    var ss=fuzzyScore(p.sku,queries)*0.9;  // SKU match slightly lower priority
+    return{p:p,score:Math.max(ts,ss)};
+  }).filter(function(x){return x.score>0;});
+  scored.sort(function(a,b){return b.score-a.score;});
+  return scored.map(function(x){return x.p;});
+}
+// ─────────────────────────────────────────────────────────────────────────
+
+function render(keep){
+  var mn=document.querySelector(".mn"),sy=0;if(mn&&keep)sy=mn.scrollTop;
+  var app=document.getElementById("app");
+  if(!S.u){
+    app.innerHTML="<div class='pin-ov'><div class='pin-c'><div class='pin-logo'>MERCHLIST</div><div class='pin-title'>Pricing Engine</div><div class='pin-sub'>Internal Sales Tool \u00B7 v13</div><input class='pini' id='pin' type='password' placeholder='\u00B7\u00B7\u00B7\u00B7' maxlength='6'><button class='pinb' id='pb' type='button'>Unlock</button><div class='pine' id='pe'></div></div></div>";
+    document.getElementById("pb").onclick=function(){
+      if(document.getElementById("pin").value==="2024"){S.u=true;render();}
+      else{document.getElementById("pin").classList.add("err");document.getElementById("pe").textContent="Incorrect PIN";
+        setTimeout(function(){document.getElementById("pin").classList.remove("err");document.getElementById("pe").textContent="";document.getElementById("pin").value="";},1300);}
+    };
+    document.getElementById("pin").onkeydown=function(e){if(e.key==="Enter")document.getElementById("pb").click();};
+    document.getElementById("pin").focus();return;
+  }
+  var fl=P.slice();
+  if(S.cf!=="ALL")fl=fl.filter(function(p){return p.cat===S.cf;});
+  if(S.gf!=="ALL"){
+    if(S.gf==="S")fl=fl.filter(function(p){return SOFT.has(p.cc)&&!isC(p);});
+    else if(S.gf==="H")fl=fl.filter(function(p){return !SOFT.has(p.cc)&&!isC(p);});
+    else fl=fl.filter(function(p){return isC(p);});
+  }
+  if(S.q.trim()){fl=fuzzyFilter(fl,S.q);}
+  var cats=Array.from(new Set(P.map(function(p){return p.cat;}).filter(Boolean))).sort();
+  var p=S.si!==null?P[S.si]:null,pms=p?gpm(p):[],pmO=PMS.find(function(m){return m.id===S.pm;}),g=p?gridOf(p):"",gn=g==="S"?"Softline":g==="H"?"Hardline":"Custom";
+  var main="";
+  if(S.tab==="finder"){
+    main="<div class='fwrap'><h2>Product Finder</h2><p class='desc'>Search by product name or SKU to find the right item quickly.</p>"+
+      "<div class='finp-row'><input class='finp' id='fIn' placeholder='Search product name or SKU\u2026' value='"+he(S.fq)+"'><button class='fgo' id='fGo' type='button'>Find</button></div>"+buildFinder()+"</div>";
+  }else if(!p){
+    main="<div class='empty'><div class='ic'>\uD83D\uDCE6</div><div class='t'>Select a product to start</div><div class='s'>Search or filter from the sidebar to generate an instant quote.</div></div>";
+  }else if(isC(p)){
+    main="<div class='proc'><div class='ic'>\uD83D\uDCCB</div><h3>"+he(p.title)+"</h3><div class='sub'>"+he(p.sku)+" \u00B7 "+he(p.cat)+"</div><div class='pill'>Contact Procurement Team</div></div>";
+  }else if(!p.web||!p.cost){
+    main="<div class='cd' style='text-align:center;padding:32px'><div style='font-size:32px;margin-bottom:8px'>\u26A0</div><h3 style='color:#92400e;font-size:15px'>Pricing data missing for this product</h3></div>";
+  }else{
+    var pmMoq=pmO&&pmO.q>1&&S.qty<pmO.q,img=ICACHE[p.sku],imgH=img?"<img src='"+he(img)+"' alt='' onerror=\"this.parentNode.innerHTML='\uD83D\uDCE6'\">":"\uD83D\uDCE6",imgCls=img===null?" img-loading":"";
+    var btnsH=pms.map(function(m){return"<button class='btn "+(S.pm===m.id?"on":"")+"' data-pm='"+m.id+"' type='button'>"+m.n+(m.q>1?"<span class='sub'>min "+m.q+"</span>":"")+"</button>";}).join("");
+    var sidesH="";if(!pmO||!pmO.f){sidesH="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+[1,2,3,4].map(function(s){return"<button class='sd-btn "+(S.sd===s?"on":"")+"' data-sd='"+s+"' type='button'>"+s+"</button>";}).join("")+"</div></div>";}
+    var premH="";if(showPrem(p)){premH="<div class='cfg-s'><div class='cfg-lbl'>Fabric</div><div class='fab-row'><button class='fab-b "+(!S.pr?"on":"")+"' data-fb='0' type='button'>Basic</button><button class='fab-b "+(S.pr?"on":"")+"' data-fb='1' type='button'>Premium</button></div></div>";}
+    main=
+      "<div class='cd'><div class='ph'>"+
+        "<div class='ph-img"+imgCls+"' id='phImg'>"+imgH+"</div>"+
+        "<div class='ph-info'><div class='ph-top'><div class='ph-title'>"+he(p.title)+"</div><div class='ph-price'><span class='pl'>Website Base</span>AED "+p.web+"</div></div>"+
+        "<div class='ph-sku'>"+he(p.sku)+"</div>"+
+        "<div class='bds'><span class='bd "+(p.stock?"stk":"oos")+"'>"+(p.stock?"In Stock":"Out of Stock")+"</span><span class='bd "+g+"'>"+gn+"</span></div></div></div>"+
+        "<div class='specs'>"+
+          "<div class='spec'><div class='l'>MOQ</div><div class='v'>"+p.moq+" units</div></div>"+
+          "<div class='spec'><div class='l'>Lead Time</div><div class='v'>"+(p.tl||"\u2014")+" days</div></div>"+
+          "<div class='spec'><div class='l'>Supplier</div><div class='v'>"+he(p.sup||"\u2014")+"</div></div>"+
+          "<div class='spec'><div class='l'>Material</div><div class='v'>"+he(p.mat||"\u2014")+"</div></div>"+
+          (p.wt?"<div class='spec'><div class='l'>Weight</div><div class='v'>"+p.wt+" kg</div></div>":"")+
+        "</div></div>"+
+      "<div class='cd'><div class='cfg-row'><div class='cfg-g'><div class='cfg-lbl'>Branding Method</div><div class='btns'>"+btnsH+"</div></div>"+sidesH+premH+"</div>"+
+      (pmMoq?"<div class='moq-warn'>\u26A0 "+pmO.n+" requires min "+pmO.q+" units</div>":"")+
+      "</div><div id='OA'></div>";
+  }
+  var listH=fl.slice(0,300).map(function(fp){
+    var ri=P.indexOf(fp),gp=gridOf(fp);
+    return"<div class='pi"+(S.si===ri?" sel":"")+"' data-i='"+ri+"'><div class='pi-dot "+gp+"'></div><div class='pi-info'><div class='pi-n'>"+he(fp.title)+"</div><div class='pi-m'>"+he(fp.sku)+(!fp.stock?" \u00B7 <span class='pi-oos'>OOS</span>":"")+"</div></div><div class='pi-p'>"+fp.web+"</div></div>";
+  }).join("")+(fl.length>300?"<div style='padding:8px;text-align:center;font-size:10px;color:#9ca3af'>Showing 300 of "+fl.length+"</div>":"")+(fl.length===0?"<div style='padding:16px;text-align:center;font-size:11px;color:#9ca3af'>No products found</div>":"");
+  app.innerHTML="<div class='app'><div class='topbar'><div class='tb-l'><span class='tb-logo'>MERCHLIST</span><span class='tb-v'>v13</span><div class='tb-tabs'><button class='tab "+(S.tab==="calc"?"on":"")+"' data-tab='calc' type='button'>Calculator</button><button class='tab "+(S.tab==="finder"?"on":"")+"' data-tab='finder' type='button'>Product Finder</button></div></div><span class='tb-r'>INTERNAL USE ONLY</span></div><div class='body'><div class='sb'><div class='sf'><input class='sf-inp' id='sIn' placeholder='Search name or SKU\u2026' value='"+he(S.q)+"'><div class='sf-row'><select class='sf-sel' id='cSel'><option value='ALL'>All Categories</option>"+cats.map(function(c){return"<option value='"+he(c)+"' "+(S.cf===c?"selected":"")+">"+he(c)+"</option>";}).join("")+"</select><select class='sf-sel' id='gSel' style='flex:0 0 88px'><option value='ALL'>All Grids</option><option value='S' "+(S.gf==="S"?"selected":"")+">Softline</option><option value='H' "+(S.gf==="H"?"selected":"")+">Hardline</option><option value='C' "+(S.gf==="C"?"selected":"")+">Custom</option></select></div><div class='sf-cnt'>"+fl.length+" products</div></div><div class='plist'>"+listH+"</div></div><div class='mn'>"+main+"</div></div></div>";
+  if(keep){var mn2=document.querySelector(".mn");if(mn2)mn2.scrollTop=sy;}
+  if(p&&!isC(p)&&ICACHE[p.sku]===undefined){
+    loadImg(p,function(url){var el=document.getElementById("phImg");if(el){el.classList.remove("img-loading");el.innerHTML=url?"<img src='"+url+"' alt='' onerror=\"this.parentNode.innerHTML='\uD83D\uDCE6'\">":"\uD83D\uDCE6";}});
+  }
+  var sIn=document.getElementById("sIn");
+  if(sIn){sIn.oninput=function(){S.q=this.value;var pos=this.selectionStart;render();var e=document.getElementById("sIn");if(e){e.focus();try{e.setSelectionRange(pos,pos);}catch(x){}}};}
+  document.getElementById("cSel").onchange=function(){S.cf=this.value;render();};
+  document.getElementById("gSel").onchange=function(){S.gf=this.value;render();};
+  document.querySelectorAll("[data-tab]").forEach(function(el){el.onclick=function(){S.tab=el.getAttribute("data-tab");render();};});
+  document.querySelectorAll(".pi").forEach(function(el){el.onclick=function(){S.si=parseInt(el.getAttribute("data-i"));S.pr=false;var pm2=gpm(P[S.si]);if(!pm2.find(function(m){return m.id===S.pm;}))S.pm=pm2[0]?pm2[0].id:"dtf";render();};});
+  document.querySelectorAll("[data-pm]").forEach(function(el){el.onclick=function(){S.pm=el.getAttribute("data-pm");var pm=PMS.find(function(m){return m.id===S.pm;});if(pm&&pm.f)S.sd=1;render(true);};});
+  document.querySelectorAll("[data-sd]").forEach(function(el){el.onclick=function(){S.sd=parseInt(el.getAttribute("data-sd"));render(true);};});
+  document.querySelectorAll("[data-fb]").forEach(function(el){el.onclick=function(){S.pr=el.getAttribute("data-fb")==="1";render(true);};});
+  // Finder
+  var fIn=document.getElementById("fIn"),fGo=document.getElementById("fGo");
+  if(fIn){fIn.oninput=function(){S.fq=this.value;};fIn.onkeydown=function(e){if(e.key==="Enter"&&fGo)fGo.click();};}
+  if(fGo){fGo.onclick=function(){
+    if(!S.fq||!S.fq.trim())return;
+    S.fl=true;S.fr=null;render();
+    setTimeout(function(){
+      var queries=expandQuery(S.fq);
+      var results=P.map(function(p){
+        var ts=fuzzyScore(p.title,queries);
+        var ss=fuzzyScore(p.sku,queries)*0.9;
+        return{p:p,score:Math.max(ts,ss)};
+      }).filter(function(x){return x.score>0;}).sort(function(a,b){return b.score-a.score;}).slice(0,10);
+      S.fr=results;S.fl=false;render();
+    },30);
+  };}
+  document.querySelectorAll("[data-fu]").forEach(function(el){el.onclick=function(){S.si=parseInt(el.getAttribute("data-fu"));S.tab="calc";render();};});
+  updOut();
+}
+render();
+</script>
+<style>
+  /* Hide the old dark PIN screen — replaced by our gate */
+  .pin-ov { display: none !important; }
+
+  /* ── Gate overlay ── */
+  #ml-gate {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #f9fafb;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    animation: gFadeIn .25s ease;
+  }
+  @keyframes gFadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+  .ml-card {
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 24px;
+    padding: 48px 40px 40px;
+    width: 100%; max-width: 420px;
+    text-align: center;
+    box-shadow: 0 4px 32px rgba(0,0,0,.06);
+  }
+
+  .ml-wordmark {
+    display: inline-flex; align-items: center; gap: 7px;
+    margin-bottom: 28px;
+  }
+  .ml-dot {
+    width: 8px; height: 8px;
+    background: #16a34a; border-radius: 50%;
+  }
+  .ml-brand {
+    font-size: 11px; font-weight: 900;
+    letter-spacing: 5px; color: #111;
+  }
+
+  .ml-title {
+    font-size: 26px; font-weight: 800;
+    color: #111; margin-bottom: 6px;
+    letter-spacing: -.4px;
+  }
+  .ml-sub {
+    font-size: 13px; color: #9ca3af;
+    margin-bottom: 32px; line-height: 1.5;
+  }
+
+  .ml-field { margin-bottom: 10px; text-align: left; }
+  .ml-label {
+    display: block;
+    font-size: 11px; font-weight: 700;
+    color: #6b7280; letter-spacing: .4px;
+    text-transform: uppercase; margin-bottom: 6px;
+  }
+  .ml-inp {
+    width: 100%; padding: 13px 16px;
+    border: 1.5px solid #e5e7eb; border-radius: 10px;
+    font-size: 14px; color: #111;
+    background: #fff; outline: none;
+    transition: border-color .15s, box-shadow .15s;
+    box-sizing: border-box;
+  }
+  .ml-inp:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22,163,74,.1);
+  }
+  .ml-inp.ml-err-inp { border-color: #dc2626; }
+
+  .ml-btn {
+    width: 100%; padding: 15px;
+    background: #111; color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 6px;
+    letter-spacing: .3px;
+    transition: background .15s, transform .1s;
+  }
+  .ml-btn:hover { background: #16a34a; }
+  .ml-btn:active { transform: scale(.98); }
+
+  .ml-err {
+    color: #dc2626; font-size: 12px;
+    margin-top: 10px; min-height: 18px;
+    font-weight: 500;
+  }
+  .ml-footer {
+    margin-top: 24px; padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+    font-size: 11px; color: #d1d5db;
+    line-height: 1.6;
+  }
+  .ml-footer strong { color: #9ca3af; }
+
+  /* ── Welcome flash ── */
+  #ml-welcome {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #fff;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    animation: wFade .6s ease forwards;
+    pointer-events: none;
+  }
+  @keyframes wFade {
+    0%   { opacity: 1 }
+    60%  { opacity: 1 }
+    100% { opacity: 0 }
+  }
+  .ml-wm { font-size: 11px; font-weight: 900; letter-spacing: 5px; color: #16a34a; margin-bottom: 12px; }
+  .ml-wt { font-size: 22px; font-weight: 800; color: #111; }
+
+  /* ── User badge in topbar ── */
+  #ml-user-badge {
+    display: flex; align-items: center; gap: 6px;
+    padding: 4px 10px;
+    background: #f0fdf4; border: 1px solid #bbf7d0;
+    border-radius: 20px; cursor: pointer;
+  }
+  #ml-user-badge .uav {
+    width: 20px; height: 20px; border-radius: 50%;
+    background: #16a34a; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; font-weight: 800;
+  }
+  #ml-user-badge .unm {
+    font-size: 11px; font-weight: 700; color: #15803d;
+  }
+</style>
+
+<script>
+(function () {
+  var KEY = 'ml_user_v1';
+  var DOMAIN = '@themerchlist.com';
+
+  /* ── 1. Check if already registered ── */
+  function getUser() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (!raw) return null;
+      var u = JSON.parse(raw);
+      if (u && u.name && u.email && u.email.endsWith(DOMAIN)) return u;
+    } catch (e) {}
+    localStorage.removeItem(KEY);
+    return null;
+  }
+
+  /* ── 2. Grant access ── */
+  function grantAccess(user, isNew) {
+    window._ML_USER = user;
+
+    // Bypass the old PIN screen
+    if (typeof S !== 'undefined') { S.u = true; }
+    if (typeof render === 'function') { render(); }
+
+    if (isNew) {
+      showWelcome(user);
+    }
+
+    // Inject user badge into topbar
+    setTimeout(function () {
+      injectBadge(user);
+    }, isNew ? 700 : 100);
+  }
+
+  /* ── 3. Welcome flash (new registrations only) ── */
+  function showWelcome(user) {
+    var w = document.createElement('div');
+    w.id = 'ml-welcome';
+    var first = user.name.split(' ')[0];
+    w.innerHTML =
+      '<div class="ml-wm">MERCHLIST</div>' +
+      '<div class="ml-wt">Welcome, ' + esc(first) + ' 👋</div>';
+    document.body.appendChild(w);
+    setTimeout(function () { w && w.remove(); }, 700);
+  }
+
+  /* ── 4. User badge in topbar ── */
+  function injectBadge(user) {
+    var tb = document.querySelector('.tb-r');
+    if (!tb) return;
+    var initials = user.name.split(' ').map(function (w) { return w[0]; }).join('').toUpperCase().slice(0, 2);
+    var first = user.name.split(' ')[0];
+    var badge = document.createElement('div');
+    badge.id = 'ml-user-badge';
+    badge.title = 'Signed in as ' + user.email + '\nClick to sign out';
+    badge.innerHTML =
+      '<div class="uav">' + esc(initials) + '</div>' +
+      '<div class="unm">' + esc(first) + '</div>';
+    badge.onclick = function () {
+      if (confirm('Sign out of Merchlist Pricing Engine?\n\nYou will need to register again next visit.')) {
+        localStorage.removeItem(KEY);
+        location.reload();
+      }
+    };
+    tb.replaceWith(badge);
+  }
+
+  /* ── 5. Show registration gate ── */
+  function showGate() {
+    var gate = document.createElement('div');
+    gate.id = 'ml-gate';
+    gate.innerHTML =
+      '<div class="ml-card">' +
+        '<div class="ml-wordmark"><div class="ml-dot"></div><div class="ml-brand">MERCHLIST</div></div>' +
+        '<div class="ml-title">Sales Tool Access</div>' +
+        '<div class="ml-sub">Register with your Merchlist email to<br>open the Pricing Engine.</div>' +
+        '<div class="ml-field"><label class="ml-label">Full Name</label>' +
+          '<input class="ml-inp" id="ml-name" type="text" placeholder="e.g. Akhil Sharma" autocomplete="name"></div>' +
+        '<div class="ml-field"><label class="ml-label">Work Email</label>' +
+          '<input class="ml-inp" id="ml-email" type="email" placeholder="you@themerchlist.com" autocomplete="email"></div>' +
+        '<button class="ml-btn" id="ml-submit">Access Pricing Engine →</button>' +
+        '<div class="ml-err" id="ml-err"></div>' +
+        '<div class="ml-footer"><strong>Staff only</strong> · Requires @themerchlist.com · Your access is saved on this device</div>' +
+      '</div>';
+    document.body.appendChild(gate);
+
+    // Focus first field
+    setTimeout(function () {
+      var n = document.getElementById('ml-name');
+      if (n) n.focus();
+    }, 80);
+
+    // Tab between fields on Enter
+    document.getElementById('ml-name').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); document.getElementById('ml-email').focus(); }
+    });
+    document.getElementById('ml-email').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); submit(); }
+    });
+    document.getElementById('ml-submit').addEventListener('click', submit);
+  }
+
+  /* ── 6. Submit handler ── */
+  function submit() {
+    var nameEl  = document.getElementById('ml-name');
+    var emailEl = document.getElementById('ml-email');
+    var errEl   = document.getElementById('ml-err');
+    var name    = nameEl.value.trim();
+    var email   = emailEl.value.trim().toLowerCase();
+
+    nameEl.classList.remove('ml-err-inp');
+    emailEl.classList.remove('ml-err-inp');
+    errEl.textContent = '';
+
+    if (!name) {
+      nameEl.classList.add('ml-err-inp');
+      errEl.textContent = 'Please enter your full name.';
+      nameEl.focus(); return;
+    }
+    if (!email) {
+      emailEl.classList.add('ml-err-inp');
+      errEl.textContent = 'Please enter your work email.';
+      emailEl.focus(); return;
+    }
+    if (!email.endsWith(DOMAIN)) {
+      emailEl.classList.add('ml-err-inp');
+      errEl.textContent = 'Must be a @themerchlist.com email address.';
+      emailEl.focus(); return;
+    }
+
+    var user = { name: name, email: email, since: Date.now() };
+    localStorage.setItem(KEY, JSON.stringify(user));
+
+    // Remove gate smoothly
+    var gate = document.getElementById('ml-gate');
+    if (gate) {
+      gate.style.transition = 'opacity .25s';
+      gate.style.opacity = '0';
+      setTimeout(function () { gate.remove(); }, 260);
+    }
+
+    grantAccess(user, true);
+  }
+
+  /* ── 7. Escape HTML helper ── */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+    });
+  }
+
+  /* ── 8. Boot ── */
+  var user = getUser();
+  if (user) {
+    grantAccess(user, false);
+  } else {
+    showGate();
+  }
+
+})();
+</script>
+</body></html>
