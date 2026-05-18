@@ -121,16 +121,17 @@ const CUST=new Set(["PM","BP","FC"]);
 const TROLLEY=new Set(["TML-BT-021","TML-BT-050","TML-BT-051","TML-BT-054","TML-BT-070"]);
 const PREM_CATS=new Set(["TP","UW","HS","JS","CH","BT","PS","KC"]);
 const PMS=[
-{id:"dtf",n:"DTF",c:3,q:1,f:0,s:1,h:1},{id:"uv",n:"UV Print / UV DTF",c:3,q:1,f:0,s:0,h:1},
+{id:"dtf",n:"DTF",c:3,q:1,f:0,s:1,h:1},{id:"uv",n:"UV Print",c:3,q:1,f:0,s:0,h:1},
 {id:"engrave",n:"Engraving",c:3,q:1,f:0,s:0,h:1},
 {id:"emb",n:"Embroidery",c:7,q:1,f:0,s:1,h:0},{id:"sand",n:"Sand Blast",c:30,q:1,f:1,s:0,h:1},
 {id:"screen",n:"Screen Print",c:2,q:100,qS:500,qH:100,f:0,s:1,h:1},{id:"sub",n:"Sublimation",c:10,q:1,f:1,s:1,h:0},
 {id:"deboss",n:"Deboss/Emboss",c:4,q:50,f:0,s:0,h:1},
-{id:"p360",n:"360 Print",c:4,q:50,f:0,s:0,h:1},{id:"foil",n:"Gold Foil",c:4,q:50,f:0,s:0,h:1},
+{id:"p360",n:"360 Print",c:4,q:50,f:1,s:0,h:1},{id:"foil",n:"Gold Foil",c:4,q:50,f:0,s:0,h:1},
 {id:"trolley",n:"Trolley Screen",c:30,q:1,f:1,s:0,h:0,t:1},{id:"none",n:"No Print",c:0,q:1,f:1,s:1,h:1}
 ];
 const TIERS=[1,6,12,24,50,100,250,500,1000,2500];
-const JRN={1:0,6:.02,12:.04,24:.08,50:.15,100:.25,250:.42,500:.62,1000:.82,2500:1};
+const JRN={1:0,6:.04,12:.08,24:.15,50:.30,100:.50,250:.72,500:.88,1000:1,2500:1};/* V49: Option E (Competitive) — matches UAE market */
+const JRN_F={1:0,6:.06,12:.12,24:.22,50:.40,100:.65,250:.85,500:.95,1000:1,2500:1}/* V49: Option F (Aggressive) — beat the market */;
 const PROX="https://api.allorigins.win/get?url=";
 const QUICK_UNITS=[1,10,50,100,250,500,1000];
 
@@ -141,10 +142,11 @@ function he(s){var d=document.createElement("div");d.textContent=s;return d.inne
 // ── PRICING FORMULA (v9 backend) ──────────────────────────────────────────
 function wpc(m,w,s){
   if(m==="none")return 0;
-  if(m==="emb")return[25,20,15,5][s]||5;
+  if(m==="emb")return[20,15,10,10][s]||10;
   if(m==="sand"||m==="trolley")return s===0?45:0;
   if(m==="sub")return s===0?20:0;
-  if(["screen","deboss","emboss","p360","foil"].indexOf(m)>=0)return 5;
+  if(m==="p360")return s===0?5:0;
+  if(["screen","deboss","emboss","foil"].indexOf(m)>=0)return 5;
   if(w<=4)return[3,2,2,1][s]||1;
   if(w<=10)return[8,5,2,1][s]||1;
   return[10,8,6,2][s]||2;
@@ -155,36 +157,70 @@ function twp(m,w,d){
   if(pm.f)return wpc(m,w,0);
   var t=0;for(var i=0;i<d;i++)t+=wpc(m,w,i);return t;
 }
-function ipc(m,d){
+function ipc(m,d,w){
+  /* V46: internal cost per unit, aligned with PRINTING PRICES FINAL sheet
+   * - emb:                  10 per side (was 7)
+   * - uv/dtf/engrave: web-tiered (1.0/1.5/2.0 per side, was flat 3)
+   * - sand/trolley:         flat 30 (outsource)
+   * - others:               PMS.c default
+   * w (web price) may be undefined for callers that don\'t pass it — fall back to PMS.c */
   var pm=PMS.find(function(x){return x.id===m;});
   if(!pm)return 0;
+  if(m==='uvdtf')m='uv';
+  /* Per-method internal cost overrides */
+  if(m==='emb') return 5*d;
+  if(m==='uv'||m==='dtf'||m==='engrave'){
+    if(typeof w!=='number'||w<=0) return pm.c*d; /* legacy fallback */
+    var avg = (w<=4 ? 1.0 : (w<=10 ? 1.5 : 2.0));
+    return avg*d;
+  }
+  /* Default: original logic */
   if(pm.f)return pm.c;
   return pm.c*d;
 }
 function isC(p){return p.type==="D"||CUST.has(p.cc);}
 function gridOf(p){if(isC(p))return"C";if(SOFT.has(p.cc))return"S";return"H";}
-function floorR(p){return(SOFT.has(p.cc)&&!isC(p))?0.80:0.85;}
+function floorR(p){return(SOFT.has(p.cc)&&!isC(p))?0.85:0.85;}
 function showPrem(p){
   if(p.cc==="TP"||p.cc==="UW"||p.cc==="HS"||p.cc==="JS"||p.cc==="PS"||p.cc==="KC") return true;
   if(p.cc==="CH") return true;
   if(p.cc==="BT") return /canvas/i.test(p.title)&&/tote/i.test(p.title);
   return false;
 }
+/* V46: isTrophy detection — comprehensive keyword match on title */
+var TROPHY_RE=/\b(troph(?:y|ies)|award(?:s)?|plaque(?:s)?|medal(?:s)?)\b/i;
+function isTrophy(p){
+  if(!p||!p.title) return false;
+  return TROPHY_RE.test(p.title);
+}
 function gpm(p){
-  var is=SOFT.has(p.cc),it=TROLLEY.has(p.sku);
-  return PMS.filter(function(m){if(m.t)return it;return is?m.s:m.h;});
+  /* V46: Trophy products → only UV Print + Sand Blasting + Engraving */
+  if(isTrophy(p)){
+    return PMS.filter(function(m){return m.id==='uv'||m.id==='sand'||m.id==='engrave';});
+  }
+  /* V46: Trolley bags → only DTF + Trolley Screen */
+  if(TROLLEY.has(p.sku)){
+    return PMS.filter(function(m){return m.id==='dtf'||m.id==='trolley';});
+  }
+  /* Normal hardline/softline filter — sand is trophy-only now, exclude from non-trophy */
+  var is=SOFT.has(p.cc);
+  return PMS.filter(function(m){
+    if(m.t)return false;          /* trolley method only for trolley SKUs */
+    if(m.id==='sand')return false; /* sand is trophy-only now */
+    return is?m.s:m.h;
+  });
 }
 function calcP(p,pm,sd,prem,tq){
   try{
     if(!p||!p.web||!p.cost)return null;
-    // V40: backwards-compat for merged UV/UVDTF — old saved quotes may have pm='uvdtf'
+    // V40: backwards-compat — old saved quotes (from before UV merge) may have pm='uvdtf'
     if(pm==='uvdtf')pm='uv';
     var isPrem=(prem&&showPrem(p));
     // V22: Premium cost = p.prem if DB has it, else fall back to basic cost
     var hasPremCost=(isPrem&&p.prem>0);
     var bc=hasPremCost?p.prem:p.cost;
     // V22: Printing unchanged in premium mode (per spec: no premium price on printing)
-    var wp=twp(pm,p.web,sd),ip=ipc(pm,sd);
+    var wp=twp(pm,p.web,sd),ip=ipc(pm,sd,p.web);
     // V22: Premium list price = basic website × 1.5, printing markup added on top
     var listBase=isPrem?p.web*1.5:p.web;
     var li=listBase+wp,tc=bc+ip,fr=floorR(p);
@@ -194,7 +230,9 @@ function calcP(p,pm,sd,prem,tq){
     if(li<=0||tc<=0)return null;
     var base=(typeof S!=="undefined"&&S.wd===false)?0:0.20,maxD=1-(fl/li);
     if(maxD<=0)return{px:fl,m:(fl-tc)/fl*100,li:li,fl:fl,tc:tc,locked:true,wp:wp};
-    var j=JRN[tq]||0,td=base+(maxD-base)*j,qp=li*(1-td),fp=Math.max(qp,fl);
+    /* V49: Aggressive toggle picks Option F curve */
+    var JRcurve=(typeof S!=="undefined"&&S.agg)?JRN_F:JRN;
+    var j=JRcurve[tq]||0,td=base+(maxD-base)*j,qp=li*(1-td),fp=Math.max(qp,fl);
     return{px:fp,m:(fp-tc)/fp*100,li:li,fl:fl,tc:tc,locked:false,td:td,wp:wp};
   }catch(e){return null;}
 }
@@ -339,12 +377,12 @@ TML-UW-022|Blazer Jacket|UW|A|1|170|0|260|polyviscose 60% cotton 40% polyster|0.
 TML-UW-023|Cargo Pants|UW|A|1|38|0|50|Twill 65%polyster 35% cotton|0.5|1|MANUFACTURE|4||I
 TML-UW-024|Round Cufflinks|UW|C|1|8.97|0|20|Metal|0|1|Temu https://www.temu.com/ae/1pair-mens-personalized-cufflinks-stainless-steel-round-shirt-cufflinks-wedding-jewelry-gifts-g-601099520436368.html?_oak_mp_inf=EJDRj5um1ogBGiA1NjNiZmMzNDUwMzI0NWY4OGU3YTgzZmI1ZTc4ODM2MiCtm5nTiTM%3D&top_gallery_url=https%3A%2F%2Fimg.kwcdn.com%2Fproduct%2FFancyalgo%2FVirtualModelMatting%2Fce2cc1b48aa57687e2c022f63e380477.jpg&spec_gallery_id=4008480951&refer_page_sn=10009&refer_source=0&freesia_scene=2&_oak_freesia_scene=2&_oak_rec_ext_1=NzM3&search_key=cufflinks%20personalised&refer_page_el_sn=200049&refer_page_name=search_result&refer_page_id=10009_1754937026684_1w8b1yfveg&_x_sessn_id=ee6nqvqpd0|7|https://www.temu.com/ae/1pair-mens-personalized-cufflinks-stainless-steel-round-shirt-cufflinks-wedding-jewelry-gifts-g-601099520436368.html?_oak_mp_inf=EJDRj5um1ogBGiA1NjNiZmMzNDUwMzI0NWY4OGU3YTgzZmI1ZTc4ODM2MiCtm5nTiTM%3D&top_gallery_url=https%3A%2F%2Fimg.kwcdn.com%2Fproduct%2FFancyalgo%2FVirtualModelMatting%2Fce2cc1b48aa57687e2c022f63e380477.jpg&spec_gallery_id=4008480951&refer_page_sn=10009&refer_source=0&freesia_scene=2&_oak_freesia_scene=2&_oak_rec_ext_1=NzM3&search_key=cufflinks%20personalised&refer_page_el_sn=200049&refer_page_name=search_result&refer_page_id=10009_1754937026684_1w8b1yfveg&_x_sessn_id=ee6nqvqpd0|I
 TML-UW-025|Flame Resistant Safety Coverall|UW|C|1|200|0|270|100% cotton|1.15|1|AMAZON, VAULTEX https://www.amazon.ae/Portwest-Anti-Static-Super-Light-Retardant/dp/B00J4FQYU2/ref=sr_1_1?dib=eyJ2IjoiMSJ9.ivDeBAStDhlHGJNJ9Vmy5qiaNckNJoCOFtfpHYnRgq84DKqWY6zzatuwsyTC09dvedE-mxhpAQwzOWqwHLyjJrV2Zr0Zm3LZRLi2kaTctkK5EY_aMBfWtKZucb9lzj6GLSMMwCV0AeNlY8qrzPHiedcu2otqUnJdv40OOo2_tbBF8l5xOGkI-MEWXyy_F9zbKnNEcHOW38a5fm78ss0MkHOI93c4pA_9E2QcW5lpJL-suRw3klzxqSeLH0_PHqCp0JuLX8WRnkUmMDaAW_XETrWx2gDrORfE4sofxHxLyhA.pmNFzplTIE7gzsXW6Hum2GtmaXtS5xdhoUw7g9G93ks&dib_tag=se&keywords=fire%2Bretardant%2Bcoverall&qid=1755431065&sr=8-1&ufe=app_do%3Aamzn1.fos.b4f74a7b-9d54-420b-9003-7e54957e6f89&th=1&psc=1|3|https://www.amazon.ae/Portwest-Anti-Static-Super-Light-Retardant/dp/B00J4FQYU2/ref=sr_1_1?dib=eyJ2IjoiMSJ9.ivDeBAStDhlHGJNJ9Vmy5qiaNckNJoCOFtfpHYnRgq84DKqWY6zzatuwsyTC09dvedE-mxhpAQwzOWqwHLyjJrV2Zr0Zm3LZRLi2kaTctkK5EY_aMBfWtKZucb9lzj6GLSMMwCV0AeNlY8qrzPHiedcu2otqUnJdv40OOo2_tbBF8l5xOGkI-MEWXyy_F9zbKnNEcHOW38a5fm78ss0MkHOI93c4pA_9E2QcW5lpJL-suRw3klzxqSeLH0_PHqCp0JuLX8WRnkUmMDaAW_XETrWx2gDrORfE4sofxHxLyhA.pmNFzplTIE7gzsXW6Hum2GtmaXtS5xdhoUw7g9G93ks&dib_tag=se&keywords=fire%2Bretardant%2Bcoverall&qid=1755431065&sr=8-1&ufe=app_do%3Aamzn1.fos.b4f74a7b-9d54-420b-9003-7e54957e6f89&th=1&psc=1|I
-TML-UW-026|Industrial Safety Vest|UW|C|1|7|0|12|100% polyster|0.5|1|Vaultex|3||I
+TML-UW-026|Industrial Safety Vest|UW|C|1|8|0|14|100% polyster|0.5|1|Vaultex|3||I
 TML-UW-027|Two-Tone Industrial Safety Vest|UW|C|1|8|0|14|100% polyster|0.5|1|Vaultex|3||I
 TML-UW-028|Short Sleeve Shirt|UW|A|1|30|0|45|100% cotton|0.6|1|MANUFACTURE|0||I
 TML-UW-029|Short Sleeve Shirt with Pocket|UW|A|1|30|0|45|100% cotton|0.65|1|MANUFACTURE|0||I
 TML-DW-001|Ceramic Mug|DW|B|1|3.5|0|8|Ceramic|0.37|1|FOTOCAD, ASHBI MICRO, MTC, HAK https://www.fotokad.ae/sublimation-white-mug https://mtc.ae/product/white-sublimation-mugs-with-box/ https://www.hakgifts.com/products/h7c3d7f92d/2060941000022974606|3|https://www.fotokad.ae/sublimation-white-mug|I
-TML-DW-002|Stainless Steel Water Bottles|DW|B|1|19|19.5|35|Stainless Steel|0.38|1|HAK, MTC, AK FLASK, FOTOCAD https://mtc.ae/product/personalized-water-bottles/ https://www.hakgifts.com/products/bec5b9596a/2060941000023928468 https://www.hakgifts.com/products/df7f9c9b5b/2060941000022974534 https://akflash.com/product/atm-11-stainless-steel-water-bottle-1000-ml|3|https://mtc.ae/product/personalized-water-bottles/|I
+TML-DW-002|Stainless Steel Water Bottles|DW|B|1|10|19.5|24|Stainless Steel|0.38|1|HAK, MTC, AK FLASK, FOTOCAD https://mtc.ae/product/personalized-water-bottles/ https://www.hakgifts.com/products/bec5b9596a/2060941000023928468 https://www.hakgifts.com/products/df7f9c9b5b/2060941000022974534 https://akflash.com/product/atm-11-stainless-steel-water-bottle-1000-ml|3|https://mtc.ae/product/personalized-water-bottles/|I
 TML-DW-003|Stainless Steel Travel Mug|DW|B|1|16|0|22|Stainless Steel|0.5|1|ASHBIMICRO|3||I
 TML-DW-004|Wheat Straw Cup|DW|B|1|9|0|16|Wheat|0.22|1|MTC|3|https://mtc.ae/product/wheat-straw-cups-with-bamboo-lid-and-cork-grip/|I
 TML-DW-005|Aluminum Sports Gym Bottle|DW|B|1|7|0|18|Aluminium|0.17|1|FOTOCAD, AL MAHIR, HAK https://www.fotokad.ae/single-wall-aluminium-sports-bottle-with-carabiner https://www.hakgifts.com/products/i8eb8fd106/2060941000187222393 https://www.hakgifts.com/products/c2b326b59a/2060941000187222467|3|https://www.fotokad.ae/single-wall-aluminium-sports-bottle-with-carabiner|I
@@ -643,7 +681,7 @@ TML-BT-090|Recycled Cotton Organizer Pouch|BT|B|20|2|0|3||0.17|1|Shanghai Gifts 
 TML-BT-091|Portiva Laptop Sleeve|BT|B|1|22|0|31||0.5|1|Luxury Trading https://luxurytrd.com/shop/bags/laptop-bags/portiva/|3|https://luxurytrd.com/shop/bags/laptop-bags/portiva/|I
 TML-BT-092|Cotton Toiletry Bag|BT|B|1|6|0|11||0.5|0|Oasis https://www.oasiscatalog.ae/item/1-000102937|7|https://www.oasiscatalog.ae/item/1-000102937|O
 TML-BT-093|City Commuter Backpack|BT|B|1|24|0|33||0.5|1|Oasis https://www.oasiscatalog.ae/item/1-000104597|7|https://www.oasiscatalog.ae/item/1-000104597|I
-TML-BT-094|Folding Tote Bag|BT|B|1|3|0|4||0.5|1|Oasis https://www.oasiscatalog.ae/item/1-000104896|7|https://www.oasiscatalog.ae/item/1-000104896|I
+TML-BT-094|Folding Tote Bag|BT|B|1|3|0|6||0.5|1|Oasis https://www.oasiscatalog.ae/item/1-000104896|7|https://www.oasiscatalog.ae/item/1-000104896|I
 TML-BT-095|Classic Drawstring Duffle Bag|BT|B|1|6.7|0|10||0.11|1|Jasani https://www.jasani.ae/shop?search=bijou&order=name+asc|3|https://www.jasani.ae/shop?search=bijou&order=name+asc|I
 TML-BT-096|Commuter Laptop Backpack|BT|B|1|57.12|0|86||0.86|1|Jasani https://www.jasani.ae/shop?order=name+asc&search=sanok|3|https://www.jasani.ae/shop?order=name+asc&search=sanok|I
 TML-BT-097|Strava Executive Backpack|BT|B|1|58|0|80||0|0|Belfast https://belfast-uae.com/product/samadi-smart-spacious-professional/|3|https://belfast-uae.com/product/samadi-smart-spacious-professional/|O
@@ -651,7 +689,7 @@ TML-BT-098|Crochet Beach Tote Bag|BT|B|1|17|0|45||0.5|0|Temu|7|https://www.temu.
 TML-BT-099|Ranger Water Resistant Laptop Backpack|BT|B|1|49|0|68||0|1|HAK https://www.hakgifts.com/products/c290d85c7c/2060941000196984149|3|https://www.hakgifts.com/products/c290d85c7c/2060941000196984149|I
 TML-BT-100|Tripster Travel Backpack|BT|B|1|35|0|49||0.67|1|MTC https://mtc.ae/product/travel-backpacks-in-black-polyester-material/|3|https://mtc.ae/product/travel-backpacks-in-black-polyester-material/|I
 TML-BT-101|Titan Tote Bag|BT|B|1|12|0|17|Reinforced 1680D PU Leather|0.28|1|Event https://eventgift.net/product/o-tote-durable-large-capacity-tote-bag-with-reinforced-1680d-pu-bottom-strong-stitching-for-reliable-everyday-use/|3|https://eventgift.net/product/o-tote-durable-large-capacity-tote-bag-with-reinforced-1680d-pu-bottom-strong-stitching-for-reliable-everyday-use/|I
-TML-BT-102|Hobo Grocery Cotton Tote Bag|BT|B|1|5|0|7|100% Cotton|0.23|1|MTC https://mtc.ae/product/cotton-hobo-bags-with-front-pocket/|3|https://mtc.ae/product/cotton-hobo-bags-with-front-pocket/|I
+TML-BT-102|Hobo Grocery Cotton Tote Bag|BT|B|1|5|0|9|100% Cotton|0.23|1|MTC https://mtc.ae/product/cotton-hobo-bags-with-front-pocket/|3|https://mtc.ae/product/cotton-hobo-bags-with-front-pocket/|I
 TML-BT-103|VINGA Laptop Case|BT|B|1|36|0|50|Nubuck PU Leather|0.36|1|Jasani https://www.jasani.ae/shop?search=VINGA+Laptop+Case&order=name+asc|3|https://www.jasani.ae/shop?search=VINGA+Laptop+Case&order=name+asc|I
 TML-BT-104|Neo Multi-Pocket Pouch|BT|B|1|9|0|13||0.12|1|Event https://eventgift.net/product/o-purse-compact-multi-pocket-pouch-sleek-durable-design-with-zipper-pen-card-pockets-for-organized-essentials/|3|https://eventgift.net/product/o-purse-compact-multi-pocket-pouch-sleek-durable-design-with-zipper-pen-card-pockets-for-organized-essentials/|I
 TML-BT-105|Campo Jute Cooler Bag|BT|B|1|12|0|17||0.29|1|Shanghai Gifts https://www.shanghaigifts.net/products/Jute-Cooler-bag/11532|3|https://www.shanghaigifts.net/products/Jute-Cooler-bag/11532|I
@@ -1036,7 +1074,7 @@ TML-OA-329|Camel Plush Toy|OA|B|1|27|0|36||0.27|1|MTC https://mtc.ae/product/pro
 TML-OA-330|Aegis A5 Leather Notebook|OA|B|1|8.5|0|14||0.3|1|Jasani https://www.jasani.ae/shop?search=lyss&order=website_sequence+asc|3|https://www.jasani.ae/shop?search=lyss&order=website_sequence+asc|I
 TML-OA-331|Double Hook Lanyard|OA|B|10|2|0|4||0.5|1|Al Wassel Printing|4||I
 TML-OA-332|Ignite Crystal Award|OA|B|1|35|0|62||0.82|1|MTC https://mtc.ae/product/flame-shaped-crystal-awards/|3|https://mtc.ae/product/flame-shaped-crystal-awards/|I
-TML-OA-334|Dual Tip Ballpoint pen|OA|B|10|2|0|4||0.5|1|Bossman|3||I
+TML-OA-334|Dual Tip Ballpoint pen|OA|B|10|1.75|0|4||0.5|1|Bossman|3||I
 TML-OA-335|Classic Pen Box|OA|B|10|0.67|0|4||0.5|0|Jasani https://www.jasani.ae/shop/pb-762-pen-case-5319?search=pen+case&order=name+asc|3|https://www.jasani.ae/shop/pb-762-pen-case-5319?search=pen+case&order=name+asc|O
 TML-OA-336|Access Card Holder|OA|B|10|1.5|0|4||0.01|1|MTC https://mtc.ae/product/rigid-pvc-card-holders-ch-003/|3|https://mtc.ae/product/rigid-pvc-card-holders-ch-003/|I
 TML-OA-338|Leather Notebook with Pocket|OA|B|1|9.5|0|15||0.36|1|Shanghai https://www.shanghaigifts.net/products/Leather-Notebook-with-Pocket-Black/11329BK|3|https://www.shanghaigifts.net/products/Leather-Notebook-with-Pocket-Black/11329BK|I
@@ -1432,7 +1470,8 @@ TML-FC-004|Coconut Matcha Chocolate Bar by Varak|FC|D|10|38|0|70||0.5|1|VARAK|3|
 TML-FC-005|Bateel Dates Gift Box|FC|D|10|50|0|70||0.5|1|Bateel https://bateel.com/en_ae/palm.html?gad_source=1&gad_campaignid=22995464306&gbraid=0AAAAADB_nTAdR3vHDQShGH5Q1UlwXfS_4&gclid=CjwKCAjwuePGBhBZEiwAIGCVS1k7eE41srYQohABT-1ZYcVL_K_CmzYr_umpj0RUQcYeaoGl_lNx1hoCzewQAvD_BwE#157=28&158=12?utm_term=&utm_campaign=&utm_source=adwords&utm_medium=ppc&hsa_acc=6594430739&hsa_cam=22995461678&hsa_grp=&hsa_ad=&hsa_src=x&hsa_tgt=&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3|3|https://bateel.com/en_ae/palm.html?gad_source=1&gad_campaignid=22995464306&gbraid=0AAAAADB_nTAdR3vHDQShGH5Q1UlwXfS_4&gclid=CjwKCAjwuePGBhBZEiwAIGCVS1k7eE41srYQohABT-1ZYcVL_K_CmzYr_umpj0RUQcYeaoGl_lNx1hoCzewQAvD_BwE#157=28&158=12?utm_term=&utm_campaign=&utm_source=adwords&utm_medium=ppc&hsa_acc=6594430739&hsa_cam=22995461678&hsa_grp=&hsa_ad=&hsa_src=x&hsa_tgt=&hsa_kw=&hsa_mt=&hsa_net=adwords&hsa_ver=3|I
 TML-FC-006|Honey Jar|FC|D|50|22|0|32||0.5|1|JAYA|3||I
 TML-FC-007|Patchi Chocolates|FC|D|80|3.5|0|5||0.5|1|Patchi https://patchi.com/en/ourcreations/3/gift-boxes|4|https://patchi.com/en/ourcreations/3/gift-boxes|I
-TML-FC-008|Fortune Cookies with Custom Message|FC|D|100|7.5|0|17||0.5|1|TAO'S DEN|5||I`;
+TML-FC-008|Fortune Cookies with Custom Message|FC|D|100|7.5|0|17||0.5|1|TAO'S DEN|5||I
+TML-OA-352|Blackline Twist Pen|OA|B|10|3.5|0|7||0|1|MTC|3|https://mtc.ae/product/metal-pens-twist-action-matte-finish-and-black-clip/|I`;
 
 var P=PDATA.split("\n").map(function(l){
   var x=l.split("|");
@@ -1509,7 +1548,7 @@ function loadProductData(p, cb){
 }
 function loadImg(p, cb){loadProductData(p, function(pd){cb(pd&&pd.img?pd.img:false);});}
 
-var S={u:false,tab:"calc",q:"",cf:"ALL",gf:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,wd:true,fq:"",fr:null,fl:false};
+var S={u:false,tab:"calc",q:"",cf:"ALL",gf:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,wd:true,fq:"",fr:null,fl:false,agg:false};
 
 function updOut(){
   var el=document.getElementById("OA");if(!el)return;
@@ -1552,7 +1591,7 @@ function updOut(){
     "<div class='quick-units'>"+quickH+"</div>"+
     "<div class='qbox "+qC+"'>"+
       "<div class='q-head'>"+
-        "<div><div class='q-lbl "+qLC+"'>"+qL+"</div><div class='q-val'>"+aed(dp)+"<span>/ unit</span></div></div>"+
+        "<div><div class='q-lbl "+qLC+"'>"+qL+(S.agg?"<span class='q-agg-badge'>\u26A1 BEAT-THE-DEAL</span>":"")+"</div><div class='q-val'>"+aed(dp)+"<span>/ unit</span></div></div>"+
         "<div class='q-mgn'><div class='ml'>Margin</div><div class='mv' style='color:"+mc+"'>"+cur.m.toFixed(1)+"%</div></div>"+
       "</div>"+
       (cur.locked?"<div class='q-note "+(cur.px>cur.li*0.8?"w":"r")+"'>"+(cur.px>cur.li*0.8?"Margin protector applied \u2014 limited discount available.":"\u26A0 Cost floor ("+aed(cur.fl)+") exceeds web price ("+aed(cur.li*0.8)+"). Needs repricing.")+"</div>":"")+
@@ -1753,6 +1792,17 @@ function render(keep){
       render(true);
     });
   }
+  // V49: Aggressive mode toggle handler — mirrors wd pattern
+  if(!window._aggHandlerInstalled){
+    window._aggHandlerInstalled=true;
+    document.addEventListener("click",function(e){
+      var btn=e.target.closest("[data-agg]");
+      if(!btn)return;
+      S.agg=btn.getAttribute("data-agg")==="1";
+      try{localStorage.setItem("ml_agg_v1",S.agg?"1":"0");}catch(err){}
+      render(true);
+    });
+  }
   // Finder
   var fIn=document.getElementById("fIn"),fGo=document.getElementById("fGo");
   if(fIn){fIn.oninput=function(){S.fq=this.value;};fIn.onkeydown=function(e){if(e.key==="Enter"&&fGo)fGo.click();};}
@@ -1774,6 +1824,7 @@ function render(keep){
 }
 // V32: Load Web Discount preference from localStorage
 try{var wdSaved=localStorage.getItem('ml_wd_v1');if(wdSaved!==null)S.wd=wdSaved==='1';}catch(e){}
+try{var aggSaved=localStorage.getItem('ml_agg_v1');if(aggSaved!==null)S.agg=aggSaved==='1';}catch(e){}
 render();
 </script>
 <style>
@@ -2454,7 +2505,7 @@ function fixScreenTip(){
   }
 }
 
-var ML_LABELS={dtf:'DTF',uv:'UV Print / UV DTF',uvdtf:'UV Print / UV DTF',engrave:'Engrave',emb:'Embroidery',sand:'Sand Blast',screen:'Screen',none:'No Print'};
+var ML_LABELS={dtf:'DTF',uv:'UV Print',uvdtf:'UV Print',engrave:'Engrave',emb:'Embroidery',sand:'Sand Blast',screen:'Screen',none:'No Print'};
 function fixMethodLabels(){
   document.querySelectorAll('[data-pm]').forEach(function(btn){
     var pm=btn.getAttribute('data-pm');
@@ -3184,11 +3235,20 @@ window.addEventListener('load',function(){
       row.className = 'ml-addbq-row';
       // V34: Web Discount toggle on left, Add button on right (same row)
       var wdOn = (typeof S!=='undefined' && S.wd!==false);
+      var aggOn = (typeof S!=='undefined' && S.agg===true);
+      // V49: Aggressive pricing toggle (Option F curve — beat-the-deal pricing)
       row.innerHTML = '<div class="ml-wdmini">'+
         '<span class="ml-wdmini-lbl">Web Discount</span>'+
         '<div class="ml-wdmini-pills">'+
           '<button class="ml-wdmini-b'+(wdOn?' on':'')+'" data-wd="1" type="button">On <span class="ml-wdmini-sub">\u221220%</span></button>'+
           '<button class="ml-wdmini-b'+(!wdOn?' on':'')+'" data-wd="0" type="button">Off</button>'+
+        '</div>'+
+      '</div>'+
+      '<div class="ml-aggmini'+(aggOn?' on':'')+'" title="Switch to aggressive pricing curve for this quote">'+
+        '<span class="ml-aggmini-lbl">\u26A1 Beat-the-Deal</span>'+
+        '<div class="ml-aggmini-pills">'+
+          '<button class="ml-aggmini-b'+(aggOn?' on':'')+'" data-agg="1" type="button">On</button>'+
+          '<button class="ml-aggmini-b'+(!aggOn?' on':'')+'" data-agg="0" type="button">Off</button>'+
         '</div>'+
       '</div>'+
       '<button class="ml-addbq-btn" id="ml-addbq" type="button">'+
@@ -6640,4 +6700,18 @@ window.addEventListener('load',function(){
 </script>
 <!-- ═══════════════════ END V29 PATCH ═══════════════════ -->
 
+
+<style>
+/* V49: Aggressive (Beat-the-Deal) toggle — mirrors ml-wdmini but with amber accent */
+.ml-aggmini{display:flex;align-items:center;gap:8px;padding:5px 9px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;font-size:11px;font-weight:600;color:#92400e;transition:all .15s ease}
+.ml-aggmini.on{background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border-color:#f59e0b;color:#78350f;box-shadow:0 0 0 1px #f59e0b inset}
+.ml-aggmini-lbl{font-size:10.5px;letter-spacing:.3px;white-space:nowrap}
+.ml-aggmini-pills{display:flex;gap:2px;background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:1px}
+.ml-aggmini-b{font-size:10.5px;font-weight:600;padding:3px 8px;border:0;background:transparent;color:#6b7280;border-radius:4px;cursor:pointer;font-family:inherit}
+.ml-aggmini-b.on{background:#f59e0b;color:#fff}
+.ml-aggmini-b:hover:not(.on){background:#f3f4f6;color:#374151}
+
+/* V49: Aggressive mode active badge inside the qbox header */
+.q-agg-badge{display:inline-block;font-size:9.5px;font-weight:700;color:#78350f;background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border:1px solid #f59e0b;padding:2px 7px;border-radius:10px;margin-left:8px;letter-spacing:.3px;vertical-align:middle}
+</style>
 </body></html>
