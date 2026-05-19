@@ -1,17 +1,96 @@
 <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Merchlist Pricing Engine</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#111;-webkit-font-smoothing:antialiased;font-size:14px}button{font-family:inherit}input,select{font-family:inherit}
 .pin-ov{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;padding:20px}.pin-c{background:#fff;border-radius:20px;padding:48px 40px;max-width:380px;width:100%;text-align:center}.pin-logo{font-size:11px;font-weight:900;letter-spacing:5px;color:#16a34a;margin-bottom:8px}.pin-title{font-size:24px;font-weight:800;color:#111;margin-bottom:4px}.pin-sub{font-size:13px;color:#9ca3af;margin-bottom:28px}.pini{width:100%;padding:14px;font-size:22px;text-align:center;border:2px solid #e5e7eb;border-radius:12px;outline:none;letter-spacing:10px;color:#111;transition:border .15s}.pini:focus{border-color:#111}.pini.err{border-color:#dc2626;animation:shake .35s}@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}.pinb{width:100%;padding:14px;font-size:14px;font-weight:700;background:#111;color:#fff;border:none;border-radius:12px;cursor:pointer;margin-top:12px;letter-spacing:.5px}.pinb:hover{background:#1f2937}.pine{color:#dc2626;font-size:12px;margin-top:8px;min-height:18px}
 .app{display:flex;flex-direction:column;height:100vh}.topbar{background:#fff;border-bottom:1px solid #e5e7eb;height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}.tb-l{display:flex;align-items:center;gap:14px}.tb-logo{font-size:13px;font-weight:900;color:#16a34a;letter-spacing:1px}.tb-v{font-size:9px;color:#9ca3af}.tb-tabs{display:flex;gap:2px;margin-left:8px}.tab{padding:6px 14px;font-size:11px;font-weight:700;color:#6b7280;cursor:pointer;border-radius:6px;border:none;background:transparent;letter-spacing:.3px;transition:all .15s}.tab.on{color:#111;background:#f3f4f6}.tab:hover:not(.on){color:#374151}.tb-r{font-size:9px;color:#d1d5db;letter-spacing:1px;font-weight:600}.body{display:flex;flex:1;overflow:hidden}
-.sb{width:300px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0}.sf{padding:10px}.sf-inp{width:100%;padding:9px 10px 9px 32px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;background:#f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;color:#111;transition:all .15s}.sf-inp:focus{border-color:#111;background:#fff}.sf-row{display:flex;gap:5px;margin-top:6px}.sf-sel{flex:1;padding:6px 7px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:11px;outline:none;background:#f9fafb;color:#374151;cursor:pointer}.sf-cnt{font-size:10px;color:#9ca3af;margin-top:5px;padding-left:2px}.plist{flex:1;overflow-y:auto}
+.sb{width:300px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0}.sf{padding:10px}.sf-inp{width:100%;padding:9px 10px 9px 32px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;background:#f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;color:#111;transition:all .15s}.sf-inp:focus{border-color:#111;background:#fff}.sf-row{display:flex;gap:5px;margin-top:6px}.sf-sel{flex:1;min-width:0;max-width:100%;box-sizing:border-box;padding:6px 7px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:11px;outline:none;background:#f9fafb;color:#374151;cursor:pointer}.sf-cnt{font-size:10px;color:#9ca3af;margin-top:5px;padding-left:2px}.plist{flex:1;overflow-y:auto}
+/* V62.14: Searchable supplier filter — custom dropdown panel (renders BELOW input) */
+.sf-sup-wrap{position:relative;flex:1;min-width:0;max-width:100%;display:flex;align-items:center}
+.sf-sup-inp{width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:6px 26px 6px 7px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:11px;outline:none;background:#f9fafb;color:#111;font-weight:500;transition:border .15s;text-overflow:ellipsis}
+.sf-sup-inp::placeholder{color:#9ca3af;font-weight:400}
+.sf-sup-inp:focus{border-color:#111;background:#fff}
+.sf-sup-clear{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;border:none;background:#e5e7eb;color:#6b7280;font-size:13px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;z-index:2}
+.sf-sup-clear:hover{background:#d1d5db;color:#111}
+.sf-sup-list{
+  position:absolute;
+  top:calc(100% + 4px);
+  left:0;
+  right:0;
+  z-index:100;
+  background:#fff;
+  border:1.5px solid #e5e7eb;
+  border-radius:8px;
+  max-height:260px;
+  overflow-y:auto;
+  box-shadow:0 6px 16px rgba(0,0,0,.12);
+  display:none;
+}
+.sf-sup-list.open{display:block}
+.sf-sup-opt{
+  padding:5px 9px;
+  cursor:pointer;
+  color:#374151;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  font-size:10.5px;
+  border-bottom:1px solid #f5f5f5;
+}
+.sf-sup-opt:last-child{border-bottom:none}
+.sf-sup-opt:hover{background:#f9fafb;color:#111}
+.sf-sup-opt .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.sf-sup-opt .cnt{
+  color:#9ca3af;
+  font-size:9.5px;
+  font-weight:500;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
 .pi{padding:9px 10px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:8px;transition:background .1s}.pi:hover{background:#f9fafb}.pi.sel{background:#f0fdf4;border-left:3px solid #16a34a}.pi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}.pi-dot.S{background:#16a34a}.pi-dot.H{background:#374151}.pi-dot.C{background:#9333ea}.pi-info{flex:1;min-width:0}.pi-n{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#111}.pi-m{font-size:10px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pi-p{font-size:11px;font-weight:700;color:#111;flex-shrink:0;margin-left:4px}.pi-oos{font-size:8px;color:#dc2626;font-weight:700}
-.mn{flex:1;overflow-y:auto;padding:18px 20px;background:#f5f5f5}.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#d1d5db;gap:8px;text-align:center}.empty .ic{font-size:48px;opacity:.5}.empty .t{font-size:14px;font-weight:600;color:#9ca3af}.empty .s{font-size:12px;color:#d1d5db;max-width:240px}
+.mn{flex:1;overflow-y:auto;padding:18px 20px;background:#f5f5f5}.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#d1d5db;gap:12px;text-align:center}.empty .ic{font-size:42px;font-weight:300;color:#cbd5e1;line-height:1;letter-spacing:-2px}.empty .t{font-size:15px;font-weight:600;color:#6b7280}.empty .s{font-size:12.5px;color:#9ca3af;max-width:280px;line-height:1.5}
 .cd{background:#fff;border-radius:12px;padding:16px 18px;border:1px solid #e5e7eb;margin-bottom:12px}.cd.tight{padding:14px 16px}
+/* V62.6/V62.8: subtle section divider inside a .cd — line only, no label */
+.cd-divider{margin:18px 0 14px;border-top:1px solid #f3f4f6;height:0}
+.cd-divider-lbl{display:none}
+/* V62.6: matching label at top of the output panel — preserves visual flow into "Quote Summary" */
+.oa-lbl{font-size:10px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:1.5px;display:block;margin:4px 0 12px}
 .ph{display:flex;gap:14px;align-items:flex-start}.ph-img{width:80px;height:80px;border-radius:10px;background:#f3f4f6;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;font-size:24px;color:#d1d5db;position:relative}.ph-img img{width:100%;height:100%;object-fit:cover}.ph-img.img-loading{background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);background-size:200% 100%;animation:shimmer 1.3s infinite}@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}.ph-info{flex:1;min-width:0}.ph-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.ph-title{font-size:16px;font-weight:700;color:#111;line-height:1.25;flex:1}.ph-price{font-size:13px;font-weight:700;color:#111;white-space:nowrap;flex-shrink:0;text-align:right}.ph-price .pl{font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:1px}.ph-sku{font-size:10px;color:#9ca3af;margin-top:3px;font-weight:500}.bds{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}.bd{padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px}.bd.stk{background:#dcfce7;color:#15803d}.bd.cat{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}.bd.oos{background:#fee2e2;color:#b91c1c}.bd.S{background:#dcfce7;color:#166534}.bd.H{background:#f3f4f6;color:#374151}.bd.C{background:#f3e8ff;color:#6b21a8}
 .specs{display:flex;flex-wrap:wrap;gap:14px 18px;padding:11px 14px;background:#fafafa;border-radius:9px;align-items:flex-start;font-size:11px}.spec .l{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}.spec .v{font-size:11px;font-weight:600;color:#111;margin-top:2px}
 .cfg-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}.cfg-g{flex:1;min-width:160px}.cfg-s{flex:0 0 auto}.cfg-lbl{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}.btns{display:flex;flex-wrap:wrap;gap:4px}.btn{padding:5px 11px;border:1.5px solid #e5e7eb;border-radius:7px;background:#f9fafb;font-size:11px;font-weight:600;cursor:pointer;color:#374151;transition:all .12s;line-height:1.2}.btn:hover{border-color:#9ca3af;background:#fff}.btn.on{border-color:#111;background:#111;color:#fff}.btn .sub{font-size:8px;display:block;color:#9ca3af;font-weight:500;margin-top:1px}.btn.on .sub{color:rgba(255,255,255,.55)}.sides-row{display:flex;gap:3px}.sd-btn{width:32px;height:32px;border:1.5px solid #e5e7eb;border-radius:7px;background:#f9fafb;font-size:12px;font-weight:700;cursor:pointer;color:#374151;display:flex;align-items:center;justify-content:center;transition:all .12s}.sd-btn.on{border-color:#111;background:#111;color:#fff}.fab-row{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:7px;overflow:hidden}.wd-row{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:7px;overflow:hidden}.wd-b{padding:8px 14px;font-size:11px;font-weight:700;color:#6b7280;background:transparent;border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap}.wd-b.on{background:#111;color:#fff}.wd-b:hover:not(.on){color:#111}.fab-b{padding:5px 13px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#374151;transition:all .12s}.fab-b.on{background:#111;color:#fff}.moq-warn{margin-top:8px;padding:7px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#92400e}
-.qty-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}.qty-wrap{display:flex;align-items:center;border:2px solid #e5e7eb;border-radius:9px;overflow:hidden;background:#fff;transition:border .15s}.qty-wrap:focus-within{border-color:#111}.qty-btn{width:36px;height:42px;background:transparent;border:none;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center;user-select:none}.qty-btn:hover{background:#f3f4f6}.qty-inp{width:80px;height:42px;border:none;outline:none;font-size:18px;font-weight:700;text-align:center;background:transparent;color:#111;-moz-appearance:textfield}.qty-inp::-webkit-inner-spin-button,.qty-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.qty-lbl{font-size:12px;color:#6b7280}.er{color:#dc2626;font-weight:700}
-.quick-units{display:flex;gap:5px;margin-bottom:14px;flex-wrap:wrap}.qu-btn{padding:5px 12px;border:1.5px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:11px;font-weight:700;cursor:pointer;color:#374151;transition:all .12s}.qu-btn:hover{border-color:#9ca3af;background:#fff}.qu-btn.on{border-color:#111;background:#111;color:#fff}
-.qbox{border-radius:12px;padding:16px 18px}.qbox.ok{background:#f0fdf4;border:2px solid #86efac}.qbox.cap{background:#fefce8;border:2px solid #fde047}.qbox.bad{background:#fef2f2;border:2px solid #fca5a5}.q-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.q-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}.q-lbl.ok{color:#15803d}.q-lbl.w{color:#a16207}.q-lbl.r{color:#b91c1c}.q-val{font-size:32px;font-weight:800;line-height:1;color:#111}.q-val span{font-size:13px;font-weight:400;color:#9ca3af;margin-left:2px}.q-mgn{text-align:right}.q-mgn .ml{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-mgn .mv{font-size:20px;font-weight:800;line-height:1;margin-top:2px}.q-note{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.4}.q-note.w{background:rgba(234,179,8,.12);color:#a16207}.q-note.r{background:rgba(220,38,38,.08);color:#b91c1c}.q-totals{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding-top:12px;border-top:1px solid rgba(0,0,0,.07)}.q-tot .tl{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-tot .tv{font-size:13px;font-weight:700;margin-top:1px;color:#111}
+.qty-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}.qty-wrap{display:flex;align-items:center;border:2px solid #e5e7eb;border-radius:9px;overflow:hidden;background:#fff;transition:border .15s}.qty-wrap:focus-within{border-color:#111}.qty-btn{width:36px;height:42px;background:transparent;border:none;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center;user-select:none}.qty-btn:hover{background:#f3f4f6}.qty-inp{width:80px;height:42px;border:none;outline:none;font-size:18px;font-weight:700;text-align:center;background:transparent;color:#111;-moz-appearance:textfield}.qty-inp::-webkit-inner-spin-button,.qty-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.qty-lbl{font-size:12px;color:#6b7280}.er{color:#dc2626;font-weight:700}
+.quick-units{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}.qu-btn{padding:5px 12px;border:1.5px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:11px;font-weight:700;cursor:pointer;color:#374151;transition:all .12s}.qu-btn:hover{border-color:#9ca3af;background:#fff}.qu-btn.on{border-color:#111;background:#111;color:#fff}
+.qbox{border-radius:12px;padding:16px 18px}.qbox.ok{background:#f0fdf4;border:2px solid #86efac}.qbox.cap{background:#fefce8;border:2px solid #fde047}.qbox.bad{background:#fef2f2;border:2px solid #fca5a5}.q-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.q-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}.q-lbl.ok{color:#15803d}.q-lbl.w{color:#a16207}.q-lbl.r{color:#b91c1c}.q-val{font-size:32px;font-weight:800;line-height:1;color:#111}.q-val span{font-size:13px;font-weight:400;color:#9ca3af;margin-left:2px}.q-mgn{text-align:right}.q-mgn .ml{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-mgn .mv{font-size:20px;font-weight:800;line-height:1;margin-top:2px}.q-note{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.4}.q-note.w{background:rgba(234,179,8,.12);color:#a16207}.q-note.r{background:rgba(220,38,38,.08);color:#b91c1c}
+/* V62.10/15: Quote totals — Subtotal + VAT as their own rows, Total as hero with separator */
+.q-totals{padding-top:12px;margin-top:12px;border-top:1px solid rgba(0,0,0,.08);display:flex;flex-direction:column;gap:5px}
+.q-tot-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  font-size:12.5px;
+  font-variant-numeric:tabular-nums;
+}
+.q-tot-row .lbl{
+  color:#6b7280;
+  font-weight:500;
+}
+.q-tot-row .val{
+  color:#374151;
+  font-weight:600;
+}
+.q-tot-main{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap:12px;
+  margin-top:8px;
+  padding-top:9px;
+  border-top:1px solid rgba(0,0,0,.08);
+}
+.q-tot-main .tl{font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.6px}
+.q-tot-main .tv{font-size:20px;font-weight:800;color:#16a34a;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
 .tips{display:flex;flex-direction:column;gap:6px;margin:10px 0}.tip{padding:8px 11px;border:1.5px solid #e5e7eb;background:#fff;border-radius:8px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .12s}.tip:hover{border-color:#9ca3af;background:#f9fafb}.tip .ti{font-size:14px;flex-shrink:0}.tip .tt{font-size:11px;font-weight:700;color:#111;line-height:1.3}.tip .ts{font-size:10px;color:#6b7280;margin-top:1px}
+/* V62.10: subtle screen-print recommendation as inline note (replaces bordered .tip block) */
+.rec-line{display:block;width:100%;text-align:left;margin:10px 0 0;padding:7px 10px;background:#f9fafb;border:none;border-left:2px solid #16a34a;border-radius:0 6px 6px 0;font-size:11px;font-weight:500;color:#374151;line-height:1.4;cursor:pointer;transition:background .12s}
+.rec-line:hover{background:#f0fdf4;color:#15803d}
 .sec-lbl{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
 .email-box{background:#f9fafb;border:1.5px solid #e5e7eb;border-radius:9px;padding:14px 16px;font-size:12.5px;line-height:1.75;color:#374151;font-family:inherit;max-height:280px;overflow-y:auto}.copy-row{display:flex;gap:8px;margin-top:8px}.copy-btn{flex:1;padding:10px;background:#111;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:background .15s}.copy-btn:hover{background:#1f2937}.copy-btn.done{background:#16a34a}
 .proc{padding:40px 24px;background:#fff;border-radius:12px;border:1px solid #e5e7eb;text-align:center}.proc .ic{font-size:42px;margin-bottom:10px}.proc h3{font-size:18px;font-weight:800;color:#111;margin-bottom:4px}.proc .sub{font-size:12px;color:#6b7280;margin-bottom:14px}.proc .pill{display:inline-block;padding:8px 18px;background:#f3e8ff;color:#6b21a8;border-radius:20px;font-size:12px;font-weight:700}
@@ -1550,7 +1629,7 @@ function loadProductData(p, cb){
 }
 function loadImg(p, cb){loadProductData(p, function(pd){cb(pd&&pd.img?pd.img:false);});}
 
-var S={u:false,tab:"calc",q:"",cf:"ALL",gf:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,wd:true,fq:"",fr:null,fl:false};
+var S={u:false,tab:"calc",dt:"details",q:"",cf:"ALL",gf:"ALL",sup:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,wd:true,fq:"",fr:null,fl:false};
 
 function updOut(){
   var el=document.getElementById("OA");if(!el)return;
@@ -1566,7 +1645,7 @@ function updOut(){
   var qC=cur.locked?(cur.px>cur.li*0.8?"cap":"bad"):"ok";
   var qL=cur.locked&&cur.px>cur.li*0.8?"Floor price applied":cur.locked?"Below web price":"Quote Price with Branding";
   var qLC=cur.locked&&cur.px>cur.li*0.8?"w":cur.locked?"r":"ok";
-  // Screen recommender (V40: grid-MOQ + single color note)
+  // Screen recommender (V62.10: subtle inline note instead of bordered tip block)
   var rec="";
   var scrMoq=SOFT.has(p.cc)?500:100;
   if(S.qty>=scrMoq&&S.pm!=="screen"&&S.pm!=="none"){
@@ -1575,13 +1654,14 @@ function updOut(){
       var sc2=calcP(p,"screen",1,S.pr,qt(S.qty));
       if(sc2&&sc2.px<cur.px-0.5){
         var sv=(cur.px-sc2.px).toFixed(1),sp=((1-sc2.px/cur.px)*100).toFixed(0);
-        rec="<div class='tip' data-ta='screen'><div class='ti'>\uD83D\uDCA1</div><div><div class='tt'>Switch to Screen Print \u2014 save AED "+sv+"/unit</div><div class='ts'>"+sp+"% cheaper \u00B7 AED "+sc2.px.toFixed(1)+"/unit \u00B7 MOQ "+scrMoq+" \u00B7 single color only</div></div></div>";
+        rec="<button class='rec-line' data-ta='screen' type='button'>Switch to Screen Print to save AED "+sv+"/unit ("+sp+"% cheaper, MOQ "+scrMoq+", single color) \u2192</button>";
       }
     }
   }
   var quickH=QUICK_UNITS.map(function(u){var l=u>=1000?(u/1000)+"K":u;return"<button class='qu-btn"+(S.qty===u?" on":"")+"' data-qu='"+u+"' type='button'>"+l+"</button>";}).join("");
   var lt=p.tl?parseInt(p.tl)||7:7;var email="Hi again! \uD83D\uDC4B\n\nThanks for your interest in working with Merchlist \u2014 here\u2019s the breakdown for your order, already discounted for you \uD83D\uDE0A\n\n"+b("Product")+": "+p.title+(S.pr?" (Premium)":"")+"\n"+b("Print Method")+": "+pt+"\n"+b("Quantity")+": "+S.qty.toLocaleString()+" units\n"+b("Unit Price")+": "+aed(dp)+"\n"+b("Total with VAT")+": "+aed(total+vat)+"\n\n"+b("Lead Time")+": "+lt+" working day"+(lt>1?"s":"")+" from artwork approval\n\nLet me know if you have any further questions :)";
   el.innerHTML=
+    "<div class='oa-lbl'>Quote Summary</div>"+
     "<div class='qty-row'>"+
       "<div class='qty-wrap'>"+
         "<button class='qty-btn' id='qm' type='button'>\u2212</button>"+
@@ -1594,14 +1674,14 @@ function updOut(){
     "<div class='qbox "+qC+"'>"+
       "<div class='q-head'>"+
         "<div class='q-info'><div class='q-lbl "+qLC+"'>"+qL+"</div><div class='q-val'>"+aed(dp)+"<span>/ unit</span></div><div class='q-range'><span class='q-range-lbl'>Closing Range</span><span class='q-range-val'>"+aed(dp*0.925)+" \u2013 "+aed(dp*1.075)+"</span></div></div>"+
-        "<div class='q-mgn'><div class='ml'>Margin</div><div class='mv' style='color:"+mc+"'>"+cur.m.toFixed(1)+"%</div></div>"+
+        "<div class='q-mgn'><div class='ml'>Margin</div><div class='mv' id='ml-mv' style='color:"+mc+"'>"+cur.m.toFixed(1)+"%</div></div>"+
       "</div>"+
       (cur.locked?"<div class='q-note "+(cur.px>cur.li*0.8?"w":"r")+"'>"+(cur.px>cur.li*0.8?"Margin protector applied \u2014 limited discount available.":"\u26A0 Cost floor ("+aed(cur.fl)+") exceeds web price ("+aed(cur.li*0.8)+"). Needs repricing.")+"</div>":"")+
-      (rec?"<div class='tips'>"+rec+"</div>":"")+
+      (rec?rec:"")+
       "<div class='q-totals'>"+
-        "<div class='q-tot'><div class='tl'>Subtotal</div><div class='tv'>"+aed(total)+"</div></div>"+
-        "<div class='q-tot'><div class='tl'>VAT 5%</div><div class='tv'>"+aed(vat)+"</div></div>"+
-        "<div class='q-tot'><div class='tl'>Total inc. VAT</div><div class='tv' style='color:#16a34a'>"+aed(total+vat)+"</div></div>"+
+        "<div class='q-tot-row'><span class='lbl'>Subtotal</span><span class='val'>"+aed(total)+"</span></div>"+
+        "<div class='q-tot-row'><span class='lbl'>VAT 5%</span><span class='val'>"+aed(vat)+"</span></div>"+
+        "<div class='q-tot-main'><span class='tl'>Total inc. VAT</span><span class='tv'>"+aed(total+vat)+"</span></div>"+
       "</div>"+
     "</div>"+
     "<div class='cd tight' style='margin-top:12px;margin-bottom:0'>"+
@@ -1697,6 +1777,145 @@ function fuzzyScore(haystack,queries){
   });
   return best;
 }
+// V62.14: Supplier extraction helpers.
+// extractSupplierSegments(supStr): split on URL/paren/comma/slash/newline → array of segments
+function extractSupplierSegments(supStr){
+  if(!supStr) return [];
+  // Strip embedded URLs (both https:// and bare-domain forms like "Amazon.ae/...")
+  var cleaned = supStr.replace(/\s+(?:https?:\/\/|[a-zA-Z0-9-]+\.[a-zA-Z]{2,5}\/)\S*/gi,'');
+  return cleaned.split(/[\n,/()]/).map(function(s){return s.trim();}).filter(Boolean);
+}
+// Levenshtein distance — used to merge typos like Jasani/Jassani (distance=1).
+function _levenshtein(a,b){
+  if(a===b) return 0;
+  if(!a.length) return b.length;
+  if(!b.length) return a.length;
+  var prev=[]; for(var j=0;j<=a.length;j++) prev[j]=j;
+  for(var i=1;i<=b.length;i++){
+    var curr=[i];
+    for(j=1;j<=a.length;j++){
+      var cost = b.charAt(i-1)===a.charAt(j-1) ? 0 : 1;
+      curr[j] = Math.min(curr[j-1]+1, prev[j]+1, prev[j-1]+cost);
+    }
+    prev=curr;
+  }
+  return prev[a.length];
+}
+// Display formatter — title-case multi-letter words, preserve ≤3-char all-caps acronyms.
+function _formatSupName(s){
+  return s.split(/\s+/).map(function(w){
+    if(w.length<=3 && /^[A-Z]+$/.test(w)) return w;
+    return w.charAt(0).toUpperCase()+w.slice(1).toLowerCase();
+  }).join(' ');
+}
+// Build the supplier list with compound-split + fuzzy-merge.
+// Returns { list: [{name,n}], expandedCanon: { rawNameLower: [canonical1, canonical2, ...] } }
+function buildSupplierList(P){
+  // PASS 1: extract raw segments from every product
+  var rawCounts={};
+  var rawDisplays={};  // remember the best display casing per raw key
+  P.forEach(function(p){
+    if(!p.sup) return;
+    extractSupplierSegments(p.sup).forEach(function(seg){
+      var key=seg.toLowerCase();
+      rawCounts[key]=(rawCounts[key]||0)+1;
+      if(!rawDisplays[key]) rawDisplays[key]=_formatSupName(seg);
+    });
+  });
+
+  // Closure: try to split a multi-word name into known supplier names.
+  // Recursive — handles "MTC HAK Jasani" → ["MTC", "HAK", "Jasani"].
+  function tryCompoundSplit(name){
+    var parts=name.split(/\s+/);
+    if(parts.length<2) return [name];
+    for(var i=1;i<parts.length;i++){
+      var left=parts.slice(0,i).join(' ');
+      var right=parts.slice(i).join(' ');
+      var lk=left.toLowerCase(), rk=right.toLowerCase();
+      if(rawCounts[lk] && rawCounts[rk]){
+        return [].concat(tryCompoundSplit(left), tryCompoundSplit(right));
+      }
+    }
+    return [name];
+  }
+
+  // PASS 2: compound-split. Build splitCounts (atomic supplier name counts).
+  var splitCounts={};
+  var splitDisplays={};
+  Object.keys(rawCounts).forEach(function(key){
+    var components=tryCompoundSplit(rawDisplays[key]);
+    components.forEach(function(comp){
+      var ck=comp.toLowerCase();
+      splitCounts[ck]=(splitCounts[ck]||0)+rawCounts[key];
+      if(!splitDisplays[ck]) splitDisplays[ck]=comp;
+    });
+  });
+
+  // PASS 3: fuzzy-merge near-duplicates (Levenshtein ≤ 1).
+  // Only merge if BOTH names have normalised-length ≥ 4 (avoid merging "MTC"/"NTC").
+  var keys=Object.keys(splitCounts);
+  var parent={};
+  keys.forEach(function(k){parent[k]=k;});
+  function find(k){while(parent[k]!==k){parent[k]=parent[parent[k]];k=parent[k];}return k;}
+  function union(a,b){
+    var ra=find(a), rb=find(b);
+    if(ra===rb) return;
+    if((splitCounts[ra]||0) >= (splitCounts[rb]||0)) parent[rb]=ra;
+    else parent[ra]=rb;
+  }
+  for(var i=0;i<keys.length;i++){
+    var a=keys[i];
+    var aNorm=a.replace(/[^a-z0-9]/g,'');
+    if(aNorm.length<4) continue;
+    for(var j=i+1;j<keys.length;j++){
+      var b=keys[j];
+      var bNorm=b.replace(/[^a-z0-9]/g,'');
+      if(bNorm.length<4) continue;
+      if(Math.abs(aNorm.length-bNorm.length)>1) continue;
+      if(_levenshtein(aNorm,bNorm)<=1){
+        union(a,b);
+      }
+    }
+  }
+
+  // Build groups (canonical = root with highest count, display from splitDisplays)
+  var groups={};
+  keys.forEach(function(k){
+    var root=find(k);
+    if(!groups[root]) groups[root]={name:splitDisplays[root],n:0,members:[]};
+    groups[root].n+=splitCounts[k];
+    groups[root].members.push(k);
+  });
+
+  // Map each split key → canonical display name
+  var splitToCanon={};
+  Object.keys(groups).forEach(function(root){
+    groups[root].members.forEach(function(m){
+      splitToCanon[m]=groups[root].name;
+    });
+  });
+
+  // Build EXPANDED canon map: every raw key → ARRAY of canonical names.
+  // For atomic names, single-entry array. For compounds like "Jasani MTC", multi-entry.
+  var expandedCanon={};
+  Object.keys(rawCounts).forEach(function(rawKey){
+    var components=tryCompoundSplit(rawDisplays[rawKey]);
+    var canons=[];
+    components.forEach(function(comp){
+      var c=splitToCanon[comp.toLowerCase()];
+      if(c && canons.indexOf(c)===-1) canons.push(c);
+    });
+    expandedCanon[rawKey]=canons;
+  });
+
+  // Final list, sorted alphabetically
+  var list=Object.keys(groups).map(function(root){
+    return {name:groups[root].name, n:groups[root].n};
+  }).sort(function(a,b){return a.name.localeCompare(b.name);});
+
+  return { list: list, expandedCanon: expandedCanon };
+}
+
 function fuzzyFilter(products,query){
   var queries=expandQuery(query);
   var scored=products.map(function(p){
@@ -1729,15 +1948,36 @@ function render(keep){
     else if(S.gf==="H")fl=fl.filter(function(p){return !SOFT.has(p.cc)&&!isC(p);});
     else fl=fl.filter(function(p){return isC(p);});
   }
+  // V62.14: Supplier filter — uses expandedCanon which maps each raw segment to ARRAY of
+  // canonicals (so compound entries like "Jasani MTC" match when filtering by either Jasani OR MTC).
+  if(S.sup!=="ALL"){
+    fl=fl.filter(function(p){
+      if(!p.sup) return false;
+      var rawSegs=extractSupplierSegments(p.sup);
+      return rawSegs.some(function(seg){
+        var canonicals=window.__SUP_EXPANDED[seg.toLowerCase()]||[];
+        return canonicals.indexOf(S.sup)!==-1;
+      });
+    });
+  }
   if(S.q.trim()){fl=fuzzyFilter(fl,S.q);}
   var cats=Array.from(new Set(P.map(function(p){return p.cat;}).filter(Boolean))).sort();
+
+  // V62.14: Build the supplier list with three passes:
+  //   PASS 1 — extract raw segments (handles URLs, parens, comma/slash/newline)
+  //   PASS 2 — compound-split: "Jasani MTC" → ["Jasani", "MTC"] if both are known
+  //   PASS 3 — fuzzy-merge typos via Levenshtein-1 (Jasani/Jassani, Fotocad/Fotokad)
+  // Result: window.__SUP_CANON map from any-encountered-name → canonical display name.
+  var sups = buildSupplierList(P);
+  window.__SUP_EXPANDED = sups.expandedCanon;
+  sups = sups.list;
   var p=S.si!==null?P[S.si]:null,pms=p?gpm(p):[],pmO=PMS.find(function(m){return m.id===S.pm;}),g=p?gridOf(p):"",gn=g==="S"?"Softline":g==="H"?"Hardline":"Custom";
   var main="";
   if(S.tab==="finder"){
     main="<div class='fwrap'><h2>Product Finder</h2><p class='desc'>Search by product name or SKU to find the right item quickly.</p>"+
       "<div class='finp-row'><input class='finp' id='fIn' placeholder='Search product name or SKU\u2026' value='"+he(S.fq)+"'><button class='fgo' id='fGo' type='button'>Find</button></div>"+buildFinder()+"</div>";
   }else if(!p){
-    main="<div class='empty'><div class='ic'>\uD83D\uDCE6</div><div class='t'>Select a product to start</div><div class='s'>Search or filter from the sidebar to generate an instant quote.</div></div>";
+    main="<div class='empty'><div class='ic'>\u2190</div><div class='t'>Pick a product to start</div><div class='s'>Browse the list on the left, or search by name or SKU</div></div>";
   }else if(isC(p)){
     main="<div class='proc'><div class='ic'>\uD83D\uDCCB</div><h3>"+he(p.title)+"</h3><div class='sub'>"+he(p.sku)+" \u00B7 "+he(p.cat)+"</div><div class='pill'>Contact Procurement Team</div></div>";
   }else if(!p.web||!p.cost){
@@ -1748,20 +1988,44 @@ function render(keep){
     var sidesH="";if(!pmO||!pmO.f){sidesH="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+[1,2,3,4].map(function(s){return"<button class='sd-btn "+(S.sd===s?"on":"")+"' data-sd='"+s+"' type='button'>"+s+"</button>";}).join("")+"</div></div>";}
     var premH="";if(showPrem(p)){premH="<div class='cfg-s'><div class='cfg-lbl'>Fabric</div><div class='fab-row'><button class='fab-b "+(!S.pr?"on":"")+"' data-fb='0' type='button'>Basic</button><button class='fab-b "+(S.pr?"on":"")+"' data-fb='1' type='button'>Premium</button></div></div>";}
     // V33: wdH removed — toggle moved to wdBarH in updOut()
+    // V62.5: Product Details + Stock unified in ONE card with underline tabs.
+    // - Product header always visible at top
+    // - Tabs ("Details" | "Stock · N") shown only when stock data exists
+    // - If no stock data, specs render directly with no tab UI
+    var stockCnt = (window.stockTabCount ? window.stockTabCount(p) : null);
+    var hasStock = !!stockCnt;
+    var activeDt = (hasStock && S.dt === 'stock') ? 'stock' : 'details';
+    var tabNavH = hasStock
+      ? "<div class='dtabs'>"+
+          "<button type='button' class='dtab"+(activeDt==='details'?' on':'')+"' data-dtab='details'>Details</button>"+
+          "<button type='button' class='dtab"+(activeDt==='stock'?' on':'')+"' data-dtab='stock'>Stock <span class='dtab-cnt'>\u00b7 "+stockCnt+"</span></button>"+
+        "</div>"
+      : "";
+    var specsH =
+      "<div class='specs'>"+
+        "<div class='spec'><div class='l'>MOQ</div><div class='v'>"+p.moq+" units</div></div>"+
+        "<div class='spec'><div class='l'>Lead Time</div><div class='v'>"+(p.tl||"\u2014")+" days</div></div>"+
+        "<div class='spec'><div class='l'>Supplier</div><div class='v'>"+he(p.sup||"\u2014")+"</div></div>"+
+        "<div class='spec'><div class='l'>Material</div><div class='v'>"+he(p.mat||"\u2014")+"</div></div>"+
+        (p.wt?"<div class='spec'><div class='l'>Weight</div><div class='v'>"+p.wt+" kg</div></div>":"")+"<div class='spec'><div class='l'>Dimensions</div><div class='v'>"+(typeof DIMS!=='undefined'&&DIMS[p.sku]?he(DIMS[p.sku]):"\u2014")+"</div></div>"+
+      "</div>";
+    var stockPaneH = hasStock
+      ? "<div class='dt-pane stock' style='display:"+(activeDt==='stock'?'block':'none')+"'>"+
+          window.stockInnerHtml(p, S.qty)+
+        "</div>"
+      : "";
     main=
       "<div class='cd'><div class='ph'>"+
         "<div class='ph-img"+imgCls+"' id='phImg'>"+imgH+"</div>"+
         "<div class='ph-info'><div class='ph-top'><div class='ph-title'>"+he(p.title)+"</div><div class='ph-price'><span class='pl'>Website Base</span>AED "+p.web+"</div></div>"+
         "<div class='ph-sku'>"+he(p.sku)+"</div>"+
         "<div class='bds'><span class='bd cat'>"+he(p.cat||p.cc||"")+"</span><span class='bd "+g+"'>"+gn+"</span></div></div></div>"+
-        "<div class='specs'>"+
-          "<div class='spec'><div class='l'>MOQ</div><div class='v'>"+p.moq+" units</div></div>"+
-          "<div class='spec'><div class='l'>Lead Time</div><div class='v'>"+(p.tl||"\u2014")+" days</div></div>"+
-          "<div class='spec'><div class='l'>Supplier</div><div class='v'>"+he(p.sup||"\u2014")+"</div></div>"+
-          "<div class='spec'><div class='l'>Material</div><div class='v'>"+he(p.mat||"\u2014")+"</div></div>"+
-          (p.wt?"<div class='spec'><div class='l'>Weight</div><div class='v'>"+p.wt+" kg</div></div>":"")+"<div class='spec'><div class='l'>Dimensions</div><div class='v'>"+(typeof DIMS!=='undefined'&&DIMS[p.sku]?he(DIMS[p.sku]):"\u2014")+"</div></div>"+
-        "</div></div>"+
-      "<div class='cd'><div class='cfg-row'><div class='cfg-g'><div class='cfg-lbl'>Branding Method</div><div class='btns'>"+btnsH+"</div></div>"+sidesH+premH+"</div>"+
+        tabNavH+
+        "<div class='dt-pane details' style='display:"+(activeDt==='details'?'block':'none')+"'>"+specsH+"</div>"+
+        stockPaneH+
+        // V62.6/V62.8: Subtle section divider (no label text per user request)
+        "<div class='cd-divider'></div>"+
+        "<div class='cfg-row'><div class='cfg-g'><div class='cfg-lbl'>Branding Method</div><div class='btns'>"+btnsH+"</div></div>"+sidesH+premH+"</div>"+
       (pmMoq?"<div class='moq-warn'>\u26A0 "+pmO.n+" requires min "+pmMoqVal+" units</div>":"")+
       "</div><div id='OA'></div>";
   }
@@ -1769,7 +2033,7 @@ function render(keep){
     var ri=P.indexOf(fp),gp=gridOf(fp);
     return"<div class='pi"+(S.si===ri?" sel":"")+"' data-i='"+ri+"'><div class='pi-dot "+gp+"'></div><div class='pi-info'><div class='pi-n'>"+he(fp.title)+"</div><div class='pi-m'>"+he(fp.sku)+(!fp.stock?" \u00B7 <span class='pi-oos'>OOS</span>":"")+"</div></div><div class='pi-p'>"+fp.web+"</div></div>";
   }).join("")+(fl.length>300?"<div style='padding:8px;text-align:center;font-size:10px;color:#9ca3af'>Showing 300 of "+fl.length+"</div>":"")+(fl.length===0?"<div style='padding:16px;text-align:center;font-size:11px;color:#9ca3af'>No products found</div>":"");
-  app.innerHTML="<div class='app'><div class='topbar'><div class='tb-l'><span class='tb-logo'>MERCHLIST</span><div class='tb-tabs'><button class='tab "+(S.tab==="calc"?"on":"")+"' data-tab='calc' type='button'>Calculator</button><button class='tab "+(S.tab==="finder"?"on":"")+"' data-tab='finder' type='button'>Product Finder</button></div></div><span class='tb-r'>INTERNAL USE ONLY</span></div><div class='body'><div class='sb'><div class='sf'><input class='sf-inp' id='sIn' placeholder='Search name or SKU\u2026' value='"+he(S.q)+"'><div class='sf-row'><select class='sf-sel' id='cSel'><option value='ALL'>All Categories</option>"+cats.map(function(c){return"<option value='"+he(c)+"' "+(S.cf===c?"selected":"")+">"+he(c)+"</option>";}).join("")+"</select><select class='sf-sel' id='gSel' style='flex:0 0 88px'><option value='ALL'>All Grids</option><option value='S' "+(S.gf==="S"?"selected":"")+">Softline</option><option value='H' "+(S.gf==="H"?"selected":"")+">Hardline</option><option value='C' "+(S.gf==="C"?"selected":"")+">Custom</option></select></div><div class='sf-cnt'>"+fl.length+" products</div></div><div class='plist'>"+listH+"</div></div><div class='mn'>"+main+"</div></div></div>";
+  app.innerHTML="<div class='app'><div class='topbar'><div class='tb-l'><span class='tb-logo'>MERCHLIST</span><div class='tb-tabs'><button class='tab "+(S.tab==="calc"?"on":"")+"' data-tab='calc' type='button'>Calculator</button><button class='tab "+(S.tab==="finder"?"on":"")+"' data-tab='finder' type='button'>Product Finder</button></div></div></div><div class='body'><div class='sb'><div class='sf'><input class='sf-inp' id='sIn' placeholder='Search name or SKU\u2026' value='"+he(S.q)+"'><div class='sf-row'><select class='sf-sel' id='cSel'><option value='ALL'>All Categories</option>"+cats.map(function(c){return"<option value='"+he(c)+"' "+(S.cf===c?"selected":"")+">"+he(c)+"</option>";}).join("")+"</select><select class='sf-sel' id='gSel' style='flex:0 0 88px'><option value='ALL'>All Grids</option><option value='S' "+(S.gf==="S"?"selected":"")+">Softline</option><option value='H' "+(S.gf==="H"?"selected":"")+">Hardline</option><option value='C' "+(S.gf==="C"?"selected":"")+">Custom</option></select></div><div class='sf-row'><div class='sf-sup-wrap'><input type='text' class='sf-sup-inp' id='supSel' placeholder='"+(S.sup==="ALL"?"All Suppliers ("+sups.length+")":S.sup)+"' value='"+(S.sup==="ALL"?"":he(S.sup))+"' autocomplete='off'>"+(S.sup!=="ALL"?"<button class='sf-sup-clear' id='supClr' type='button' aria-label='Clear'>\u00D7</button>":"")+"<div class='sf-sup-list' id='supList'>"+sups.map(function(sp){return"<div class='sf-sup-opt' data-name='"+he(sp.name)+"'><span class='nm'>"+he(sp.name)+"</span><span class='cnt'>"+sp.n+"</span></div>";}).join("")+"</div></div></div><div class='sf-cnt'>"+fl.length+" products</div></div><div class='plist'>"+listH+"</div></div><div class='mn'>"+main+"</div></div></div>";
   if(keep){var mn2=document.querySelector(".mn");if(mn2)mn2.scrollTop=sy;}
   if(p&&!isC(p)&&ICACHE[p.sku]===undefined){
     loadImg(p,function(url){var el=document.getElementById("phImg");if(el){el.classList.remove("img-loading");el.innerHTML=url?"<img src='"+url+"' alt='' onerror=\"this.parentNode.innerHTML='\uD83D\uDCE6'\">":"\uD83D\uDCE6";}});
@@ -1778,7 +2042,46 @@ function render(keep){
   if(sIn){sIn.oninput=function(){S.q=this.value;var pos=this.selectionStart;render();var e=document.getElementById("sIn");if(e){e.focus();try{e.setSelectionRange(pos,pos);}catch(x){}}};}
   document.getElementById("cSel").onchange=function(){S.cf=this.value;render();};
   document.getElementById("gSel").onchange=function(){S.gf=this.value;render();};
+  var supSel=document.getElementById("supSel");
+  var supList=document.getElementById("supList");
+  if(supSel && supList){
+    function _filterSupList(query){
+      query=(query||'').toLowerCase().trim();
+      Array.prototype.forEach.call(supList.children, function(opt){
+        var name=opt.getAttribute('data-name').toLowerCase();
+        opt.style.display = (!query || name.indexOf(query)!==-1) ? 'flex' : 'none';
+      });
+    }
+    supSel.onfocus=function(){supList.classList.add('open');_filterSupList(this.value);};
+    supSel.oninput=function(){supList.classList.add('open');_filterSupList(this.value);};
+    supSel.onblur=function(){setTimeout(function(){supList.classList.remove('open');},150);};
+    supSel.onkeydown=function(e){
+      if(e.key==='Escape'){this.value='';supList.classList.remove('open');this.blur();}
+      else if(e.key==='Enter'){
+        // Apply first visible option
+        var first=Array.prototype.find.call(supList.children, function(o){return o.style.display!=='none';});
+        if(first){S.sup=first.getAttribute('data-name');render();}
+      }
+    };
+    // Wire option clicks (mousedown so it fires before blur)
+    Array.prototype.forEach.call(supList.children, function(opt){
+      opt.onmousedown=function(e){
+        e.preventDefault();
+        S.sup=this.getAttribute('data-name');
+        render();
+      };
+    });
+  }
+  var supClr=document.getElementById("supClr");
+  if(supClr)supClr.onclick=function(){S.sup="ALL";render();};
   document.querySelectorAll("[data-tab]").forEach(function(el){el.onclick=function(){S.tab=el.getAttribute("data-tab");render();};});
+  // V62.5: detail tabs (Details / Stock) — toggle via data-dtab; pane visibility flipped without full re-render
+  document.querySelectorAll("[data-dtab]").forEach(function(el){el.onclick=function(){
+    var v=el.getAttribute("data-dtab"); S.dt=v;
+    document.querySelectorAll(".dtab").forEach(function(b){b.classList.toggle("on", b.getAttribute("data-dtab")===v);});
+    var dpDetails=document.querySelector(".dt-pane.details"); if(dpDetails) dpDetails.style.display=(v==="details"?"block":"none");
+    var dpStock=document.querySelector(".dt-pane.stock"); if(dpStock) dpStock.style.display=(v==="stock"?"block":"none");
+  };});
   document.querySelectorAll(".pi").forEach(function(el){el.onclick=function(){S.si=parseInt(el.getAttribute("data-i"));S.pr=false;var pm2=gpm(P[S.si]);if(!pm2.find(function(m){return m.id===S.pm;}))S.pm=pm2[0]?pm2[0].id:"dtf";render();};});
   document.querySelectorAll("[data-pm]").forEach(function(el){el.onclick=function(){S.pm=el.getAttribute("data-pm");var pm=PMS.find(function(m){return m.id===S.pm;});if(pm&&pm.f)S.sd=1;render(true);};});
   document.querySelectorAll("[data-sd]").forEach(function(el){el.onclick=function(){S.sd=parseInt(el.getAttribute("data-sd"));render(true);};});
@@ -2025,9 +2328,11 @@ render();
 .ml-logo-svg{height:22px;display:block}
 .ml-logo-img{height:22px;display:none;filter:invert(1)}
 
-/* ── TOPBAR ── */
-.topbar{height:52px;padding:0 20px;border-bottom:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
-.tab{padding:7px 16px;font-size:11px;font-weight:700;border-radius:6px}
+/* ── TOPBAR ── (desktop+ only — wrapped to stop overriding mobile media queries) */
+@media (min-width:601px){
+  .topbar{height:52px;padding:0 20px;border-bottom:1px solid #f0f0f0;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .tab{padding:7px 16px;font-size:11px;font-weight:700;border-radius:6px}
+}
 
 /* ── SIDEBAR SEARCH ── */
 .sf-inp{border-radius:10px;font-size:12.5px;border:1.5px solid #e8e8e8;background:#fff;padding:10px 10px 10px 34px}
@@ -2054,9 +2359,8 @@ render();
 .spec{display:inline-flex;flex-direction:column;gap:2px;min-width:0;flex:0 0 auto}
 .spec .l{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}
 .spec .v{font-size:11.5px;font-weight:600;color:#111;margin-top:2px}
-/* Supplier row — full width, chips layout */
+/* Supplier row — chips layout (inline-friendly since V62.7) */
 .spec-sup{flex:0 1 auto;min-width:0;max-width:100%}
-.spec-sup .l{margin-bottom:5px}
 .spec-sup .v{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center;max-width:100%}
 .ml-sup-chip{display:inline-flex;align-items:center;gap:3px;background:#f3f4f6;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;color:#374151;white-space:nowrap;line-height:1.4}
 .ml-sup-link{display:inline-flex;align-items:center;gap:3px;background:#dcfce7;border:1px solid #bbf7d0;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;color:#15803d;text-decoration:none;white-space:nowrap;line-height:1.4;transition:all .12s}
@@ -2523,15 +2827,16 @@ function fixSupplierSpec(){
       var suppliers=(p.sup||'').split(',').map(function(s){return s.trim();}).filter(Boolean);
       var supUrl=p.supUrl||'';
       var html='';
-      suppliers.forEach(function(s,i){
-        if(i===0&&supUrl){
-          html+='<a class="ml-sup-link" href="'+supUrl+'" target="_blank" rel="noopener">'+
-            '<svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round"/></svg>'+
-            esc(s)+'</a>';
-        } else {
-          html+='<span class="ml-sup-chip">'+esc(s)+'</span>';
-        }
+      // V62.8: all supplier names render as plain chips; URL becomes a compact "Link ↗" chip
+      suppliers.forEach(function(s){
+        html+='<span class="ml-sup-chip">'+esc(s)+'</span>';
       });
+      if(supUrl){
+        html+='<a class="ml-sup-link" href="'+supUrl+'" target="_blank" rel="noopener" title="'+esc(supUrl)+'">'+
+          'Link'+
+          '<svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'+
+        '</a>';
+      }
       val.innerHTML=html;
     });
   }catch(e){}
@@ -3136,12 +3441,12 @@ window.addEventListener('load',function(){
 /* Suppress the old bottom button completely */
 .ml-addq-row{display:none!important}
 
-/* ── 2-LINE SUPPLIER (names row 1, URL row 2) ── */
-.spec-sup{flex:1 1 100%!important;border-top:1px solid #f9fafb!important;padding-top:6px!important;margin-top:2px!important}
-.spec-sup .l{margin-bottom:5px!important}
-.ml-sup-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center;margin-bottom:5px}
-.ml-sup-urlrow{display:flex;align-items:center;gap:6px;padding-top:5px;border-top:1px dashed #f3f4f6;margin-top:2px}
-.ml-sup-urllink{font-size:10.5px;font-weight:600;color:#15803d;text-decoration:none;display:inline-flex;align-items:center;gap:5px;padding:3px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;line-height:1.4;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* V62.8: supplier inline like other specs — old "forces own row" rule disabled */
+.spec-sup{flex:0 0 auto!important;border-top:none!important;padding-top:0!important;margin-top:0!important}
+.spec-sup .l{margin-bottom:0!important}
+.ml-sup-row{display:inline-flex;flex-wrap:wrap;gap:5px;align-items:baseline;margin:0}
+.ml-sup-urlrow{display:inline-flex;align-items:baseline;gap:6px;margin:0;padding:0}
+.ml-sup-urllink{font-size:10.5px;font-weight:700;color:#15803d;text-decoration:none;display:inline-flex;align-items:baseline;gap:4px;padding:3px 8px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;line-height:1.4;white-space:nowrap}
 .ml-sup-urllink:hover{background:#dcfce7;border-color:#86efac}
 .ml-sup-urllink svg{flex-shrink:0}
 
@@ -3292,11 +3597,11 @@ window.addEventListener('load',function(){
         });
         html += '</div>';
         if (supUrl){
-          var short = supUrl.replace(/^https?:\/\/(www\.)?/,'').slice(0,60) + (supUrl.length>60?'…':'');
+          // V62.9: compact "Link ↗" chip — no truncated URL text, full URL in tooltip
           html += '<div class="ml-sup-urlrow">'+
             '<a class="ml-sup-urllink" href="'+escAttr(supUrl)+'" target="_blank" rel="noopener" title="'+escAttr(supUrl)+'">'+
-              '<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'+
-              escHTML(short)+
+              'Link'+
+              '<svg width="9" height="9" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'+
             '</a>'+
             '</div>';
         }
@@ -3516,13 +3821,11 @@ window.addEventListener('load',function(){
 .air-summary svg{flex-shrink:0;color:#111}
 .air-summary b{color:#111;font-weight:800}
 
-/* ── SPEC LAYOUT (V24): force 5 short specs row 1, supplier on row 2 ── */
-.specs{display:flex;flex-wrap:wrap;gap:8px 16px;padding:11px 14px;background:#fafafa;border-radius:9px;align-items:flex-start;font-size:11px;margin-top:12px}
-.spec{display:inline-flex;flex-direction:column;gap:2px;min-width:0}
-.spec .l{font-size:9px;color:#9ca3af;font-weight:700;text-transform:uppercase;letter-spacing:.4px;line-height:1}
-.spec .v{font-size:11.5px;color:#111;font-weight:700;line-height:1.25}
-.spec-sup{flex:1 1 100%!important;padding-top:8px;margin-top:4px;border-top:1px solid #f3f4f6}
-.spec-sup .l{margin-bottom:5px}
+/* ── SPEC LAYOUT (V62.8): all specs ACTUALLY inline — override older cascade rules ── */
+.specs{display:flex!important;flex-wrap:wrap!important;gap:6px 22px!important;padding:11px 14px;background:#fafafa;border-radius:9px;align-items:baseline!important;font-size:11px;margin-top:12px}
+.spec{display:inline-flex!important;flex-direction:row!important;align-items:baseline!important;gap:6px!important;min-width:0;flex:0 0 auto;border-top:none!important;padding-top:0!important;margin-top:0!important}
+.spec .l{font-size:9px!important;color:#9ca3af!important;font-weight:700!important;text-transform:uppercase!important;letter-spacing:.4px!important;line-height:1.2!important;margin:0!important}
+.spec .v{font-size:11.5px!important;color:#111!important;font-weight:700!important;line-height:1.2!important;margin:0!important}
 </style>
 
 <script>
@@ -6693,4 +6996,536 @@ window.addEventListener('load',function(){
   .q-range-val{font-size:12px}
 }
 </style>
+
+<!-- V62.1: Mobile nav overflow fix.
+     At ≤390px (iPhone-size) the 4 dynamic tabs (Calculator / Product Finder /
+     ✨ AI Recommender / Quote Builder) overflow .tb-l (which has overflow:hidden,
+     so they get visually cut off). CSS-only shortener using ::before pseudo-elements.
+     No DOM/JS changes — original labels still in HTML for accessibility and tests. -->
+<style>
+@media (max-width:480px){
+  .topbar{padding:0 8px}
+  .tb-l{gap:4px;min-width:0;flex:1;overflow:hidden}
+  .tb-tabs{gap:0;margin-left:0;flex-wrap:nowrap;min-width:0}
+  .tab{padding:7px 8px;letter-spacing:0;min-height:34px;flex-shrink:0;white-space:nowrap}
+  /* Hide the long label text without touching the DOM */
+  .tab[data-tab]{font-size:0}
+  .tab[data-tab]::before{font-size:11px;font-weight:700;letter-spacing:.2px}
+  .tab[data-tab="calc"]::before{content:"Calc"}
+  .tab[data-tab="finder"]::before{content:"Find"}
+  .tab[data-tab="airec"]::before{content:"\2728 AI"}
+  .tab[data-tab="quote"]::before{content:"Quote"}
+  /* Keep the count badge (font-size:0 on parent zeroed it out) */
+  .tab .ml-qb-badge{font-size:9px;margin-left:4px}
+}
+</style>
+
+<!-- V62: Static closing range box (restored from V58) + dual-section stock side-card.
+     V59 slider, wireSlider(), addCurrentToQuote v59-wrapper, .mv-sub profit display all stripped.
+     Stock schema: keyed by SKU, fields {mt,mv,sn,st,sv} = merch_total, merch_variants,
+     supplier_name (cleaned from master col N), supplier_total (col AA), supplier_variants (col AB). -->
+<style>
+/* V62.5 Detail tabs — Details / Stock inside the product card.
+   Underline style, minimal, sits between the product header and the active pane. */
+.dtabs{
+  display:flex;
+  align-items:center;
+  gap:0;
+  margin:14px 0 0;
+  padding:0 0 0 4px;
+  border-bottom:1px solid #e5e7eb;
+}
+.dtab{
+  padding:9px 16px 10px;
+  font-size:11.5px;
+  font-weight:700;
+  letter-spacing:.3px;
+  color:#9ca3af;
+  background:transparent;
+  border:none;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  cursor:pointer;
+  transition:color .15s, border-color .15s;
+}
+.dtab:hover:not(.on){color:#374151}
+.dtab.on{
+  color:#111;
+  border-bottom-color:#16a34a;
+}
+.dtab-cnt{
+  font-weight:600;
+  color:#6b7280;
+  margin-left:2px;
+}
+.dtab.on .dtab-cnt{color:#16a34a}
+.dt-pane{padding-top:14px}
+.dt-pane.details > .specs{margin-top:0}
+
+/* V62.5: Stock content inside the tab pane (no outer .cd wrapper now). */
+.sc-inner{font-size:11px;background:#fafafa;border-radius:9px;padding:11px 14px;margin-top:12px}
+.sc-inner .sc-head{padding-top:0;border-top:none}
+
+/* HEADER: title + status pill on the left, grand total on the right */
+.sc-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  padding-bottom:12px;
+  margin-bottom:12px;
+  border-bottom:1px solid #f3f4f6;
+}
+.sc-head-l{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sc-head-r{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.sc-badge{
+  font-size:11px;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:20px;
+  white-space:nowrap;
+}
+.sc-badge.in{background:#dcfce7;color:#15803d}
+.sc-badge.low{background:#ffedd5;color:#9a3412}
+.sc-badge.short{background:#fef3c7;color:#92400e}
+.sc-badge.out{background:#fee2e2;color:#991b1b}
+
+.sc-grand{
+  font-size:16px;
+  font-weight:800;
+  color:#111;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.3px;
+}
+/* Dual-stock: header right shows "X ready · Y at Supplier" */
+.sc-grand-bit{display:inline-flex;align-items:baseline;gap:5px}
+.sc-grand-bit strong{
+  font-size:16px;
+  font-weight:800;
+  color:#111;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.3px;
+}
+.sc-grand-tag{font-size:11px;color:#6b7280;font-weight:500}
+.sc-grand-sep{color:#d1d5db;font-weight:700;margin:0 2px}
+
+/* BODY: one or more sections */
+.sc-sec + .sc-sec{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px dashed #e5e7eb;
+}
+.sc-sec-head{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:8px;
+}
+.sc-sec-lbl{
+  font-size:10px;
+  font-weight:700;
+  color:#6b7280;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.sc-sec-tot{
+  font-size:12px;
+  font-weight:700;
+  color:#374151;
+  font-variant-numeric:tabular-nums;
+}
+
+/* THE multi-column variant grid — auto-fill keeps chips at a comfortable width
+   and flows them into as many columns as fit. */
+.sc-var-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+  gap:1px 16px;
+}
+.sc-var{
+  display:flex;
+  align-items:baseline;
+  gap:6px;
+  padding:2px 0;
+  line-height:1.4;
+  border-bottom:1px dotted rgba(0,0,0,.05);
+  font-size:11px;
+}
+.sc-var .nm{
+  color:#374151;
+  font-weight:500;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  min-width:0;
+  flex:0 1 auto;
+}
+.sc-var .q{
+  font-weight:700;
+  color:#111;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
+.sc-var.zero .nm{color:#9ca3af}
+.sc-var.zero .q{color:#dc2626;text-decoration:line-through;text-decoration-color:#dc262680}
+
+/* V62.11: Color × Size matrix view for 2-attribute variants */
+.sc-matrix{
+  width:auto;
+  border-collapse:collapse;
+  font-size:11.5px;
+  font-variant-numeric:tabular-nums;
+  margin:2px 0 0;
+}
+.sc-matrix th, .sc-matrix td{
+  padding:4px 12px;
+  text-align:center;
+  white-space:nowrap;
+  border-bottom:1px solid #f3f4f6;
+}
+.sc-matrix thead th{
+  font-size:9.5px;
+  font-weight:700;
+  color:#9ca3af;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  padding:4px 12px 6px;
+  border-bottom:1px solid #e5e7eb;
+}
+.sc-matrix tbody tr:last-child td,
+.sc-matrix tbody tr:last-child th{border-bottom:none}
+.sc-matrix .sc-mx-rowlbl{
+  /* Row labels (colour names) stay left-aligned — looks weird centered next to numbers */
+  text-align:left;
+  font-size:11.5px;
+  font-weight:600;
+  color:#374151;
+  padding-right:14px;
+  letter-spacing:0;
+  text-transform:none;
+}
+.sc-matrix tbody td{
+  font-weight:700;
+  color:#111;
+}
+.sc-matrix tbody td.dim{
+  color:#d1d5db;
+  font-weight:400;
+}
+.sc-matrix tbody td.zero{
+  color:#dc2626;
+  text-decoration:line-through;
+  text-decoration-color:#dc262680;
+}
+/* Mobile: horizontal scroll if matrix is too wide */
+@media (max-width:600px){
+  .sc-sec .sc-matrix{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .sc-matrix th, .sc-matrix td{padding:4px 8px}
+}
+/* V62.12: Single-row 1D table variant (sizes-only, colors-only, single variant) */
+.sc-matrix-1d th{
+  text-align:center;
+  color:#374151;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+  border-bottom:1px solid #e5e7eb;
+}
+.sc-matrix-1d tbody td{padding-top:6px;text-align:center}
+
+.sc-inhouse-msg{
+  font-size:12px;
+  color:#4b5563;
+  line-height:1.5;
+}
+
+@media (max-width:600px){
+  .sc-head{padding-bottom:10px;margin-bottom:10px}
+  .sc-grand,.sc-grand-bit strong{font-size:14px}
+  .sc-var-grid{grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));gap:1px 12px}
+}
+@media (max-width:380px){
+  .sc-var-grid{grid-template-columns:1fr 1fr;gap:1px 10px}
+  .sc-badge{font-size:10px;padding:3px 8px}
+}
+</style>
+<script>
+/* V62 stock data. Keys: mt=merch_total, mv=merch_variants, sn=supplier_name (cleaned),
+   st=supplier_total, sv=supplier_variants. Fields absent when blank in master. */
+window.MLSTOCK = {"TML-TP-001":{"ih":1},"TML-TP-002":{"ih":1},"TML-TP-003":{"ih":1},"TML-TP-004":{"ih":1},"TML-TP-005":{"ih":1},"TML-TP-006":{"ih":1},"TML-TP-007":{"ih":1},"TML-TP-008":{"ih":1},"TML-TP-009":{"ih":1},"TML-TP-010":{"ih":1},"TML-TP-011":{"mt":61,"mv":"Black, L: 13 | Black, M: 12 | Black, S: 11 | Black, XL: 7 | Navy Blue, L: 7 | White, 2XL: 3 | Navy Blue, S: 3 | White, M: 2 | Navy Blue, XL: 2 | White, L: 1","sn":"Jasani"},"TML-TP-012":{"mt":67,"mv":"Orange, M: 14 | Cool Grey, L: 10 | Navy Blue, L: 7 | White, M: 6 | Orange, L: 6 | Orange, S: 3 | Black, S: 3 | Cool Grey, M: 3 | White, S: 2 | Cool Grey, S: 2 | Navy Blue, 2XL: 2 | Cool Grey, 2XL: 2 | Navy Blue, M: 2 | Cool Grey, XL: 1 | White, 2XL: 1 | Black, 2XL: 1 | Black, M: 1 | Black, L: 1","sn":"Jasani"},"TML-TP-013":{"ih":1},"TML-TP-014":{"ih":1},"TML-TP-015":{"ih":1},"TML-TP-016":{"mt":118,"mv":"Navy Blue, S: 12 | Royal Blue, XL: 11 | Grey, M: 11 | Cool Grey, S: 10 | Black, L: 8 | Black, XL: 7 | White, M: 6 | White, S: 5 | Cool Grey, L: 4 | Navy Blue, L: 4 | Fuchsia Pink, 2XL: 4 | White, 3XL: 4 | Red, S: 4 | Red, L: 3 | Maroon, M: 3 | Red, XL: 2 | Maroon, XL: 2 | Cool Grey, XL: 2 | Royal Blue, L: 2 | Maroon, L: 2 | Navy Blue, 3XL: 2 | Navy Blue, M: 2 | Sky Blue, M: 2 | Red, M: 2 | Black, 2XL: 1 | Cool Grey, 3XL: 1 | Sky Blue, S: 1 | Black, M: 1","sn":"Jasani"},"TML-TP-017":{"ih":1},"TML-TP-018":{"ih":1},"TML-TP-019":{"ih":1},"TML-TP-020":{"ih":1},"TML-TP-021":{"mt":180,"mv":"Black, XL: 39 | Black, S: 30 | Khaki, L: 24 | Black, L: 15 | Black, M: 15 | Purple, XL: 10 | Pink, XL: 9 | Khaki, S: 8 | Khaki, 2XL: 8 | Purple, 2XL: 8 | Purple, S: 5 | Purple, M: 4 | Purple, L: 3 | Khaki, XL: 1 | Pink, L: 1","sn":"Temu (tarkeeb)"},"TML-TP-022":{"ih":1},"TML-TP-024":{"ih":1},"TML-TP-025":{"ih":1},"TML-TP-026":{"ih":1},"TML-TP-027":{"ih":1},"TML-TP-028":{"ih":1},"TML-TP-029":{"ih":1},"TML-TP-030":{"ih":1},"TML-TP-031":{"ih":1},"TML-TP-032":{"mt":38,"mv":"S: 21 | XL: 7 | 3XL: 4 | M: 3 | L: 3","sn":"Temu"},"TML-TP-033":{"ih":1},"TML-TP-034":{"ih":1},"TML-TP-035":{"ih":1},"TML-TP-036":{"mt":6,"mv":"Black, S: 3 | Black, M: 1 | Light Blue, L: 1 | Navy Blue, L: 1","sn":"Amazon"},"TML-TP-037":{"ih":1},"TML-TP-038":{"ih":1},"TML-TP-039":{"ih":1},"TML-TP-040":{"ih":1},"TML-TP-041":{"ih":1},"TML-TP-042":{"mt":8,"mv":"56 Inches: 4 | 58 Inches: 2 | 60 Inches: 1 | 59 Inches: 1","sn":"Market"},"TML-TP-043":{"ih":1},"TML-TP-044":{"ih":1},"TML-TP-045":{"ih":1},"TML-TP-046":{"ih":1},"TML-TP-047":{"ih":1},"TML-TP-048":{"mt":1,"mv":"Black, L: 1","sn":"Boss"},"TML-TP-050":{"ih":1},"TML-TP-051":{"mt":1,"mv":"Black, S: 1","sn":"Amazon"},"TML-TP-052":{"mt":7,"mv":"White, XL: 2 | White, L: 2 | Navy Blue, M: 2 | Black, M: 1","sn":"Amazon"},"TML-TP-053":{"ih":1},"TML-TP-054":{"ih":1},"TML-TP-055":{"ih":1},"TML-HS-001":{"ih":1},"TML-HS-002":{"ih":1},"TML-HS-003":{"ih":1},"TML-HS-004":{"ih":1},"TML-HS-005":{"ih":1},"TML-HS-006":{"ih":1},"TML-HS-007":{"ih":1},"TML-HS-008":{"ih":1},"TML-HS-009":{"ih":1},"TML-HS-010":{"ih":1},"TML-HS-011":{"ih":1},"TML-HS-012":{"ih":1},"TML-HS-013":{"ih":1},"TML-HS-014":{"mt":3,"mv":"Black, L: 2 | Black, M: 1","sn":"Jasani"},"TML-HS-015":{"ih":1},"TML-HS-016":{"ih":1},"TML-HS-017":{"mt":35,"mv":"S: 20 | M: 7 | 2XL: 5 | XL: 3","sn":"Temu"},"TML-HS-018":{"ih":1},"TML-HS-019":{"ih":1},"TML-HS-020":{"ih":1},"TML-HS-021":{"mt":18,"mv":"S: 7 | M: 3 | XL: 3 | 2XL: 3 | L: 2","sn":"Temu"},"TML-HS-022":{"ih":1},"TML-HS-024":{"ih":1},"TML-JA-001":{"ih":1},"TML-JA-002":{"ih":1},"TML-JA-003":{"ih":1},"TML-JA-004":{"ih":1},"TML-JA-005":{"ih":1},"TML-JA-006":{"ih":1},"TML-JA-007":{"ih":1},"TML-JA-008":{"ih":1},"TML-JA-009":{"ih":1},"TML-JA-010":{"ih":1},"TML-JA-011":{"ih":1},"TML-JA-012":{"ih":1},"TML-JA-013":{"ih":1},"TML-JA-014":{"ih":1},"TML-JA-015":{"ih":1},"TML-JA-016":{"ih":1},"TML-JA-017":{"ih":1},"TML-JA-018":{"ih":1},"TML-JA-019":{"ih":1},"TML-JA-020":{"ih":1},"TML-JA-022":{"ih":1},"TML-JA-023":{"ih":1},"TML-JA-024":{"mt":16,"mv":"Silver, Large: 4 | Gold, Large: 4 | Brown, Large: 4 | Silver, Small: 3 | Gold, Small: 1","sn":"MTC & Fotocad"},"TML-JA-025":{"ih":1},"TML-JA-026":{"mt":12,"mv":"Black, XL: 6 | White, XL: 6","sn":"Temu Manufacture"},"TML-JA-028":{"ih":1},"TML-JA-029":{"ih":1},"TML-JA-031":{"ih":1},"TML-JA-033":{"ih":1},"TML-JA-034":{"ih":1},"TML-JA-035":{"mt":80,"mv":"Black, S: 6 | White, S: 6 | Black, XL: 6 | White, XL: 6 | Black, 2XL: 6 | White, 2XL: 6 | Black, M: 5 | White, M: 5 | White, L: 4 | Navy Blue, 2XL: 4 | Navy Blue, XL: 4 | Navy Blue, L: 4 | Navy Blue, M: 4 | Navy Blue, S: 3 | Light Purple, S: 2 | Black, L: 2 | Light Purple, L: 2 | Light Purple, XL: 2 | Light Purple, 2XL: 2 | Light Purple, M: 1","sn":"Temu"},"TML-UW-001":{"ih":1},"TML-UW-002":{"ih":1},"TML-UW-003":{"ih":1},"TML-UW-004":{"ih":1},"TML-UW-005":{"ih":1},"TML-UW-006":{"ih":1},"TML-UW-009":{"ih":1},"TML-UW-010":{"mt":28,"mv":"Navy Blue, 2XL: 6 | Bottle Green, XL: 5 | Bottle Green, L: 4 | Navy Blue, 3XL: 3 | Bottle Green, M: 3 | Grey, XL: 1 | Red, L: 1 | Blue, L: 1 | Orange, S: 1 | Grey, S: 1 | Grey, L: 1 | Bottle Green, S: 1","sn":"Vaultex"},"TML-UW-011":{"ih":1},"TML-UW-012":{"mt":39,"mv":"Yellow: 15 | White: 14 | Red: 5 | Royal Blue: 3 | Grey: 2","sn":"Vaultex"},"TML-UW-013":{"ih":1},"TML-UW-014":{"ih":1},"TML-UW-015":{"ih":1},"TML-UW-016":{"mt":66,"mv":"Red: 16 | Blue: 15 | Green: 14 | Brown: 12 | Khaki: 5 | Grey: 4","sn":"Temu"},"TML-UW-017":{"ih":1},"TML-UW-019":{"ih":1},"TML-UW-020":{"ih":1},"TML-UW-022":{"ih":1},"TML-UW-023":{"ih":1},"TML-UW-024":{"mt":78,"mv":"Silver: 35 | Black: 27 | Gold: 16","sn":"Temu"},"TML-UW-026":{"mt":90,"mv":"XL, Black: 19 | 2XL, Black: 17 | L, Black: 12 | XL, Limegreen: 9 | 2XL, Limegreen: 8 | XL, Green: 6 | L, Limegreen: 3 | XL, Blue: 3 | L, Orange: 2 | L, Blue: 2 | M, Black: 1 | 3XL, Black: 1 | XL, Orange: 1 | M, Blue: 1 | 2XL, Blue: 1 | 3XL, Blue: 1 | 2XL, Red: 1 | XL, Red: 1 | L, Red: 1","sn":"Vaultex"},"TML-UW-028":{"ih":1},"TML-UW-029":{"ih":1},"TML-DW-001":{"mt":118,"mv":"Black: 107 | White: 11","sn":"Fotocad"},"TML-DW-002":{"mt":89,"mv":"White, 500 ML, Matte: 19 | Grey, 500 ML, Matte: 15 | Black, 500 ML, Matte: 14 | Black, 500 ML, Gloss: 9 | White, 500 ML, Gloss: 8 | Navy Blue, 500 ML, Gloss: 6 | Green, 500 ML, Matte: 4 | Blue, 500 ML, Matte: 4 | Navy Blue, 500 ML, Matte: 3 | Red, 500 ML, Matte: 3 | Orange, 500 ML, Matte: 2 | Red, 500 ML, Gloss: 1 | Blue, 500 ML, Gloss: 1","sn":"HAK"},"TML-DW-003":{"mt":30,"mv":"White: 15 | Silver: 15","sn":"Ashbimicro"},"TML-DW-004":{"mt":2,"sn":"MTC"},"TML-DW-005":{"mt":130,"mv":"White: 71 | Black: 21 | Silver: 16 | Red: 14 | Dark Blue: 8","sn":"Fotocad"},"TML-DW-006":{"mt":51,"mv":"White: 33 | Dark Blue: 9 | Silver: 8 | Blue: 1","sn":"AK Flash"},"TML-DW-007":{"mt":35,"sn":"Fotocad"},"TML-DW-008":{"mt":70,"mv":"White: 35 | Navy Blue: 17 | Black: 16 | Green: 2","sn":"HAK"},"TML-DW-009":{"mt":16,"mv":"Black: 16","sn":"HAK"},"TML-DW-010":{"mt":20,"mv":"Black: 19 | White: 1","sn":"AK Flash"},"TML-DW-011":{"mt":37,"mv":"Light Blue: 16 | Limegreen: 7 | Red: 5 | Black: 3 | Navy Blue: 3 | Green: 2 | Bottle Green: 1","sn":"MTC"},"TML-DW-012":{"mt":14,"mv":"White: 11 | Cool Grey: 2 | Black: 1","sn":"AK Flash"},"TML-DW-013":{"mt":5,"mv":"Black: 2 | Parrot Green: 1 | Red: 1 | Royal Blue: 1","sn":"MTC HAK"},"TML-DW-014":{"mt":3,"sn":"MTC"},"TML-DW-016":{"mt":1,"sn":"MTC"},"TML-DW-018":{"mt":13,"mv":"Green: 6 | White: 5 | Black: 2","sn":"Jasani","st":621,"sv":"Green: 621"},"TML-DW-019":{"mt":4,"mv":"Black: 3 | White: 1","sn":"Jasani","st":16572,"sv":"Blue (anti-microbial): 6744 | Black (anti-microbial): 6446 | White (anti-microbial): 3382"},"TML-DW-020":{"mt":3,"sn":"Akflash"},"TML-DW-021":{"mt":101,"mv":"Black: 84 | White: 6 | Pink: 6 | Sky Blue: 5","sn":"Jasani","st":3107,"sv":"Black: 3107"},"TML-DW-022":{"mt":17,"mv":"White: 12 | Black: 5","sn":"Jasani","st":191,"sv":"Black: 188 | White: 3"},"TML-DW-023":{"sn":"Jasani","st":264,"sv":"Blue: 250 | Black: 14 | White: 0"},"TML-DW-024":{"mt":4,"sn":"Jasani","st":4285},"TML-DW-025":{"mt":35,"sn":"MTC"},"TML-DW-026":{"mt":2,"sn":"MTC"},"TML-DW-027":{"sn":"Jasani","st":1030,"sv":"Black: 994 | Sky: 36"},"TML-DW-028":{"mt":8,"mv":"Black, 500 ML: 3 | Bottle Green, 500 ML: 2 | Sky Blue, 500 ML: 2 | Navy Blue, 1 LTR: 1","sn":"Jasani","st":643,"sv":"Rock Grey: 643"},"TML-DW-029":{"mt":2,"sn":"AK Flash"},"TML-DW-030":{"mt":3,"sn":"AK Flash"},"TML-DW-031":{"mt":3,"sn":"MTC"},"TML-DW-032":{"mt":45,"sn":"MTC"},"TML-DW-033":{"mt":18,"mv":"Black: 7 | Grey: 5 | White: 3 | Navy Blue: 3","sn":"Jasani","st":843,"sv":"White: 730 | Black: 113"},"TML-DW-034":{"mt":9,"mv":"Green: 4 | Black: 3 | Royal Blue: 2","sn":"Jasani","st":7768,"sv":"White: 3318 | Aqua Green: 1605 | Black: 1020 | Grey: 799 | Green: 752 | Blue: 274"},"TML-DW-036":{"mt":18,"mv":"Cial Blue: 17 | Yellow Green: 1","sn":"Belfast"},"TML-DW-037":{"mt":54,"mv":"Navy Blue, 750 ML: 14 | Black, 750 ML: 11 | White, 550 ML: 11 | White, 750 ML: 10 | Blue, 750 ML: 4 | Grey, 750 ML: 4","sn":"Belfast"},"TML-DW-038":{"mt":12,"mv":"Black: 5 | Royal Blue: 4 | White: 3","sn":"Belfast","st":3216,"sv":"Black: 3216"},"TML-DW-040":{"mt":12,"mv":"Blue: 10 | Pink: 2","sn":"Jasani","st":633,"sv":"Default: 633 | Default: 0"},"TML-DW-041":{"mt":22,"sn":"Fufu Trading"},"TML-DW-042":{"mt":5,"sn":"MTC"},"TML-DW-043":{"mt":14,"mv":"Black: 7 | White: 5 | Grey: 2","sn":"Belfast"},"TML-DW-046":{"mt":22,"mv":"Black: 8 | White: 8 | Blue: 6","sn":"Belfast"},"TML-DW-047":{"mt":4,"sn":"MTC"},"TML-DW-048":{"mt":11,"sn":"MTC Liying Kicthen"},"TML-DW-049":{"mt":2,"mv":"Black: 1 | White: 1","sn":"Belfast"},"TML-DW-050":{"mt":10,"mv":"White: 4 | Rose Gold: 3 | Black: 2 | Royal Blue: 1","sn":"Belfast"},"TML-DW-051":{"mt":14,"mv":"Black: 9 | White: 5","sn":"MTC"},"TML-DW-052":{"mt":5,"mv":"Black: 3 | White: 2","sn":"Jasani","st":5900,"sv":"Black: 3682 | White: 2218"},"TML-DW-053":{"mt":13,"mv":"Royal Blue, 500 ML: 7 | White, 500 ML: 5 | Black, 500 ML: 1","sn":"Belfast"},"TML-DW-054":{"mt":19,"mv":"Grey: 10 | Bottle Green: 4 | Brown: 3 | Black: 2","sn":"Jasani","st":2946,"sv":"Green: 1636 | Black: 1272 | Brown: 36 | Blue: 2 | Grey: 0"},"TML-DW-055":{"mt":1,"mv":"Sky Blue: 1","sn":"Jasani"},"TML-DW-056":{"mt":4,"mv":"White: 2 | Sky Blue: 1 | Orange: 1","sn":"Moya"},"TML-DW-057":{"mt":2,"mv":"Black: 1 | White: 1","sn":"Moya"},"TML-DW-058":{"mt":29,"mv":"White: 22 | Black: 3 | Red: 3 | Orange: 1","sn":"Jasani","st":2023,"sv":"Orange: 1040 | Sky Blue: 983 | Black: 0 | White: 0 | Grey: 0"},"TML-DW-060":{"mt":5,"mv":"Black: 4 | Sky Blue: 1","sn":"Jasani","st":580,"sv":"Black: 320 | Cream: 260"},"TML-DW-061":{"mt":13,"sn":"MTC"},"TML-DW-062":{"mt":23,"mv":"Navy Blue: 6 | Pink: 5 | Red: 3 | Bottle Green: 3 | Black: 3 | Orange: 2 | Yellow: 1","sn":"MTC"},"TML-DW-063":{"mt":6,"mv":"White: 5 | Green: 1","sn":"MTC"},"TML-DW-064":{"mt":4,"mv":"Black: 2 | Navy Blue: 2","sn":"Jasani","st":2901,"sv":"Black: 1958 | White: 939 | Blue: 4"},"TML-DW-065":{"mt":10,"mv":"White: 8 | Navy Blue: 2","sn":"Jasani","st":6367,"sv":"Black: 3596 | Blue: 2771"},"TML-DW-066":{"mt":2,"mv":"Black: 2","sn":"Belfast"},"TML-DW-067":{"mt":1,"mv":"Black: 1","sn":"Belfast"},"TML-DW-068":{"mt":5,"mv":"Black, 450 ML: 4 | White, 450 ML: 1","sn":"Jasani","st":645,"sv":"Black: 645"},"TML-DW-069":{"mt":9,"mv":"White, 750 ML: 5 | White, 1 LTR: 3 | Black, 1 LTR: 1","sn":"Jasani","st":1,"sv":"Aqua Blue: 1"},"TML-DW-070":{"mt":6,"mv":"Black: 5 | Silver: 1","sn":"Jasani","st":0,"sv":"Black: 0"},"TML-DW-071":{"mt":11,"mv":"Black: 5 | White: 4 | Brown: 2","sn":"Jasani","st":3451,"sv":"Green: 1457 | White: 1371 | Black: 316 | Royal Blue: 307"},"TML-DW-072":{"mt":5,"mv":"1 LTR: 5","sn":"Fotokad"},"TML-DW-073":{"sn":"Jasani","st":4599,"sv":"Black: 4063 | Navy Blue: 423 | White: 113"},"TML-DW-074":{"mt":2,"mv":"Black: 2","sn":"Eventgift"},"TML-DW-076":{"mt":7,"mv":"White: 2 | Yellow: 2 | Red: 2 | Black: 1","sn":"MAF"},"TML-DW-077":{"mt":19,"mv":"Black: 11 | Navy Blue: 6 | Grey: 1 | Bottle Green: 1","sn":"Event"},"TML-DW-078":{"mt":7,"mv":"Pink: 4 | Black: 2 | White: 1","sn":"Event"},"TML-DW-079":{"mt":13,"mv":"White: 9 | Black: 4","sn":"MTC"},"TML-DW-080":{"mt":1,"mv":"Navy Blue: 1","sn":"Go Sports"},"TML-DW-082":{"mt":12,"mv":"Black: 8 | White: 3 | Navy Blue: 1","sn":"Jasani","st":4728,"sv":"White: 3895 | Black: 833"},"TML-DW-083":{"mt":19,"mv":"Blue: 9 | Sky Blue: 5 | Black: 2 | Light Green: 2 | Transperant: 1","sn":"Temu"},"TML-DW-084":{"mt":5,"mv":"Navy Blue: 5","sn":"Belfast"},"TML-DW-085":{"mt":40,"mv":"Black: 34 | White: 6","sn":"MTC"},"TML-DW-086":{"mt":10,"mv":"Black: 10","sn":"Alpha"},"TML-DW-087":{"mt":47,"mv":"Gold: 24 | Pink: 12 | Silver: 11","sn":"AL Mahir"},"TML-DW-088":{"mt":15,"mv":"White: 14 | Black: 1","sn":"MTC"},"TML-DW-089":{"mt":10,"mv":"White: 5 | Black: 4 | Navy Blue: 1","sn":"MTC"},"TML-DW-090":{"mt":8,"mv":"Black: 3 | Navy Blue: 3 | Silver: 2","sn":"MTC"},"TML-DW-091":{"mt":13,"mv":"White: 8 | Black: 3 | Red: 2","sn":"MTC"},"TML-DW-092":{"mt":1,"mv":"Brown: 1","sn":"Jasani","st":1503,"sv":"Brown: 1114 | Yellow: 389"},"TML-DW-093":{"mt":3,"mv":"Black: 3","sn":"Jasani","st":1936,"sv":"Cream: 1936"},"TML-DW-094":{"mt":15,"mv":"Red: 5 | Grey: 4 | Black: 2 | Light Green: 2 | Sky Blue: 1 | Navy Blue: 1","sn":"MTC"},"TML-DW-095":{"mt":6,"mv":"Purple: 6","sn":"MTC"},"TML-DW-096":{"mt":14,"mv":"Navy Blue: 8 | Black: 5 | White: 1","sn":"Jasani","st":6224,"sv":"White: 3241 | Blue: 1544 | Dark Green: 832 | Black: 588 | Red: 19"},"TML-DW-097":{"mt":2,"sn":"MTC"},"TML-DW-098":{"mt":24,"mv":"Black: 20 | White: 4","sn":"MTC"},"TML-DW-099":{"mt":7,"mv":"Black, 900 ML: 3 | White, 750 ML: 2 | Black, 750 ML: 1 | Green, 750 ML: 1","sn":"Eventstore"},"TML-DW-100":{"mt":32,"mv":"Royal Blue: 13 | Red: 12 | Black: 3 | Green: 3 | Silver: 1","sn":"MTC"},"TML-DW-101":{"mt":2,"mv":"Black: 1 | Royal Blue: 1","sn":"Luxurytrdg"},"TML-DW-102":{"mt":40,"mv":"Black: 30 | White: 8 | Navy Blue: 2","sn":"MTC"},"TML-DW-103":{"mt":4,"sn":"Jasani","st":2985},"TML-DW-105":{"mt":1,"mv":"White: 1","sn":"Jasani","st":12081,"sv":"Black: 8027 | White: 3163 | Navy Blue: 891"},"TML-DW-107":{"mt":4,"mv":"Navy Blue: 2 | White: 1 | Dim Grey: 1","sn":"Event"},"TML-DW-108":{"mt":1,"mv":"Black: 1","sn":"Event"},"TML-DW-111":{"mt":2,"mv":"Black: 2","sn":"HAK"},"TML-DW-112":{"mt":18,"mv":"Silver: 8 | Navy Blue: 5 | Black: 5","sn":"HAK"},"TML-DW-113":{"mt":5,"mv":"Black: 3 | Grey: 2","sn":"HAK"},"TML-DW-114":{"mt":217,"mv":"Black: 117 | White: 100","sn":"Temu"},"TML-DW-116":{"mt":67,"mv":"White: 66 | Black: 1","sn":"Luxurytrdg"},"TML-DW-117":{"mt":11,"mv":"Black: 5 | White: 5 | Pink: 1","sn":"Fotokad"},"TML-DW-121":{"mt":4,"mv":"Black: 4","sn":"Amazon"},"TML-DW-122":{"mt":11,"sn":"MTC"},"TML-DW-125":{"mt":20,"mv":"Navy Blue: 8 | Black: 8 | Red: 3 | Yellow: 1","sn":"Fotokad"},"TML-DW-126":{"mt":1,"mv":"White: 1","sn":"Jasani","st":12081,"sv":"Black: 8027 | White: 3163 | Navy Blue: 891"},"TML-DW-127":{"mt":2,"mv":"Black: 1 | White: 1","sn":"Jasani","st":889,"sv":"White: 883 | Black: 6"},"TML-DW-128":{"mt":6,"sn":"Shanghai Gifts"},"TML-DW-129":{"mt":15,"mv":"White: 6 | Navy Blue: 5 | Black: 2 | Green: 2","sn":"Shanghai Gifts"},"TML-DW-131":{"mt":21,"mv":"Navy Blue: 14 | Red: 5 | White: 2","sn":"Shanghai Gifts"},"TML-DW-133":{"mt":26,"mv":"White: 26","sn":"Oasis"},"TML-DW-135":{"mt":527,"mv":"Black: 267 | Navy Blue: 258 | White: 2","sn":"Oasis"},"TML-DW-136":{"mt":41,"mv":"Navy Blue: 23 | White: 16 | Black: 2","sn":"Oasis"},"TML-DW-138":{"sn":"Jasani","st":873,"sv":"Obsidian Black: 873"},"TML-DW-139":{"mt":2,"mv":"Navy Blue: 2","sn":"MTC"},"TML-DW-142":{"mt":41,"sn":"Red Dot"},"TML-DW-144":{"sn":"Jasani","st":483,"sv":"Black: 483"},"TML-DW-145":{"mt":1,"mv":"Black: 1","sn":"Jasani"},"TML-DW-146":{"mt":21,"mv":"Black: 14 | White: 7","sn":"Shanghai Gifts"},"TML-DW-147":{"mt":2,"mv":"Black: 2","sn":"AK Flash"},"TML-DW-148":{"mt":20,"sn":"Amazon"},"TML-DW-149":{"mt":2,"mv":"Set Of 2: 2","sn":"Amazon"},"TML-DW-150":{"mt":7,"sn":"Amazon"},"TML-DW-151":{"mt":2,"mv":"White: 2","sn":"Temu"},"TML-DW-152":{"mt":9,"mv":"Grey: 4 | Black: 3 | Navy Blue: 2","sn":"HAK"},"TML-DW-153":{"mt":9,"mv":"Black: 9","sn":"HAK"},"TML-DW-154":{"mt":13,"mv":"White: 12 | Black: 1","sn":"HAK"},"TML-DW-155":{"mt":14,"mv":"Navy Blue: 14","sn":"Jasani"},"TML-DW-156":{"sn":"Jasani","st":20},"TML-DW-157":{"mt":1,"mv":"Black: 1","sn":"Event"},"TML-DW-158":{"mt":9,"mv":"Black: 8 | White: 1","sn":"Event"},"TML-DW-159":{"sn":"Jasani","st":1058,"sv":"White: 780 | Black: 278"},"TML-DW-160":{"mt":6,"mv":"White: 4 | Black: 1 | Green: 1","sn":"Jasani","st":23060,"sv":"White: 9554 | Navy Blue: 5009 | Black: 3818 | Green: 2750 | Grey: 1004 | Red: 925"},"TML-DW-161":{"sn":"Jasani","st":3011,"sv":"Black: 1672 | White: 1339"},"TML-DW-162":{"sn":"Jasani","st":15185,"sv":"Black: 4547 | Blue: 3818 | Grey: 2823 | Green: 2302 | White: 1244 | Aqua Green: 451"},"TML-DW-166":{"mt":2,"mv":"White: 2","sn":"Luxury Trdg"},"TML-DW-167":{"mt":22,"mv":"Set Of 2: 22","sn":"Jasani","st":1472},"TML-DW-168":{"mt":2,"sn":"MTC"},"TML-DW-169":{"mt":3,"mv":"White: 2 | Grey: 1","sn":"Shanghai"},"TML-DW-170":{"mt":9,"mv":"Black: 7 | White: 2","sn":"Jasani"},"TML-DW-172":{"mt":11,"mv":"White: 7 | Navy Blue: 3 | Black: 1","sn":"Jasani","st":12124,"sv":"Navy Blue: 5065 | Black: 4508 | White: 2551"},"TML-DW-174":{"mt":1,"mv":"Navy Blue: 1","sn":"Amazon"},"TML-DW-176":{"mt":1,"mv":"White: 1","sn":"Jasani","st":9942,"sv":"White: 6491 | Black: 3451"},"TML-DW-179":{"sn":"Jasani","st":515,"sv":"Ocean Blue: 515"},"TML-CH-001":{"mt":138,"mv":"Navy Blue: 82 | Royal Blue: 15 | Black: 13 | Grey: 11 | White: 7 | Green: 4 | Red: 3 | Blue: 1 | Cool Grey: 1 | Yellow: 1","sn":"Tshirtmart"},"TML-CH-002":{"mt":67,"mv":"Black: 45 | Navy Blue: 11 | White: 6 | Red: 2 | Green: 1 | Purple: 1 | Royal Blue: 1","sn":"Yuanye Caps"},"TML-CH-003":{"mt":781,"mv":"White: 363 | Black: 74 | Grey: 69 | Royal Blue: 66 | Navy Blue: 60 | Red: 36 | Maroon: 33 | Beige: 28 | Orange: 20 | Yellow: 10 | Cream: 8 | Light Blue: 6 | Pink: 3 | Dark Green: 2 | Dark Pink: 2 | Green: 1","sn":"Bahram"},"TML-CH-004":{"mt":23,"mv":"Pink: 12 | Black: 11","sn":"Tshirtmart"},"TML-CH-005":{"mt":16,"mv":"Black: 9 | White: 7","sn":"GO Sports"},"TML-CH-006":{"mt":160,"mv":"Black: 60 | Navy Blue: 30 | Grey: 25 | White: 13 | Yellow: 10 | Orange: 5 | Light Blue: 5 | Pink: 4 | Green: 2 | Red: 2 | Brown: 2 | Maroon: 2","sn":"Merchlist"},"TML-CH-007":{"mt":65,"mv":"Black: 36 | White: 29","sn":"Wild & Wicky Caps"},"TML-CH-008":{"mt":115,"mv":"Navy Blue: 30 | White: 17 | Black: 15 | Normal Green: 13 | Red: 11 | Royal Blue: 10 | Light Blue: 8 | Grey: 6 | Yellow: 2 | Orange: 2 | Purple: 1","sn":"Tshirtmart"},"TML-CH-009":{"mt":45,"mv":"Black: 17 | White: 13 | Blue: 6 | Navy Blue: 6 | Red: 3","sn":"Yuanye Caps"},"TML-CH-010":{"mt":10,"mv":"White: 4 | Navy Blue: 4 | Black: 2","sn":"Jasani","st":3377,"sv":"White: 1732 | Black: 1645 | Navy Blue: 0"},"TML-CH-011":{"ih":1},"TML-CH-012":{"mt":6,"mv":"Beige: 6","sn":"Temu"},"TML-CH-014":{"mt":157,"mv":"Black: 79 | Navy Blue: 50 | White: 14 | Grey: 14","sn":"Temu"},"TML-CH-015":{"mt":42,"mv":"Light Grey: 7 | Black: 7 | Navy Blue: 7 | Light Brown: 6 | Green: 5 | Orange: 3 | Red: 3 | Light Blue: 2 | Purple: 1 | Cream: 1","sn":"Yuanye Caps"},"TML-CH-016":{"mt":217,"mv":"Black: 120 | Light Blue: 20 | Pink: 20 | Light Green: 20 | White: 20 | Yellow: 17","sn":"Temu"},"TML-CH-018":{"mt":10,"mv":"Green: 5 | Black: 2 | Grey: 2 | Navy Blue: 1","sn":"Amazon"},"TML-CH-019":{"mt":72,"mv":"Pink: 19 | Black: 15 | White: 12 | Beige: 11 | Red: 7 | Navy Blue: 5 | Cool Grey: 3","sn":"Yuanye Caps"},"TML-CH-021":{"mt":134,"mv":"Black: 70 | White: 29 | Navy Blue: 12 | Red: 8 | Purple: 8 | Beige: 7","sn":"Tshirtmart"},"TML-CH-022":{"mt":21,"mv":"Army White: 12 | Army Green: 9","sn":"Temu"},"TML-CH-023":{"mt":7,"mv":"Black: 3 | Bottle Green: 2 | Grey: 2","sn":"Jasani","st":847,"sv":"Grey: 753 | White: 78 | Black: 16 | Green: 0"},"TML-CH-024":{"mt":22,"mv":"Black: 11 | Dark Brown: 10 | Navy Blue: 1","sn":"Temu"},"TML-CH-025":{"mt":8,"mv":"Black: 5 | Navy Blue: 3","sn":"HAK"},"TML-CH-028":{"sn":"Jasani","st":2028,"sv":"Black: 1306 | Grey: 722"},"TML-CH-029":{"mt":18,"sn":"Amazon"},"TML-BT-001":{"mt":768,"mv":"Beige: 226 | White: 154 | Black: 154 | Red: 99 | Blue: 43 | Green: 40 | Navy Blue: 29 | Pink: 23","sn":"MTC"},"TML-BT-002":{"mt":86,"sn":"Jasani","st":6033,"sv":"Natural: 6033"},"TML-BT-003":{"mt":5,"sn":"MTC"},"TML-BT-004":{"mt":182,"mv":"Navy Blue: 166 | Red: 5 | Orange: 5 | Yellow Green: 4 | Black: 2","sn":"MTC"},"TML-BT-005":{"mt":24,"mv":"Blue: 10 | Black: 9 | Cool Grey: 5","sn":"Akflash"},"TML-BT-007":{"sn":"Jasani","st":2075,"sv":"Black: 1032 | Grey: 535 | Navy Blue: 508"},"TML-BT-008":{"mt":3,"mv":"Navy Blue: 3","sn":"Jasani","st":1867,"sv":"Black: 1248 | Grey: 525 | Navy Blue: 94"},"TML-BT-009":{"mt":3,"mv":"Black: 2 | Navy Blue: 1","sn":"Jasani","st":379,"sv":"Black: 379"},"TML-BT-010":{"mt":330,"mv":"Red: 84 | Navy Blue: 69 | White: 50 | Yellow: 48 | Parrot Green: 35 | Black: 19 | Royal Blue: 19 | Orange: 6","sn":"HAK"},"TML-BT-011":{"mt":142,"mv":"Black: 79 | White: 54 | Blue: 9","sn":"MTC","st":5986,"sv":"Black: 5986 | Navy Blue: 0"},"TML-BT-012":{"mt":31,"mv":"Cial Blue: 16 | Wine Red: 10 | Cool Grey: 5","sn":"MTC"},"TML-BT-013":{"mt":33,"mv":"White: 16 | Red: 10 | Royal Blue: 7","sn":"MTC","st":0,"sv":"White: 0 | Black: 0"},"TML-BT-014":{"mt":22,"mv":"Royal Blue: 19 | Black: 2 | Red: 1","sn":"MTC"},"TML-BT-016":{"mt":26,"sn":"MTC"},"TML-BT-018":{"mt":12,"sn":"MTC"},"TML-BT-019":{"mt":5,"mv":"Black: 5","sn":"HAK"},"TML-BT-020":{"mt":1,"sn":"Jasani"},"TML-BT-021":{"sn":"Jasani","st":568},"TML-BT-022":{"sn":"Jasani","st":6536,"sv":"Grey: 3198 | Black: 1728 | Blue: 1610"},"TML-BT-023":{"mt":3,"sn":"Jasani","st":490},"TML-BT-024":{"mt":3,"mv":"Black: 2 | Navy Blue: 1","sn":"Jasani","st":980,"sv":"Black: 980"},"TML-BT-025":{"mt":4,"sn":"Jasani","st":1525},"TML-BT-026":{"mt":15,"sn":"MTC"},"TML-BT-027":{"mt":44,"mv":"White: 44","sn":"Jasani","st":2267,"sv":"Black: 1294 | Natural: 973"},"TML-BT-028":{"mt":49,"mv":"Black: 44 | White: 5","sn":"Jasani","st":2343,"sv":"Black: 1097 | Blue: 975 | Natural: 188 | Natural: 83"},"TML-BT-029":{"mt":4,"sn":"MTC"},"TML-BT-034":{"mt":160,"mv":"Black: 61 | Normal Green: 33 | Navy Blue: 30 | White: 20 | Orange: 12 | Maroon: 4","sn":"MTC"},"TML-BT-035":{"mt":3,"sn":"Fotocad"},"TML-BT-036":{"mt":3,"sn":"Jasani","st":2813},"TML-BT-037":{"sn":"Jasani","st":223},"TML-BT-038":{"ih":1},"TML-BT-040":{"sn":"Jasani","st":750,"sv":"Black: 750"},"TML-BT-041":{"mt":9,"mv":"White: 5 | Black: 4","sn":"Jasani","st":5420,"sv":"Black/Tan: 2730 | Beige/Tan: 2690"},"TML-BT-042":{"mt":12,"mv":"Wine Red: 10 | Black: 2","sn":"Event Store"},"TML-BT-045":{"mt":166,"mv":"Black: 94 | White: 58 | Beige: 14","sn":"Custom Made"},"TML-BT-046":{"mt":193,"mv":"Navy Blue: 85 | White: 63 | Black: 45","sn":"Red Dot"},"TML-BT-047":{"ih":1},"TML-BT-048":{"mt":11,"mv":"Black: 11","sn":"MTC"},"TML-BT-049":{"mt":5,"sn":"Jasani","st":3641,"sv":"Black: 3641"},"TML-BT-050":{"mt":2,"sn":"Jasani","st":17,"sv":"Black: 17"},"TML-BT-051":{"sn":"Jasani","st":130,"sv":"Black Matt Finish: 130"},"TML-BT-052":{"mt":2,"mv":"Grey: 1 | Red: 1","sn":"MTC"},"TML-BT-053":{"mt":7,"sn":"MTC"},"TML-BT-054":{"mt":5,"mv":"Grey: 4 | Black: 1","sn":"MTC"},"TML-BT-055":{"mt":4,"sn":"Jasani","st":10186,"sv":"Natural: 10186"},"TML-BT-056":{"mt":8,"sn":"Jasani","st":0,"sv":"Natural: 0"},"TML-BT-060":{"sn":"Jasani","st":0,"sv":"Black: 0"},"TML-BT-061":{"mt":17,"sn":"Event"},"TML-BT-062":{"mt":3,"mv":"Green: 2 | Black: 1","sn":"Event Store"},"TML-BT-063":{"mt":13,"mv":"Black: 12 | Navy Blue: 1","sn":"Jasani","st":2838,"sv":"Beige: 1928 | Navy: 683 | Black: 227"},"TML-BT-064":{"mt":11,"mv":"Navy Blue: 5 | Light Grey: 3 | Black: 2 | Green: 1","sn":"Jasani","st":8276,"sv":"Navy Blue: 3983 | Grey: 2985 | Green: 1308 | Black: 0"},"TML-BT-065":{"mt":4,"sn":"Jasani","st":1336},"TML-BT-068":{"mt":2,"sn":"Jasani","st":320},"TML-BT-069":{"mt":8,"sn":"Jasani","st":0},"TML-BT-071":{"mt":5,"mv":"Black: 3 | Tan: 2","sn":"Jasani","st":3760,"sv":"Black: 3760"},"TML-BT-072":{"mt":3,"sn":"Jasani","st":1208},"TML-BT-073":{"mt":4,"mv":"Grey: 2 | Black: 2","sn":"Jasani","st":3551,"sv":"Black/Tan: 1646 | Grey/Tan: 1266 | Navy Blue/Tan: 639"},"TML-BT-075":{"mt":3,"sn":"MTC"},"TML-BT-076":{"mt":6,"mv":"Royal Blue: 5 | Black: 1","sn":"HAK"},"TML-BT-079":{"mt":11,"mv":"Grey: 7 | Black: 4","sn":"HAK"},"TML-BT-080":{"mt":1,"mv":"Navy Blue: 1","sn":"HAK"},"TML-BT-081":{"mt":13,"mv":"Black: 12 | White: 1","sn":"Jasani","st":0,"sv":"White: 0"},"TML-BT-082":{"mt":6,"sn":"Luxury Trdg"},"TML-BT-083":{"mt":4,"sn":"Luxury Trdg"},"TML-BT-084":{"mt":24,"mv":"Black: 11 | Grey: 7 | Green: 4 | White: 2","sn":"HAK"},"TML-BT-085":{"mt":37,"mv":"A5: 19 | A4: 18","sn":"MTC"},"TML-BT-086":{"mt":1,"mv":"Black: 1","sn":"Event Store"},"TML-BT-087":{"mt":6,"mv":"Navy Blue: 3 | Black: 1 | Brown: 1 | Green: 1","sn":"Event Store"},"TML-BT-090":{"mt":7,"sn":"Shanghai Gifts"},"TML-BT-091":{"mt":4,"mv":"Grey: 3 | Navy Blue: 1","sn":"Luxury Trading"},"TML-BT-093":{"mt":28,"mv":"Light Blue: 10 | Black: 9 | Navy Blue: 9","sn":"Oasis"},"TML-BT-094":{"mt":75,"mv":"Red: 25 | Navy Blue: 25 | Royal Blue: 25","sn":"Oasis"},"TML-BT-095":{"mt":33,"mv":"Black: 32 | Navy Blue: 1","sn":"Jasani"},"TML-BT-096":{"mt":2,"mv":"Navy Blue: 1 | Black: 1","sn":"Jasani","st":1545},"TML-BT-098":{"mt":145,"mv":"Khaki: 50 | Black: 40 | Brown: 27 | White: 27 | Beige: 1","sn":"Temu"},"TML-BT-099":{"mt":15,"mv":"Black: 12 | Grey: 3","sn":"HAK"},"TML-BT-100":{"mt":1,"sn":"MTC"},"TML-BT-101":{"mt":6,"mv":"Navy Blue: 4 | Black: 1 | Green: 1","sn":"Event"},"TML-BT-102":{"mt":8,"sn":"MTC"},"TML-BT-103":{"mt":2,"mv":"Navy Blue: 2","sn":"Jasani","st":3418,"sv":"Navy: 1453 | Black: 1230 | Beige: 735"},"TML-BT-104":{"mt":30,"mv":"Green: 21 | Black: 8 | Navy Blue: 1","sn":"Event"},"TML-BT-105":{"mt":4,"sn":"Shanghai Gifts"},"TML-BT-106":{"sn":"Jasani","st":996},"TML-BT-107":{"mt":2,"mv":"Black: 1 | Grey: 1","sn":"HAK"},"TML-BT-108":{"mt":228,"mv":"Black: 103 | White: 72 | Navy Blue: 53","sn":"HAK"},"TML-BT-109":{"mt":72,"sn":"Temu"},"TML-BT-111":{"mt":3,"mv":"Grey: 3","sn":"Jasani"},"TML-BT-113":{"mt":4,"mv":"Black: 2 | Navy Blue: 2","sn":"Event"},"TML-BT-114":{"mt":5,"mv":"Khaki: 2 | Green: 2 | Black: 1","sn":"Event"},"TML-BT-115":{"mt":2,"mv":"Navy Blue: 2","sn":"Event"},"TML-BT-116":{"mt":3,"mv":"Khaki: 2 | Black: 1","sn":"Event"},"TML-BT-119":{"mt":6,"sn":"Event"},"TML-BT-120":{"mt":3,"mv":"Grey: 2 | Navy Blue: 1","sn":"Event"},"TML-BT-123":{"sn":"Jasani","st":0,"sv":"Natural: 0"},"TML-BT-125":{"mt":1,"mv":"Grey: 1","sn":"Jasani","st":8474,"sv":"Grey: 3472 | Navy Blue: 2772 | Black: 2230"},"TML-BT-126":{"mt":1,"mv":"Black: 1","sn":"Lxry Trading"},"TML-BT-127":{"sn":"Jasani","st":1545},"TML-BT-131":{"mt":4,"mv":"Black: 2 | Khaki: 1 | Navy Blue: 1","sn":"Eventgift"},"TML-BT-132":{"mt":10,"mv":"Grey: 9 | Green: 1","sn":"MTC"},"TML-BT-133":{"sn":"Jasani","st":105,"sv":"Black: 105 | Navy: 0"},"TML-BT-135":{"mt":2,"mv":"Black: 2","sn":"Temu"},"TML-BT-137":{"mt":228,"mv":"Black: 172 | Beige: 56","sn":"Jasani","st":5514,"sv":"Black: 2941 | Beige: 2573"},"TML-BT-143":{"mt":5,"mv":"Grey: 2 | Red: 2 | Brown: 1","sn":"Temu"},"TML-BT-144":{"mt":16,"mv":"Navy Blue: 9 | Sky Blue: 7","sn":"Temu"},"TML-BT-145":{"mt":12,"mv":"Brown: 7 | Beige: 5","sn":"Temu"},"TML-BT-146":{"mt":8,"mv":"Beige: 4 | White: 2 | Blue: 2","sn":"Oasis"},"TML-OA-001":{"mt":37,"mv":"Navy Blue: 15 | Black: 13 | Cool Grey: 4 | White: 3 | Red: 2","sn":"Goodwill"},"TML-OA-002":{"mt":104,"mv":"Red: 47 | Black: 26 | Cool Grey: 25 | Navy Blue: 5 | White: 1","sn":"Goodwill"},"TML-OA-003":{"mt":53,"mv":"Black: 21 | Navy Blue: 9 | Cool Grey: 8 | Sky Blue: 7 | Red: 4 | White: 3 | Yellow: 1","sn":"Goodwill"},"TML-OA-005":{"mt":58,"mv":"Cool Grey, Round: 46 | White, Round: 12","sn":"MTC"},"TML-OA-006":{"mt":78,"mv":"Black: 40 | White: 32 | Royal Blue: 6","sn":"AK Flash"},"TML-OA-007":{"mt":5,"sn":"MTC"},"TML-OA-008":{"mt":223,"mv":"Sky Blue: 68 | Black: 43 | White: 38 | Navy Blue: 30 | Grey: 15 | Green: 13 | Red: 4 | Orange: 3 | Purple: 3 | Pink: 2 | Light Green: 2 | Yellow: 1 | Brown: 1","sn":"AK Flash"},"TML-OA-009":{"sn":"Jasani","st":0},"TML-OA-010":{"mt":13,"sn":"Akflash"},"TML-OA-012":{"mt":30,"sn":"MTC"},"TML-OA-013":{"mt":200,"mv":"Grey: 200","sn":"MTC"},"TML-OA-016":{"mt":364,"mv":"Silver: 119 | Orange: 65 | Red: 59 | Green: 34 | Black: 26 | Navy Blue: 25 | Royal Blue: 16 | White: 10 | Yellow: 6 | Sky Blue: 4","sn":"HAK"},"TML-OA-017":{"mt":6,"mv":"White: 4 | Black: 2","sn":"Jassani MTC"},"TML-OA-018":{"sn":"Jasani","st":4,"sv":"Green: 4"},"TML-OA-020":{"mt":1,"mv":"Black: 1","sn":"Jasani","st":958,"sv":"Black: 846 | Navy Blue: 112"},"TML-OA-021":{"mt":64,"mv":"White: 50 | Black: 14","sn":"MTC"},"TML-OA-022":{"ih":1},"TML-OA-024":{"mt":128,"mv":"White, 15x15: 37 | Red, 15x15: 30 | Pink, 10x10: 27 | Yellow, 15x15: 15 | Royal Blue, 15x15: 10 | Navy Blue, 15x15: 6 | Black, 15x15: 3","sn":"MTC"},"TML-OA-026":{"mt":1,"sn":"MTC"},"TML-OA-027":{"mt":1,"sn":"MTC"},"TML-OA-028":{"mt":1,"sn":"MTC"},"TML-OA-029":{"mt":1,"sn":"Shanghai"},"TML-OA-030":{"mt":20,"sn":"Jasani","st":0},"TML-OA-031":{"sn":"Jasani","st":0,"sv":"Black: 0"},"TML-OA-032":{"sn":"Jasani","st":1534,"sv":"White: 1534"},"TML-OA-034":{"mt":64,"mv":"Black: 28 | Red: 20 | Bottle Green: 10 | Blue: 6","sn":"MTC"},"TML-OA-036":{"mt":15,"mv":"Cool Grey: 9 | White: 6","sn":"MTC"},"TML-OA-037":{"mt":14,"sn":"AK Flash"},"TML-OA-038":{"mt":45,"mv":"Black: 37 | White: 4 | Royal Blue: 4","sn":"AK Flash"},"TML-OA-040":{"mt":21,"sn":"MTC"},"TML-OA-044":{"sn":"Jasani","st":0},"TML-OA-045":{"mt":11,"mv":"Black, Hardcover: 6 | Black, Softcover: 3 | Navy Blue, Hardcover: 1 | Cool Grey, Hardcover: 1","sn":"Jasani","st":836,"sv":"Black: 836"},"TML-OA-046":{"sn":"Jasani","st":9014,"sv":"Black: 4254 | Grey: 2491 | Blue: 1765 | Green: 504"},"TML-OA-048":{"mt":11,"mv":"Black: 10 | Grey: 1","sn":"Jasani","st":8396,"sv":"Black: 5081 | Navy Blue: 3315"},"TML-OA-049":{"mt":1,"sn":"Jasani","st":1543,"sv":"Black: 1543"},"TML-OA-050":{"mt":56,"mv":"Black: 35 | Blue: 16 | White: 5","sn":"Jasani","st":7,"sv":"White: 6 | Blue/Grey: 1 | Black: 0"},"TML-OA-051":{"mt":9,"mv":"Red: 8 | Normal Green: 1","sn":"Jasani","st":26112,"sv":"Black: 6571 | Dark Blue: 5799 | Grey: 3337 | Red: 2109 | Light Green: 2078 | Purple: 2015 | Light Blue: 1589 | Dark Green: 1540 | Aqua Green: 1074"},"TML-OA-052":{"mt":57,"mv":"Black: 20 | White: 15 | Sky Blue: 11 | Dark Blue: 5 | Grey: 3 | Purple: 2 | Green: 1","sn":"Jasani","st":81037,"sv":"White: 31381 | Aqua Blue: 15590 | Black: 15428 | Purple: 4976 | Red: 4589 | Green: 3021 | Grey: 2984 | Orange: 2489 | Royal Blue: 579"},"TML-OA-053":{"sn":"Jasani","st":6494},"TML-OA-054":{"mt":11,"sn":"Jasani","st":575},"TML-OA-055":{"sn":"Jasani","st":5},"TML-OA-056":{"mt":5,"sn":"Fotocad (flag Stand) 4 Star For Flag"},"TML-OA-059":{"mt":1,"sn":"Rocketbook"},"TML-OA-060":{"mt":20,"sn":"Goodwill"},"TML-OA-061":{"ih":1},"TML-OA-063":{"sn":"Jasani","st":7013,"sv":"Natural: 7013"},"TML-OA-065":{"mt":46,"mv":"Royal Blue: 22 | Black: 14 | Purple: 10","sn":"Sky Touch"},"TML-OA-067":{"mt":45,"sn":"MTC"},"TML-OA-068":{"mt":51,"mv":"Dark Blue: 24 | Black: 14 | White: 5 | Green: 4 | Red: 2 | Sky Blue: 1 | Orange: 1","sn":"MTC"},"TML-OA-069":{"mt":164,"mv":"White: 110 | Black: 25 | Green: 12 | Brown: 6 | Navy Blue: 5 | Yellow: 4 | Grey: 2","sn":"MTC"},"TML-OA-074":{"mt":5,"sn":"MTC"},"TML-OA-078":{"mt":54,"mv":"White: 21 | Black: 18 | Navy Blue: 8 | Red: 4 | Cool Grey: 3","sn":"Normal - Goodwill"},"TML-OA-081":{"mt":378,"mv":"White: 268 | Black: 37 | Blue: 19 | Orange: 19 | Navy Blue: 15 | Dark Green: 14 | Red: 6","sn":"MTC"},"TML-OA-083":{"mt":5,"sn":"Goodwill"},"TML-OA-084":{"ih":1},"TML-OA-085":{"mt":5,"mv":"White: 3 | Black: 2","sn":"Jasani","st":2790,"sv":"Black: 2790 | White: 0"},"TML-OA-089":{"mt":5,"sn":"Belfast"},"TML-OA-091":{"mt":25,"mv":"Black: 25","sn":"Jasani","st":1788,"sv":"Black: 1788"},"TML-OA-092":{"mt":64,"mv":"Green: 54 | Blue: 6 | Black: 2 | Roma Blue: 2","sn":"Jasani","st":2742,"sv":"Black: 1286 | Green: 1285 | Blue: 171"},"TML-OA-093":{"ih":1},"TML-OA-094":{"mt":12,"sn":"Jasani","st":1035},"TML-OA-095":{"mt":26,"mv":"White: 14 | Green: 7 | Black: 3 | Royal Blue: 2","sn":"Jasani","st":14811,"sv":"Red: 5502 | Black: 4009 | Blue: 3241 | Green: 2059"},"TML-OA-097":{"mt":1,"mv":"Grey: 1","sn":"Belfast"},"TML-OA-098":{"mt":2,"mv":"Green: 2","sn":"Jasani","st":3152,"sv":"Default: 1463 | Default: 1008 | Default: 681"},"TML-OA-099":{"mt":12,"sn":"MTC"},"TML-OA-101":{"mt":8,"sn":"Jasani","st":2725},"TML-OA-102":{"mt":16,"mv":"Black: 5 | Birch: 5 | Beige: 4 | Grey: 2","sn":"Jasani","st":5448,"sv":"Black: 2613 | Grey: 2123 | White: 712"},"TML-OA-106":{"mt":6,"mv":"Black: 6","sn":"Jasani","st":5834,"sv":"Grey: 5580 | Black: 254"},"TML-OA-109":{"mt":96,"mv":"Black: 59 | White: 20 | Navy Blue: 12 | Grey: 5","sn":"Jasani","st":12317,"sv":"Black: 6982 | White: 2613 | Navy Blue: 2243 | Grey: 479"},"TML-OA-114":{"mt":2,"mv":"Grey: 2","sn":"Event"},"TML-OA-115":{"mt":35,"mv":"White: 35","sn":"MTC"},"TML-OA-116":{"mt":1,"mv":"Brown: 1","sn":"Event"},"TML-OA-119":{"mt":242,"sn":"MTC"},"TML-OA-121":{"mt":4,"mv":"Black: 4","sn":"Jasani","st":12038,"sv":"Black: 7816 | White: 4222"},"TML-OA-122":{"sn":"Jasani","st":5327,"sv":"White: 2984 | Black: 2343"},"TML-OA-124":{"mt":17,"mv":"Royal Blue: 10 | Red: 5 | Normal Green: 1 | Black: 1","sn":"MTC"},"TML-OA-126":{"mt":42,"sn":"MTC"},"TML-OA-127":{"mt":270,"sn":"MTC"},"TML-OA-128":{"mt":64,"mv":"Black: 49 | Silver: 8 | Grey: 4 | Green: 2 | Navy Blue: 1","sn":"MTC"},"TML-OA-129":{"mt":85,"mv":"Royal Blue: 35 | Forest Green: 28 | Black: 15 | White: 5 | Navy Blue: 2","sn":"MTC"},"TML-OA-130":{"mt":4,"mv":"Olive: 4","sn":"Events Store"},"TML-OA-131":{"mt":14,"mv":"Black: 6 | Grey: 3 | Dark Grey: 3 | Dark Green: 2","sn":"Event"},"TML-OA-132":{"mt":12,"mv":"Green: 10 | Grey: 2","sn":"Event"},"TML-OA-133":{"mt":5,"sn":"MTC"},"TML-OA-137":{"mt":61,"mv":"Black: 32 | Red: 20 | Blue: 5 | Green: 4","sn":"MTC"},"TML-OA-138":{"mt":6,"mv":"Black: 2 | Brown: 2 | Grey: 1 | Beige: 1","sn":"MTC"},"TML-OA-139":{"sn":"Jasani","st":905,"sv":"Metallic: 905"},"TML-OA-140":{"mt":1,"sn":"Jasani","st":3719,"sv":"Black: 2216 | Grey: 1503"},"TML-OA-141":{"mt":9,"mv":"White: 5 | Grey: 3 | Yellow: 1","sn":"Event"},"TML-OA-143":{"mt":7,"mv":"Royal Blue: 3 | Navy Blue: 2 | Black: 1 | Grey: 1","sn":"Event"},"TML-OA-144":{"mt":26,"mv":"Blue: 25 | Black: 1","sn":"Jasani","st":4202,"sv":"White: 2738 | Black: 1315 | Navy Blue: 149"},"TML-OA-145":{"sn":"Jasani","st":945,"sv":"Black Swirl: 945"},"TML-OA-146":{"sn":"Jasani","st":4986,"sv":"Black: 2777 | Grey: 1330 | Navy Blue: 879"},"TML-OA-148":{"mt":5,"sn":"Event"},"TML-OA-149":{"mt":13,"sn":"MTC"},"TML-OA-150":{"mt":65,"mv":"Navy Blue: 12 | Red: 11 | Brown: 11 | Green: 10 | Royal Blue: 9 | Black: 4 | White: 4 | Orange: 4","sn":"Jasani","st":2769},"TML-OA-151":{"mt":4,"mv":"Light Grey: 2 | Black: 1 | Blue: 1","sn":"Jasani","st":0,"sv":"Navy Blue: 0 | Black: 0 | Grey: 0"},"TML-OA-152":{"mt":4,"mv":"Brown: 3 | Silver: 1","sn":"MTC"},"TML-OA-156":{"mt":50,"mv":"Black: 50","sn":"Jasani","st":4446,"sv":"White: 2539 | Black: 1907"},"TML-OA-157":{"mt":5,"mv":"Black: 5","sn":"Jasani","st":4350,"sv":"Black: 2463 | Brown: 1887"},"TML-OA-158":{"mt":2,"sn":"Jasani","st":1468},"TML-OA-160":{"sn":"Jasani","st":8749},"TML-OA-161":{"sn":"Jasani","st":1329,"sv":"Black: 1329"},"TML-OA-162":{"mt":1,"mv":"Black: 1","sn":"Jasani","st":1,"sv":"Black: 1 | Metallic: 0"},"TML-OA-163":{"mt":6,"mv":"Red: 3 | White: 1 | Blue: 1 | Green: 1","sn":"Jasani","st":2104},"TML-OA-168":{"mt":9,"mv":"Black: 5 | Brown: 2 | Blue: 1 | Grey: 1","sn":"HAK"},"TML-OA-170":{"mt":23,"mv":"Purple: 8 | Black: 6 | Sky Blue: 6 | Brown: 2 | Green: 1","sn":"HAK"},"TML-OA-172":{"mt":6,"mv":"Black: 2 | Navy Blue: 2 | Grey: 2","sn":"HAK"},"TML-OA-173":{"ih":1},"TML-OA-175":{"mt":4,"sn":"Luxury"},"TML-OA-176":{"mt":3,"sn":"Luxury"},"TML-OA-177":{"sn":"Jasani","st":3924,"sv":"Royal Blue: 2167 | Black: 1757 | Navy Blue: 0"},"TML-OA-181":{"mt":6,"sn":"Fotocad"},"TML-OA-183":{"mt":2,"sn":"Fotocad"},"TML-OA-184":{"mt":20,"sn":"Amazon"},"TML-OA-185":{"mt":3,"mv":"Black: 2 | Navy Blue: 1","sn":"Event"},"TML-OA-188":{"mt":5,"sn":"HAK"},"TML-OA-196":{"mt":6,"mv":"Black: 3 | White: 3","sn":"HAK"},"TML-OA-197":{"mt":27,"mv":"Black: 25 | Blue: 2","sn":"HAK"},"TML-OA-198":{"mt":125,"mv":"White: 125","sn":"MTC"},"TML-OA-201":{"mt":2,"sn":"MTC"},"TML-OA-205":{"mt":1,"sn":"Shanghai Gifts"},"TML-OA-213":{"mt":40,"mv":"Navy Blue: 28 | Black: 6 | White: 6","sn":"Shanghai Gifts"},"TML-OA-216":{"mt":110,"mv":"Red: 60 | Beige: 50","sn":"Oasis"},"TML-OA-217":{"mt":60,"sn":"Oasis"},"TML-OA-218":{"mt":54,"mv":"Black: 28 | Beige: 20 | White: 6","sn":"Oasis"},"TML-OA-221":{"mt":25,"sn":"Jasani","st":838,"sv":"Black: 757 | Blue: 81"},"TML-OA-224":{"mt":6,"mv":"Green: 4 | Light Grey: 1 | Black: 1","sn":"Event"},"TML-OA-227":{"sn":"Jasani","st":12827},"TML-OA-231":{"mt":18,"mv":"White: 9 | Black: 5 | Red: 4","sn":"Jasani","st":2371,"sv":"Lime: 2371"},"TML-OA-233":{"mt":3,"mv":"Light Grey: 2 | Navy Blue: 1","sn":"Event"},"TML-OA-235":{"mt":4,"mv":"Black: 1 | Navy Blue: 1 | Green: 1 | Grey: 1","sn":"Event"},"TML-OA-237":{"mt":64,"mv":"Black: 25 | White: 25 | Navy Blue: 14","sn":"Event"},"TML-OA-240":{"mt":6,"sn":"Titleist"},"TML-OA-241":{"sn":"Jasani","st":7148},"TML-OA-242":{"mt":7,"mv":"Black: 4 | Green: 2 | Royal Blue: 1","sn":"Shanghai"},"TML-OA-245":{"mt":11,"mv":"Blue: 6 | Green: 2 | Grey: 2 | Black: 1","sn":"Event"},"TML-OA-247":{"mt":1,"sn":"Shanghai"},"TML-OA-248":{"mt":1,"sn":"Shanghai"},"TML-OA-250":{"mt":4,"mv":"White: 4","sn":"Fotokad"},"TML-OA-252":{"mt":35,"mv":"Black: 29 | Silver: 6","sn":"MTC"},"TML-OA-254":{"mt":1,"sn":"Shanghai"},"TML-OA-255":{"mt":18,"mv":"Royal Blue: 12 | Black: 4 | White: 2","sn":"Event"},"TML-OA-256":{"mt":11,"mv":"Black: 6 | Navy Blue: 4 | Grey: 1","sn":"MTC"},"TML-OA-257":{"sn":"Jasani","st":2365},"TML-OA-258":{"mt":3,"mv":"Black/sliver: 3","sn":"Jasani","st":72,"sv":"Black: 70 | Blue: 2"},"TML-OA-260":{"mt":100,"mv":"White: 100","sn":"Jasani","st":1442,"sv":"Maroon: 918 | Navy Blue: 509 | Green: 9 | Black: 6 | White: 0"},"TML-OA-263":{"mt":5,"sn":"Amazon"},"TML-OA-264":{"mt":16,"mv":"Green: 6 | Red: 5 | Yellow: 4 | Black: 1","sn":"Temu Belfast"},"TML-OA-266":{"mt":6,"mv":"Grey: 3 | Black: 1 | Light Blue: 1 | Silver: 1","sn":"MTC"},"TML-OA-267":{"mt":175,"mv":"Blue: 170 | Red: 5","sn":"HAK"},"TML-OA-268":{"sn":"Jasani","st":9378},"TML-OA-270":{"sn":"Jasani","st":4580},"TML-OA-271":{"sn":"Jasani","st":9831,"sv":"White: 3663 | Blue: 3511 | Red: 1236 | Purple: 1025 | Black: 396"},"TML-OA-273":{"mt":7,"mv":"Navy Blue: 7","sn":"Jasani","st":6084,"sv":"Navy Blue: 3477 | Black: 2607 | White: 0"},"TML-OA-276":{"mt":34,"sn":"MTC"},"TML-OA-278":{"mt":1,"sn":"Event"},"TML-OA-279":{"sn":"Jasani","st":2031,"sv":"Navy: 1990 | Black: 41"},"TML-OA-282":{"mt":40,"mv":"Black: 40","sn":"MTC"},"TML-OA-283":{"mt":4,"mv":"Black: 2 | Navy Blue: 2","sn":"Jasani","st":2618,"sv":"Navy: 2452 | Black: 166"},"TML-OA-284":{"mt":3,"mv":"Black: 2 | Navy Blue: 1","sn":"Jasani","st":3622,"sv":"Black: 2776 | Navy: 846"},"TML-OA-285":{"mt":8,"sn":"Jasani","st":5686,"sv":"Black: 5686"},"TML-OA-286":{"mt":3,"sn":"MTC"},"TML-OA-289":{"mt":12,"mv":"Black: 11 | Navy Blue: 1","sn":"Shanghai Gifts"},"TML-OA-293":{"mt":8,"mv":"Navy Blue: 6 | Black: 2","sn":"Jasani","st":6306,"sv":"Black: 6306 | Navy Blue: 0"},"TML-OA-294":{"mt":1,"sn":"Amazon"},"TML-OA-297":{"mt":3,"sn":"HAK"},"TML-OA-300":{"mt":5,"sn":"MTC"},"TML-OA-301":{"sn":"Jasani","st":0,"sv":"Black: 0 | Blue: 0 | Grey: 0"},"TML-OA-302":{"sn":"Jasani","st":5506},"TML-OA-303":{"mt":2,"mv":"Black: 1 | Navy Blue: 1","sn":"MTC"},"TML-OA-304":{"sn":"Jasani","st":5018,"sv":"Black: 3713 | Blue: 950 | Green: 355"},"TML-OA-306":{"mt":2,"mv":"White: 2","sn":"Jasani","st":841,"sv":"Green: 710 | Navy Blue: 131 | White: 0 | Black: 0"},"TML-OA-310":{"mt":121,"mv":"Black: 100 | Grey: 10 | Red: 7 | Green: 2 | Blue: 2","sn":"MTC"},"TML-OA-313":{"mt":1,"mv":"L: 1","sn":"MTC"},"TML-OA-314":{"mt":43,"mv":"Black: 17 | Blue: 11 | White: 10 | Light Blue: 5","sn":"MTC AK Flash"},"TML-OA-315":{"sn":"Jasani","st":2295},"TML-OA-320":{"mt":6,"sn":"MTC Shanghai"},"TML-OA-323":{"sn":"Jasani","st":1914,"sv":"Green: 1283 | Red: 595 | Black: 36 | White: 0 | Blue: 0"},"TML-OA-325":{"sn":"Jasani","st":588,"sv":"Black: 588 | White: 0"},"TML-OA-329":{"mt":8,"sn":"MTC"},"TML-OA-335":{"sn":"Jasani","st":0},"TML-OA-339":{"sn":"Jasani","st":4255},"TML-OA-341":{"mt":25,"mv":"Shiny Gold: 25","sn":"MTC"},"TML-OA-354":{"sn":"Jasani","st":1595},"TML-OA-364":{"sn":"Jasani","st":5327,"sv":"White: 2984 | Black: 2343"},"TML-OA-367":{"sn":"Jasani","st":2922},"TML-PP-012":{"mt":40,"mv":"12x9 CM: 40","sn":"Green Sea Heng Xing Trading Fzc0"},"TML-PP-034":{"mt":27,"mv":"80 Pcs: 19 | 126 Pcs: 6 | 36 Pcs: 2","sn":"MTC"},"TML-PP-039":{"mt":10,"mv":"Black: 5 | Red: 5","sn":"Temu"},"TML-PP-040":{"mt":24,"mv":"Pink: 6 | Red: 5 | Wine Red: 4 | Grey: 4 | Black: 3 | Light Blue: 2","sn":"Temu"},"TML-PP-045":{"mt":11,"sn":"Saeed Screen Printing"},"TML-PP-046":{"sn":"Jasani","st":3791,"sv":"Black: 3791"},"TML-PP-047":{"mt":26,"mv":"White: 18 | Black: 6 | Navy Blue: 2","sn":"MTC"},"TML-PP-048":{"mt":35,"mv":"Orange: 10 | Brown: 10 | Black: 9 | Green: 6","sn":"Temu"},"TML-TA-001":{"sn":"Jasani","st":4684},"TML-TA-002":{"mt":50,"sn":"Jasani","st":0},"TML-TA-003":{"mt":2,"sn":"MTC"},"TML-TA-005":{"mt":1,"mv":"4 In 1: 1","sn":"AK Flash"},"TML-TA-007":{"mt":1,"mv":"Black: 1","sn":"AK Flash"},"TML-TA-010":{"sn":"Jasani","st":0},"TML-TA-011":{"sn":"Jasani","st":1668},"TML-TA-013":{"mt":3,"sn":"Jasani","st":1270},"TML-TA-014":{"mt":28,"sn":"Jasani","st":1251},"TML-TA-015":{"mt":2,"sn":"MTC"},"TML-TA-017":{"mt":5,"mv":"8000: 3 | 10000: 2","sn":"Akflash"},"TML-TA-018":{"sn":"Jasani","st":1264},"TML-TA-021":{"mt":3,"mv":"Green: 3","sn":"Movetouch"},"TML-TA-023":{"sn":"Jasani","st":7131,"sv":"Black: 4909 | White: 2218 | Blue: 4"},"TML-TA-024":{"mt":75,"mv":"Black: 75","sn":"AK Flash MTC"},"TML-TA-026":{"mt":1,"sn":"MTC"},"TML-TA-027":{"mt":17,"mv":"Black: 17","sn":"MTC"},"TML-TA-028":{"mt":6,"sn":"Jasani","st":1590,"sv":"Default: 1588 | Black: 2"},"TML-TA-034":{"mt":13,"mv":"Black: 7 | White: 6","sn":"MTC"},"TML-TA-037":{"mt":121,"mv":"15 Pro: 16 | 14 Pro Max: 15 | 14: 14 | 14 Pro: 14 | 16 Plus: 14 | 15 Pro Max: 12 | 16 Pro: 11 | 16 Pro Max: 9 | 15: 8 | 16: 5 | 15 Plus: 3","sn":"Temu"},"TML-TA-038":{"mt":3,"sn":"Jasani","st":763},"TML-TA-039":{"mt":15,"mv":"Black: 15","sn":"MTC"},"TML-TA-044":{"mt":6,"sn":"Jasani","st":2747,"sv":"Black/Black: 2747"},"TML-TA-045":{"sn":"Jasani","st":2566,"sv":"Black: 2566"},"TML-TA-046":{"sn":"Jasani","st":1914},"TML-TA-051":{"mt":18,"sn":"Jasani","st":6536,"sv":"Black: 6536"},"TML-TA-052":{"sn":"Jasani","st":19180,"sv":"Black: 18538 | White: 642"},"TML-TA-054":{"sn":"Jasani","st":3821},"TML-TA-057":{"sn":"Jasani","st":3462},"TML-TA-059":{"mt":3,"sn":"Shanghai Gifts"},"TML-TA-062":{"sn":"Jasani","st":1204},"TML-TA-063":{"sn":"Jasani","st":1394,"sv":"White: 1228 | Black: 166"},"TML-TA-064":{"sn":"Jasani","st":217,"sv":"White: 179 | Black: 38"},"TML-TA-065":{"mt":2,"mv":"Black: 2","sn":"Jasani","st":0,"sv":"White: 0 | Black: 0"},"TML-TA-067":{"mt":14,"sn":"Jasani","st":2034},"TML-TA-069":{"mt":1,"sn":"Event Store"},"TML-TA-074":{"mt":4,"sn":"Jasani","st":2514},"TML-TA-075":{"mt":3,"mv":"Black: 3","sn":"HAK"},"TML-TA-078":{"mt":12,"mv":"White: 7 | Black: 5","sn":"MTC AK Flash"},"TML-TA-079":{"mt":1,"sn":"Event"},"TML-TA-081":{"sn":"Jasani","st":1117},"TML-TA-086":{"mt":1,"sn":"Shanghai"},"TML-TA-087":{"mt":2,"sn":"AK Flash"},"TML-TA-088":{"sn":"Jasani","st":2527},"TML-TA-089":{"mt":16,"sn":"Jasani","st":3620,"sv":"Black: 3620"},"TML-TA-092":{"mt":1,"sn":"Amazon"},"TML-TA-094":{"sn":"Jasani","st":1960,"sv":"Black/Black: 1204 | White/Grey: 756"},"TML-TA-099":{"mt":1,"mv":"Black: 1","sn":"Fotokad"},"TML-TA-103":{"sn":"Jasani","st":2638,"sv":"Black: 2312 | White: 326"},"TML-TA-104":{"sn":"Jasani","st":5454,"sv":"Light: 5454"},"TML-TA-109":{"sn":"Jasani","st":4132,"sv":"Black: 2097 | White: 2035"},"TML-TA-110":{"mt":2,"sn":"Akflash"},"TML-TA-114":{"sn":"Jasani","st":1148,"sv":"Transparent: 1148"},"TML-TA-115":{"sn":"Jasani","st":174},"TML-GS-001":{"mt":25,"sn":"Jasani","st":4817},"TML-GS-002":{"sn":"Jasani","st":455},"TML-GS-003":{"sn":"Jasani","st":451},"TML-GS-007":{"mt":3,"sn":"Jasani","st":0},"TML-GS-008":{"sn":"Jasani","st":2646},"TML-GS-009":{"sn":"Jasani","st":1},"TML-GS-010":{"sn":"Jasani","st":0},"TML-GS-011":{"sn":"Jasani","st":4},"TML-GS-013":{"sn":"Jasani","st":0},"TML-GS-015":{"sn":"Jasani","st":0},"TML-GS-016":{"sn":"Jasani","st":0},"TML-GS-017":{"sn":"Jasani","st":0},"TML-GS-018":{"sn":"Jasani","st":0},"TML-GS-019":{"mt":7,"mv":"Grey: 6 | Black: 1","sn":"HAK"},"TML-GS-022":{"mt":6,"mv":"Navy Blue: 4 | Black: 2","sn":"Jasani"},"TML-GS-023":{"mt":2,"mv":"Cool Grey: 1 | Black: 1","sn":"Jasani","st":8226,"sv":"Black: 2654 | Grey: 2616 | Navy: 1964 | Green: 992"},"TML-GS-024":{"mt":13,"mv":"White: 12 | Blue: 1","sn":"Jasani","st":12065,"sv":"Black: 5013 | Blue: 2976 | Grey: 2204 | White: 1872"},"TML-GS-026":{"sn":"Jasani","st":0,"sv":"Blue: 0 | Black: 0"},"TML-GS-030":{"sn":"Jasani","st":0,"sv":"Light: 0"},"TML-GS-033":{"sn":"Jasani","st":0,"sv":"Navy Blue: 0"},"TML-HW-001":{"mt":8,"mv":"Orange: 4 | White: 4","sn":"Lagoon Trading"},"TML-HW-002":{"mt":8,"mv":"Grey: 4 | Pink: 2 | Black: 1 | White: 1","sn":"Amazon"},"TML-HW-003":{"mt":51,"mv":"Set Of 6: 51","sn":"Lagoon Trading"},"TML-HW-004":{"mt":2,"sn":"DAY TO DAY"},"TML-HW-005":{"mt":1,"mv":"Gold, M: 1","sn":"Jasani","st":1032,"sv":"Default: 752 | Default: 280"},"TML-HW-006":{"mt":34,"mv":"White: 7 | Gold: 6 | Blue: 6 | Green: 6 | Black: 5 | Pink: 4","sn":"MAF"},"TML-HW-007":{"mt":858,"mv":"Black: 319 | Pink: 245 | Light Grey: 161 | Navy Blue: 52 | Beige: 34 | Dark Beige: 27 | White: 20","sn":"Temu"},"TML-HW-010":{"mt":26,"mv":"Red: 26","sn":"Temu"},"TML-HW-011":{"mt":8,"sn":"Jasani","st":1902},"TML-HW-012":{"mt":2,"sn":"Jasani","st":3468},"TML-HW-013":{"mt":5,"sn":"Luxurytrdg"},"TML-HW-014":{"mt":6,"sn":"Jasani","st":629},"TML-HW-015":{"mt":1,"sn":"Jasani","st":1486,"sv":"Black: 1486"},"TML-HW-017":{"mt":3,"sn":"MTC"},"TML-HW-018":{"mt":89,"mv":"Grey: 14 | Black: 13 | Pink: 11 | Blue: 10 | Brown: 10 | Yellow: 10 | Green: 10 | Red: 10 | Purple: 1","sn":"Temu"},"TML-HW-020":{"mt":4,"sn":"Jasani","st":225},"TML-HW-021":{"mt":16,"mv":"Black: 16","sn":"Jasani","st":9072,"sv":"White: 5067 | Black: 4005"},"TML-HW-022":{"mt":4,"sn":"Jasani","st":0,"sv":"Wood: 0"},"TML-HW-023":{"mt":5,"sn":"Jasani","st":559,"sv":"White: 559"},"TML-HW-024":{"mt":4,"sn":"AK Flash"},"TML-HW-025":{"mt":3,"sn":"Jasani","st":1169,"sv":"Black: 1169"},"TML-HW-026":{"sn":"Jasani","st":1694},"TML-HW-027":{"sn":"Jasani","st":366,"sv":"Black: 366"},"TML-HW-028":{"sn":"Jasani","st":3621,"sv":"Black: 3621"},"TML-HW-029":{"mt":4,"sn":"MTC"},"TML-HW-032":{"mt":2,"sn":"Fotocad"},"TML-HW-033":{"mt":102,"mv":"Black: 97 | White: 5","sn":"Fotocad"},"TML-HW-037":{"mt":14,"mv":"White: 10 | Black: 4","sn":"Jasani","st":2},"TML-HW-038":{"mt":21,"sn":"Amazon Sky Touch"},"TML-HW-040":{"sn":"Jasani","st":2578,"sv":"Black: 1811 | White: 767"},"TML-HW-041":{"mt":45,"sn":"Jasani","st":6468},"TML-HW-042":{"mt":19,"sn":"Fotokad"},"TML-HW-044":{"mt":5,"sn":"Shanghai Gifts"},"TML-HW-045":{"mt":1,"sn":"Lagoon Trading"},"TML-HW-046":{"mt":120,"mv":"Set Of 4: 120","sn":"Temu"},"TML-HW-047":{"mt":31,"mv":"Green: 19 | Red: 12","sn":"Oasis"},"TML-HW-048":{"mt":407,"mv":"Silver: 167 | Black: 164 | Forest Green: 48 | Navy Blue: 28","sn":"Oasis"},"TML-HW-049":{"mt":20,"mv":"Green: 19 | Maroon: 1","sn":"Oasis"},"TML-HW-050":{"mt":12,"mv":"Black: 6 | Grey: 2 | Blue: 2 | Red: 2","sn":"Jasani","st":4968,"sv":"Black: 4968"},"TML-HW-051":{"mt":5,"sn":"Temu"},"TML-HW-052":{"mt":30,"sn":"Temu"},"TML-HW-056":{"sn":"Jasani","st":1800,"sv":"Black: 1710 | White: 90"},"TML-HW-057":{"mt":5,"sn":"Temu"},"TML-HW-060":{"mt":68,"mv":"Navy Blue: 32 | Grey: 15 | White: 11 | Black: 10","sn":"Temu"},"TML-HW-066":{"mt":1,"sn":"MTC"},"TML-HW-068":{"sn":"Jasani","st":2024},"TML-HW-069":{"sn":"Jasani","st":2227},"TML-HW-070":{"mt":35,"mv":"Black: 7 | Brown: 7 | Grey: 7 | Orange: 7 | Red: 7","sn":"Temu"},"TML-HW-072":{"mt":2,"mv":"White: 1 | Black: 1","sn":"Jasani","st":1642,"sv":"Black: 1091 | White: 551"},"TML-HW-073":{"ih":1},"TML-HW-074":{"mt":3,"sn":"Sky Touch"},"TML-HW-076":{"mt":2,"sn":"Amazon"},"TML-HW-080":{"sn":"Jasani","st":4203},"TML-HW-081":{"mt":1,"mv":"Black: 1","sn":"MTC"},"TML-HW-082":{"mt":5,"mv":"Black: 4 | Khaki: 1","sn":"Temu - Out Door Gear LLC"},"TML-HW-086":{"mt":2,"sn":"Amazon"},"TML-HW-087":{"sn":"Jasani","st":2230,"sv":"Black: 2230"},"TML-HW-088":{"mt":1,"sn":"Amazon"},"TML-HW-090":{"sn":"Jasani","st":2127},"TML-HW-091":{"mt":1,"sn":"Jasani","st":973},"TML-HW-092":{"sn":"Jasani","st":5197},"TML-HW-094":{"sn":"Jasani","st":18},"TML-HW-095":{"sn":"Jasani","st":46},"TML-HW-107":{"mt":11,"mv":"Brown: 3 | Green: 3 | Wheat: 3 | Black: 2","sn":"Amazon"},"TML-HW-109":{"sn":"Jasani","st":3862,"sv":"Black: 3862"},"TML-PS-001":{"ih":1},"TML-PS-002":{"ih":1},"TML-PS-004":{"ih":1},"TML-PS-006":{"mt":136,"mv":"Black, XL: 27 | Black, L: 21 | Black, S: 11 | Pink, L: 9 | Wine Red, L: 9 | Wine Red, XL: 9 | Pink, XL: 9 | Black, M: 9 | Pink, M: 9 | Wine Red, M: 9 | Wine Red, S: 7 | Pink, S: 7","sn":"Temu"},"TML-PS-007":{"mt":5,"sn":"Nike.ae"},"TML-PM-001":{"mt":5,"sn":"Amazon"},"TML-PM-002":{"ih":1},"TML-PM-003":{"ih":1},"TML-PM-004":{"ih":1},"TML-PM-005":{"mt":45,"mv":"Purple: 7 | Light Blue: 7 | Orange: 6 | Mint Green: 6 | Navy Blue: 5 | Grey: 5 | Pink: 5 | Red: 4","sn":"Temu"},"TML-PM-006":{"mt":34,"mv":"Grey: 14 | Light Grey: 10 | Brown: 10","sn":"Temu"},"TML-KC-001":{"mt":62,"mv":"White, 9-12 Months, Boys: 18 | White, 18-24 Months, Boys: 17 | White, 12-18 Months, Boys: 8 | White, 3-6 Months, Boys: 6 | White, 0-3 Months, Girls: 6 | White, 6-9 Months, Boys: 4 | White, 24-30 Months, Boys: 3","sn":"Landmark"},"TML-KC-002":{"ih":1},"TML-KC-003":{"ih":1},"TML-KC-004":{"ih":1},"TML-KC-005":{"ih":1},"TML-KC-006":{"ih":1},"TML-KC-007":{"ih":1},"TML-KC-008":{"ih":1},"TML-KC-009":{"ih":1},"TML-KC-010":{"mt":183,"mv":"Black: 40 | White: 30 | Cool Grey: 20 | Red: 17 | Dark Green: 14 | Orange: 10 | Purple: 10 | Pink: 8 | Navy Blue: 8 | Maroon: 7 | Blue: 7 | Baby Pink: 5 | Light Pink: 5 | Beige: 2","sn":"Tshirtmart"},"TML-KC-011":{"ih":1},"TML-KC-012":{"ih":1},"TML-KC-013":{"ih":1},"TML-KC-014":{"mt":20,"mv":"Black: 18 | Navy Blue: 2","sn":"Jasani","st":6204,"sv":"Black: 2948 | White: 2341 | Navy Blue: 915"},"TML-KC-015":{"mt":10,"mv":"3-6 Months: 5 | 6-9 Months: 2 | 12-18 Months: 2 | 9-12 Months: 1","sn":"Landmark"},"TML-KC-016":{"mt":20,"sn":"Landmark"},"TML-KC-017":{"ih":1},"TML-KC-018":{"ih":1},"TML-KC-019":{"ih":1},"TML-KC-020":{"ih":1},"TML-KC-021":{"ih":1},"TML-KC-022":{"ih":1},"TML-KC-023":{"ih":1},"TML-KC-024":{"ih":1},"TML-KC-025":{"ih":1},"TML-KC-026":{"ih":1},"TML-KC-027":{"ih":1},"TML-KC-028":{"ih":1},"TML-KC-029":{"ih":1},"TML-KC-030":{"ih":1}};
+
+(function(){
+  function he(s){
+    return String(s).replace(/[&<>"']/g, function(m){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];
+    });
+  }
+
+  function parseVariants(str){
+    if(!str) return [];
+    var out = [];
+    var seen = {};
+    str.split(' | ').forEach(function(p){
+      var m = p.match(/^(.+?):\s*(\d+)\s*$/);
+      if(!m) return;
+      var name = m[1].trim();
+      var n = parseInt(m[2], 10);
+      var k = name.toLowerCase();
+      if(seen[k] != null){
+        out[seen[k]].n += n;          // accumulate dupes within a side
+      } else {
+        seen[k] = out.length;
+        out.push({ name: name, n: n });
+      }
+    });
+    out.sort(function(a,b){
+      if(b.n !== a.n) return b.n - a.n;
+      return a.name.localeCompare(b.name);
+    });
+    return out;
+  }
+
+  function variantGridHtml(variants){
+    if(!variants.length) return '';
+    return "<div class='sc-var-grid'>" + variants.map(function(v){
+      var cls = v.n === 0 ? ' zero' : '';
+      return "<div class='sc-var" + cls + "'>" +
+        "<span class='nm'>" + he(v.name) + "</span>" +
+        "<span class='q'>" + v.n.toLocaleString() + "</span>" +
+      "</div>";
+    }).join('') + "</div>";
+  }
+
+  // V62.12: Unified table layout — every variant set renders as a table.
+  //   · 2-attribute (Color, Size) with ≥4 variants AND ≥2 unique rows/cols → 2D matrix
+  //   · Everything else (1+ variants) → 1D single-row table
+  // Sizes always ordered via SIZE_ORDER (clothing) or numerically (capacities).
+  // Non-size variants sort by qty desc.
+  var SIZE_ORDER = ['XXS','XS','S','M','L','XL','XXL','2XL','XXXL','3XL','4XL','5XL','6XL'];
+  function sizeRank(s){
+    var u = String(s).toUpperCase().trim();
+    var i = SIZE_ORDER.indexOf(u);
+    if(i >= 0) return i;
+    var num = parseFloat(u);
+    if(!isNaN(num)){
+      if(/LTR|LITER|LITRE|\bL\b/.test(u)) num *= 1000;  // normalize L to ml
+      return 100 + num;
+    }
+    return 9000 + u.charCodeAt(0);  // alphabetical fallback for non-sized
+  }
+
+  function tryBuildMatrix(variants){
+    if(variants.length === 0) return null;
+
+    // Try 2D matrix first
+    if(variants.length >= 4){
+      var pairs = [];
+      var allHaveComma = true;
+      for(var i=0; i<variants.length; i++){
+        var parts = variants[i].name.split(',');
+        if(parts.length === 2){
+          pairs.push({ row: parts[0].trim(), col: parts[1].trim(), n: variants[i].n });
+        } else { allHaveComma = false; break; }
+      }
+      if(allHaveComma){
+        var rowMap = {}, colMap = {}, rows = [], cols = [];
+        pairs.forEach(function(p){
+          if(rowMap[p.row] == null){ rowMap[p.row] = rows.length; rows.push(p.row); }
+          if(colMap[p.col] == null){ colMap[p.col] = cols.length; cols.push(p.col); }
+        });
+        if(cols.length >= 2 && rows.length >= 2){
+          cols.sort(function(a,b){ return sizeRank(a) - sizeRank(b); });
+          var rowTotals = {};
+          pairs.forEach(function(p){ rowTotals[p.row] = (rowTotals[p.row] || 0) + p.n; });
+          rows.sort(function(a,b){ return (rowTotals[b]||0) - (rowTotals[a]||0); });
+          var cells = {};
+          pairs.forEach(function(p){ cells[p.row + '|' + p.col] = p.n; });
+          return { kind: '2d', rows: rows, cols: cols, cells: cells };
+        }
+      }
+    }
+
+    // 1D single-row table (everything else: sizes only, colors only, single variant, etc.)
+    var sorted = variants.slice();
+    var allSizes = sorted.every(function(v){ return sizeRank(v.name) < 100; });
+    if(allSizes){
+      sorted.sort(function(a,b){ return sizeRank(a.name) - sizeRank(b.name); });
+    }
+    // else: keep parseVariants's qty-desc sort
+    return { kind: '1d', items: sorted };
+  }
+
+  function variantMatrixHtml(m){
+    if(m.kind === '1d'){
+      var html = "<table class='sc-matrix sc-matrix-1d'><thead><tr>";
+      m.items.forEach(function(v){
+        html += "<th>" + he(v.name) + "</th>";
+      });
+      html += "</tr></thead><tbody><tr>";
+      m.items.forEach(function(v){
+        if(v.n === 0){
+          html += "<td class='zero'>0</td>";
+        } else {
+          html += "<td>" + v.n.toLocaleString() + "</td>";
+        }
+      });
+      html += "</tr></tbody></table>";
+      return html;
+    }
+    // 2D matrix
+    var html = "<table class='sc-matrix'><thead><tr>" +
+      "<th class='sc-mx-rowlbl'></th>";
+    m.cols.forEach(function(c){
+      html += "<th>" + he(c) + "</th>";
+    });
+    html += "</tr></thead><tbody>";
+    m.rows.forEach(function(r){
+      html += "<tr><th class='sc-mx-rowlbl'>" + he(r) + "</th>";
+      m.cols.forEach(function(c){
+        var n = m.cells[r + '|' + c];
+        if(n == null){
+          html += "<td class='dim'>\u2014</td>";
+        } else if(n === 0){
+          html += "<td class='zero'>0</td>";
+        } else {
+          html += "<td>" + n.toLocaleString() + "</td>";
+        }
+      });
+      html += "</tr>";
+    });
+    html += "</tbody></table>";
+    return html;
+  }
+
+  function sectionHtml(label, totalText, variants){
+    var matrix = tryBuildMatrix(variants);
+    var body = matrix ? variantMatrixHtml(matrix) : variantGridHtml(variants);
+    return "<div class='sc-sec'>" +
+      "<div class='sc-sec-head'>" +
+        "<span class='sc-sec-lbl'>" + he(label) + "</span>" +
+        "<span class='sc-sec-tot'>" + he(totalText) + "</span>" +
+      "</div>" +
+      body +
+    "</div>";
+  }
+
+  // ──────────────────────────────────────────────────────────────────
+  // V62.5: stockTabCount(p) — short label for the Stock tab.
+  //   In-house  → "10,000+"
+  //   Single    → "118"  (toLocaleString)
+  //   Dual      → "8 + 643"
+  //   No data   → null   (caller should hide the tab)
+  // ──────────────────────────────────────────────────────────────────
+  window.stockTabCount = function(p){
+    if(!p || !p.sku) return null;
+    var d = window.MLSTOCK && window.MLSTOCK[p.sku];
+    if(!d) return null;
+    if(d.ih === 1) return '10,000+';
+    var mt = (d.mt != null) ? d.mt : null;
+    var st = (d.st != null) ? d.st : null;
+    if(mt == null && st == null) return null;
+    if(mt != null && st != null){
+      return mt.toLocaleString() + ' + ' + st.toLocaleString();
+    }
+    return (mt != null ? mt : st).toLocaleString();
+  };
+
+  // ──────────────────────────────────────────────────────────────────
+  // V62.5: stockInnerHtml(p, qty) — inner HTML for the Stock tab pane.
+  // Returns just the header + body content, NOT wrapped in .cd.stock-card.
+  // (The outer wrapper is now the shared product-details .cd that hosts the tab.)
+  // Returns '' if no stock data.
+  // ──────────────────────────────────────────────────────────────────
+  window.stockInnerHtml = function(p, qty){
+    if(!p || !p.sku) return '';
+    var data = window.MLSTOCK && window.MLSTOCK[p.sku];
+    if(!data) return '';
+
+    qty = parseInt(qty) || 0;
+
+    // In-house
+    if(data.ih === 1){
+      return "<div class='sc-inner sc-inhouse'>" +
+        "<div class='sc-head'>" +
+          "<div class='sc-head-l'>" +
+            "<span class='sc-badge in'>\u2713 In-House Manufacturing</span>" +
+          "</div>" +
+          "<div class='sc-head-r'><span class='sc-grand'>10,000+ units</span></div>" +
+        "</div>" +
+        "<div class='sc-body'>" +
+          "<div class='sc-inhouse-msg'>All colours and sizes manufactured in-house \u2014 order any combination you need.</div>" +
+        "</div>" +
+      "</div>";
+    }
+
+    var mt = (data.mt != null) ? data.mt : null;
+    var st = (data.st != null) ? data.st : null;
+    if(mt == null && st == null) return '';
+
+    // Dual stock
+    if(mt != null && st != null){
+      var supName = data.sn ? data.sn : 'Supplier';
+      var headerRight =
+        "<span class='sc-grand-bit'><strong>" + mt.toLocaleString() + "</strong><span class='sc-grand-tag'>ready</span></span>" +
+        "<span class='sc-grand-sep'>\u00b7</span>" +
+        "<span class='sc-grand-bit'><strong>" + st.toLocaleString() + "</strong><span class='sc-grand-tag'>at " + he(supName) + "</span></span>";
+
+      return "<div class='sc-inner sc-dual'>" +
+        "<div class='sc-head'>" +
+          "<div class='sc-head-l'></div>" +
+          "<div class='sc-head-r'>" + headerRight + "</div>" +
+        "</div>" +
+        "<div class='sc-body'>" +
+          sectionHtml('Merchlist Stock', mt.toLocaleString() + ' units ready to ship', parseVariants(data.mv || '')) +
+          sectionHtml(supName + ' Stock', st.toLocaleString() + ' units sourceable', parseVariants(data.sv || '')) +
+        "</div>" +
+      "</div>";
+    }
+
+    // Single stock
+    var singleTotal = (mt != null) ? mt : st;
+    var cls, badgeText;
+    if(singleTotal === 0){
+      cls = 'out';   badgeText = '\u274C Out of Stock';
+    } else if(qty > singleTotal){
+      cls = 'short'; badgeText = '\u26A0 Insufficient for order';
+    } else if(singleTotal < 50){
+      cls = 'low';   badgeText = '\u26A0 Low Stock';
+    } else {
+      cls = 'in';    badgeText = '\u2713 In Stock';
+    }
+
+    var section;
+    if(mt != null){
+      section = sectionHtml('Merchlist Stock', mt.toLocaleString() + ' units ready to ship', parseVariants(data.mv || ''));
+    } else {
+      var supName2 = data.sn ? data.sn : 'Supplier';
+      section = sectionHtml(supName2 + ' Stock', st.toLocaleString() + ' units sourceable', parseVariants(data.sv || ''));
+    }
+
+    return "<div class='sc-inner sc-" + cls + "'>" +
+      "<div class='sc-head'>" +
+        "<div class='sc-head-l'>" +
+          "<span class='sc-badge " + cls + "'>" + badgeText + "</span>" +
+        "</div>" +
+        "<div class='sc-head-r'><span class='sc-grand'>" + singleTotal.toLocaleString() + " units</span></div>" +
+      "</div>" +
+      "<div class='sc-body'>" + section + "</div>" +
+    "</div>";
+  };
+
+  // Back-compat no-ops
+  window.renderStockBlock = function(){ return ''; };
+  window.renderStockSide = function(){ return ''; };
+  window.renderStock = function(){ return ''; };
+  window.stockPairClass = function(){ return ''; };
+})();
+</script>
+
+
+
 </body></html>
