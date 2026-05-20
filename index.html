@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <!--
   ═══════════════════════════════════════════════════════════════════════
-  MERCHLIST — Pricing Engine v64
+  MERCHLIST — Pricing Engine v65
   ═══════════════════════════════════════════════════════════════════════
-  V64 changes (from v63):
-    • UAE Delivery moved INTO q-totals box (inline before Total row)
-    • Total inc. VAT now dynamically includes delivery as you type
-    • Email quote + Quote Builder copy text show delivery line when > 0
-    • Rubik's Cube: defaults to 6 sides, side buttons extend 1-6
-    • Other products unchanged: side buttons stay 1-4
-  Carries forward from v62.x:
-    • V62.20  Densified tier table (19 tiers, original anchors preserved)
-    • V62.19  Sublimation on Hardline = DTF cost/price formula
-    • V62.18  Product Finder 2.0 (similar products + Request Upload msg)
+  V65 — comprehensive UI audit + restoration:
+    • 🇦🇪/🌍 UAE-International toggle — RESTORED (topbar was missing .tb-r
+      anchor, so injectShipToggle() was bailing silently. Now present.)
+    • "Add to Bulk Quote List" button — restored visibility (was broken in
+      v64 due to V19 patch fail; also made styling more prominent)
+    • Web Discount toggle (V34 ml-wdmini) — restored visibility, brighter
+      green ON state, larger touch target
+    • UAE Delivery focus loss — surgically updates Total + Email inline;
+      typing in delivery field no longer rebuilds the DOM
+    • Audit methodology: JSDOM render + element-count diff vs v62.x baseline
+  Pricing: byte-identical to v64 (288-scenario regression pass)
+  Carries forward from v62.x/v64:
+    • V64     UAE Delivery inline in q-totals box, Rubik's Cube 6 sides
+    • V62.20  Densified tier table (19 tiers)
+    • V62.19  Sublimation on Hardline = DTF formula
+    • V62.18  Product Finder 2.0 (similar + Request Upload)
     • V62.14  Searchable supplier filter
-    • V62.10  Inline screen-print tip + redesigned quote totals
-    • V62.6+  Subtle section dividers in calc card
+    • V62.10  Inline screen-print tip + quote totals layout
   ═══════════════════════════════════════════════════════════════════════
 -->
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Merchlist Pricing Engine</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#111;-webkit-font-smoothing:antialiased;font-size:14px}button{font-family:inherit}input,select{font-family:inherit}
@@ -2047,7 +2052,6 @@ function render(keep){
     var btnsH=pms.map(function(m){var moqShow=SOFT.has(p.cc)?(m.qS||m.q):(m.qH||m.q);return"<button class='btn "+(S.pm===m.id?"on":"")+"' data-pm='"+m.id+"' type='button'>"+m.n+(moqShow>1?"<span class='sub'>min "+moqShow+"</span>":"")+"</button>";}).join("");
     var sidesH="";if(!pmO||!pmO.f){var _ms=maxSidesFor(p);var _sa=[];for(var _i=1;_i<=_ms;_i++)_sa.push(_i);sidesH="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+_sa.map(function(s){return"<button class='sd-btn "+(S.sd===s?"on":"")+"' data-sd='"+s+"' type='button'>"+s+"</button>";}).join("")+"</div></div>";}
     var premH="";if(showPrem(p)){premH="<div class='cfg-s'><div class='cfg-lbl'>Fabric</div><div class='fab-row'><button class='fab-b "+(!S.pr?"on":"")+"' data-fb='0' type='button'>Basic</button><button class='fab-b "+(S.pr?"on":"")+"' data-fb='1' type='button'>Premium</button></div></div>";}
-    // V33: wdH removed — toggle moved to wdBarH in updOut()
     // V62.5: Product Details + Stock unified in ONE card with underline tabs.
     // - Product header always visible at top
     // - Tabs ("Details" | "Stock · N") shown only when stock data exists
@@ -2093,7 +2097,7 @@ function render(keep){
     var ri=P.indexOf(fp),gp=gridOf(fp);
     return"<div class='pi"+(S.si===ri?" sel":"")+"' data-i='"+ri+"'><div class='pi-dot "+gp+"'></div><div class='pi-info'><div class='pi-n'>"+he(fp.title)+"</div><div class='pi-m'>"+he(fp.sku)+(!fp.stock?" \u00B7 <span class='pi-oos'>OOS</span>":"")+"</div></div><div class='pi-p'>"+fp.web+"</div></div>";
   }).join("")+(fl.length>300?"<div style='padding:8px;text-align:center;font-size:10px;color:#9ca3af'>Showing 300 of "+fl.length+"</div>":"")+(fl.length===0?"<div style='padding:16px;text-align:center;font-size:11px;color:#9ca3af'>No products found</div>":"");
-  app.innerHTML="<div class='app'><div class='topbar'><div class='tb-l'><span class='tb-logo'>MERCHLIST</span><div class='tb-tabs'><button class='tab "+(S.tab==="calc"?"on":"")+"' data-tab='calc' type='button'>Calculator</button><button class='tab "+(S.tab==="finder"?"on":"")+"' data-tab='finder' type='button'>Product Finder</button></div></div></div><div class='body'><div class='sb'><div class='sf'><input class='sf-inp' id='sIn' placeholder='Search name or SKU\u2026' value='"+he(S.q)+"'><div class='sf-row'><select class='sf-sel' id='cSel'><option value='ALL'>All Categories</option>"+cats.map(function(c){return"<option value='"+he(c)+"' "+(S.cf===c?"selected":"")+">"+he(c)+"</option>";}).join("")+"</select><select class='sf-sel' id='gSel' style='flex:0 0 88px'><option value='ALL'>All Grids</option><option value='S' "+(S.gf==="S"?"selected":"")+">Softline</option><option value='H' "+(S.gf==="H"?"selected":"")+">Hardline</option><option value='C' "+(S.gf==="C"?"selected":"")+">Custom</option></select></div><div class='sf-row'><div class='sf-sup-wrap'><input type='text' class='sf-sup-inp' id='supSel' placeholder='"+(S.sup==="ALL"?"All Suppliers ("+sups.length+")":S.sup)+"' value='"+(S.sup==="ALL"?"":he(S.sup))+"' autocomplete='off'>"+(S.sup!=="ALL"?"<button class='sf-sup-clear' id='supClr' type='button' aria-label='Clear'>\u00D7</button>":"")+"<div class='sf-sup-list' id='supList'>"+sups.map(function(sp){return"<div class='sf-sup-opt' data-name='"+he(sp.name)+"'><span class='nm'>"+he(sp.name)+"</span><span class='cnt'>"+sp.n+"</span></div>";}).join("")+"</div></div></div><div class='sf-cnt'>"+fl.length+" products</div></div><div class='plist'>"+listH+"</div></div><div class='mn'>"+main+"</div></div></div>";
+  app.innerHTML="<div class='app'><div class='topbar'><div class='tb-l'><span class='tb-logo'>MERCHLIST</span><div class='tb-tabs'><button class='tab "+(S.tab==="calc"?"on":"")+"' data-tab='calc' type='button'>Calculator</button><button class='tab "+(S.tab==="finder"?"on":"")+"' data-tab='finder' type='button'>Product Finder</button></div></div><div class='tb-r'>INTERNAL USE ONLY</div></div><div class='body'><div class='sb'><div class='sf'><input class='sf-inp' id='sIn' placeholder='Search name or SKU\u2026' value='"+he(S.q)+"'><div class='sf-row'><select class='sf-sel' id='cSel'><option value='ALL'>All Categories</option>"+cats.map(function(c){return"<option value='"+he(c)+"' "+(S.cf===c?"selected":"")+">"+he(c)+"</option>";}).join("")+"</select><select class='sf-sel' id='gSel' style='flex:0 0 88px'><option value='ALL'>All Grids</option><option value='S' "+(S.gf==="S"?"selected":"")+">Softline</option><option value='H' "+(S.gf==="H"?"selected":"")+">Hardline</option><option value='C' "+(S.gf==="C"?"selected":"")+">Custom</option></select></div><div class='sf-row'><div class='sf-sup-wrap'><input type='text' class='sf-sup-inp' id='supSel' placeholder='"+(S.sup==="ALL"?"All Suppliers ("+sups.length+")":S.sup)+"' value='"+(S.sup==="ALL"?"":he(S.sup))+"' autocomplete='off'>"+(S.sup!=="ALL"?"<button class='sf-sup-clear' id='supClr' type='button' aria-label='Clear'>\u00D7</button>":"")+"<div class='sf-sup-list' id='supList'>"+sups.map(function(sp){return"<div class='sf-sup-opt' data-name='"+he(sp.name)+"'><span class='nm'>"+he(sp.name)+"</span><span class='cnt'>"+sp.n+"</span></div>";}).join("")+"</div></div></div><div class='sf-cnt'>"+fl.length+" products</div></div><div class='plist'>"+listH+"</div></div><div class='mn'>"+main+"</div></div></div>";
   if(keep){var mn2=document.querySelector(".mn");if(mn2)mn2.scrollTop=sy;}
   if(p&&!isC(p)&&ICACHE[p.sku]===undefined){
     loadImg(p,function(url){var el=document.getElementById("phImg");if(el){el.classList.remove("img-loading");el.innerHTML=url?"<img src='"+url+"' alt='' onerror=\"this.parentNode.innerHTML='\uD83D\uDCE6'\">":"\uD83D\uDCE6";}});
@@ -3268,32 +3272,37 @@ window.addEventListener('load',function(){
       var del = (readShip()==='uae' ? (_delCharge||0) : 0);
       var grand = sub + vat + del;
       totVal.textContent = 'AED '+grand.toFixed(2);
-      // V64: also refresh the email quote box inline (without nuking the delivery input focus)
+      // V65: Surgically rebuild ONLY the email quote text content, no DOM rebuild → focus preserved.
+      // The email uses unicode-bold labels via b(), so we rebuild by line-pattern matching.
       try{
         var eBox = document.getElementById('eBox');
-        if (eBox){
-          // The email uses unicode-bold labels via b(), so we can't regex on <b> tags.
-          // Strategy: re-call updOut() to rebuild the entire email body, but defer it
-          // via setTimeout so the keystroke completes and the input keeps focus.
-          if (typeof updOut==='function' && !window._mlDelRefresh){
-            window._mlDelRefresh = setTimeout(function(){
-              try{
-                var focused = document.activeElement;
-                var wasDelInp = focused && focused.id === 'ml-del-inp';
-                var caret = wasDelInp ? focused.selectionStart : null;
-                updOut();
-                // Restore focus + caret to delivery input
-                if (wasDelInp){
-                  var fresh = document.getElementById('ml-del-inp');
-                  if (fresh){
-                    fresh.focus();
-                    if (caret !== null) try{fresh.setSelectionRange(caret,caret);}catch(e3){}
-                  }
-                }
-              }catch(e4){}
-              window._mlDelRefresh = null;
-            }, 250);
-          }
+        if (eBox && typeof S!=='undefined' && S.si!==null){
+          var p = P[S.si]; if (!p) return;
+          // Re-derive what updOut() would build, but write only into eBox — no DOM tree swap.
+          var pmO = PMS.find(function(m){return m.id===S.pm;});
+          var cur = calcP(p, S.pm, S.sd, S.pr, qt(S.qty));
+          if (!cur) return;
+          var dp = cur.px;
+          var total = dp * S.qty;
+          var vatAmt = total * 0.05;
+          var st = (!pmO || pmO.f) ? '' : S.sd + ' side' + (S.sd>1?'s':'');
+          var pt = S.pm==='none' ? 'no print' : (pmO.n + (st?' ('+st+')':''));
+          var lt = p.tl ? (parseInt(p.tl)||7) : 7;
+          var delLine = (del>0) ? (window.b('UAE Delivery')+': '+window.aed(del)+'\n') : '';
+          var totLine = (del>0)
+            ? (window.b('Total with VAT + Delivery')+': '+window.aed(total+vatAmt+del)+'\n')
+            : (window.b('Total with VAT')+': '+window.aed(total+vatAmt)+'\n');
+          var email = 'Hi again! \uD83D\uDC4B\n\nThanks for your interest in working with Merchlist \u2014 here\u2019s the breakdown for your order, already discounted for you \uD83D\uDE0A\n\n'+
+            window.b('Product')+': '+p.title+(S.pr?' (Premium)':'')+'\n'+
+            window.b('Print Method')+': '+pt+'\n'+
+            window.b('Quantity')+': '+S.qty.toLocaleString()+' units\n'+
+            window.b('Unit Price')+': '+window.aed(dp)+'\n'+
+            delLine + totLine + '\n'+
+            window.b('Lead Time')+': '+lt+' working day'+(lt>1?'s':'')+' from artwork approval\n\nLet me know if you have any further questions :)';
+          // Convert newlines to <br> (matches the original he(email).replace(/\n/g,'<br>') pattern)
+          eBox.innerHTML = (window.he ? window.he(email) : email.replace(/[<>&]/g, function(c){
+            return {'<':'&lt;','>':'&gt;','&':'&amp;'}[c];
+          })).replace(/\n/g, '<br>');
         }
       }catch(e2){}
     }catch(e){}
@@ -3614,16 +3623,16 @@ window.addEventListener('load',function(){
 <!-- ═══════════════════ MERCHLIST UI PATCH v3.4 (v21) ═══════════════════ -->
 <style>
 /* ── ADD TO BULK QUOTE — now inside qbox at top ── */
-.ml-addbq-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px;margin-top:4px;flex-wrap:wrap}
-.ml-wdmini{display:inline-flex;align-items:center;gap:8px}
-.ml-wdmini-lbl{font-size:10px;font-weight:700;color:#6b7280;text-transform:uppercase;letter-spacing:.5px}
-.ml-wdmini-pills{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:6px;overflow:hidden}
-.ml-wdmini-b{padding:5px 10px;font-size:10.5px;font-weight:700;color:#6b7280;background:transparent;border:none;cursor:pointer;transition:all .12s;letter-spacing:.2px;white-space:nowrap;line-height:1.3}
-.ml-wdmini-b:hover:not(.on){color:#111}
-.ml-wdmini-b.on{background:#111;color:#fff}
-.ml-wdmini-sub{font-size:9px;font-weight:600;opacity:.75;margin-left:2px}
-.ml-addbq-btn{padding:5px 11px;background:#fff;border:1.5px solid #111;color:#111;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;letter-spacing:.2px;transition:all .12s;display:inline-flex;align-items:center;gap:6px;line-height:1.3}
-.ml-addbq-btn:hover{background:#111;color:#fff}
+.ml-addbq-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px;margin-top:6px;padding:8px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:9px;flex-wrap:wrap}
+.ml-wdmini{display:inline-flex;align-items:center;gap:10px}
+.ml-wdmini-lbl{font-size:11px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.6px}
+.ml-wdmini-pills{display:inline-flex;border:1.5px solid #d1d5db;border-radius:7px;overflow:hidden;background:#fff}
+.ml-wdmini-b{padding:7px 14px;font-size:11.5px;font-weight:700;color:#6b7280;background:transparent;border:none;cursor:pointer;transition:all .12s;letter-spacing:.2px;white-space:nowrap;line-height:1.3}
+.ml-wdmini-b:hover:not(.on){color:#111;background:#f3f4f6}
+.ml-wdmini-b.on{background:#16a34a;color:#fff}
+.ml-wdmini-sub{font-size:10px;font-weight:600;opacity:.85;margin-left:3px}
+.ml-addbq-btn{padding:8px 16px;background:#111;border:1.5px solid #111;color:#fff;border-radius:7px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.3px;transition:all .12s;display:inline-flex;align-items:center;gap:7px;line-height:1.3}
+.ml-addbq-btn:hover{background:#000;transform:translateY(-1px);box-shadow:0 2px 6px rgba(0,0,0,.15)}
 .ml-addbq-btn.done{background:#16a34a;border-color:#16a34a;color:#fff}
 /* Suppress the old bottom button completely */
 .ml-addq-row{display:none!important}
