@@ -1,4 +1,24 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Merchlist Pricing Engine</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#111;-webkit-font-smoothing:antialiased;font-size:14px}button{font-family:inherit}input,select{font-family:inherit}
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════
+  MERCHLIST — Pricing Engine v64
+  ═══════════════════════════════════════════════════════════════════════
+  V64 changes (from v63):
+    • UAE Delivery moved INTO q-totals box (inline before Total row)
+    • Total inc. VAT now dynamically includes delivery as you type
+    • Email quote + Quote Builder copy text show delivery line when > 0
+    • Rubik's Cube: defaults to 6 sides, side buttons extend 1-6
+    • Other products unchanged: side buttons stay 1-4
+  Carries forward from v62.x:
+    • V62.20  Densified tier table (19 tiers, original anchors preserved)
+    • V62.19  Sublimation on Hardline = DTF cost/price formula
+    • V62.18  Product Finder 2.0 (similar products + Request Upload msg)
+    • V62.14  Searchable supplier filter
+    • V62.10  Inline screen-print tip + redesigned quote totals
+    • V62.6+  Subtle section dividers in calc card
+  ═══════════════════════════════════════════════════════════════════════
+-->
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Merchlist Pricing Engine</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f5f5;color:#111;-webkit-font-smoothing:antialiased;font-size:14px}button{font-family:inherit}input,select{font-family:inherit}
 .pin-ov{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;padding:20px}.pin-c{background:#fff;border-radius:20px;padding:48px 40px;max-width:380px;width:100%;text-align:center}.pin-logo{font-size:11px;font-weight:900;letter-spacing:5px;color:#16a34a;margin-bottom:8px}.pin-title{font-size:24px;font-weight:800;color:#111;margin-bottom:4px}.pin-sub{font-size:13px;color:#9ca3af;margin-bottom:28px}.pini{width:100%;padding:14px;font-size:22px;text-align:center;border:2px solid #e5e7eb;border-radius:12px;outline:none;letter-spacing:10px;color:#111;transition:border .15s}.pini:focus{border-color:#111}.pini.err{border-color:#dc2626;animation:shake .35s}@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}.pinb{width:100%;padding:14px;font-size:14px;font-weight:700;background:#111;color:#fff;border:none;border-radius:12px;cursor:pointer;margin-top:12px;letter-spacing:.5px}.pinb:hover{background:#1f2937}.pine{color:#dc2626;font-size:12px;margin-top:8px;min-height:18px}
 .app{display:flex;flex-direction:column;height:100vh}.topbar{background:#fff;border-bottom:1px solid #e5e7eb;height:48px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}.tb-l{display:flex;align-items:center;gap:14px}.tb-logo{font-size:13px;font-weight:900;color:#16a34a;letter-spacing:1px}.tb-v{font-size:9px;color:#9ca3af}.tb-tabs{display:flex;gap:2px;margin-left:8px}.tab{padding:6px 14px;font-size:11px;font-weight:700;color:#6b7280;cursor:pointer;border-radius:6px;border:none;background:transparent;letter-spacing:.3px;transition:all .15s}.tab.on{color:#111;background:#f3f4f6}.tab:hover:not(.on){color:#374151}.tb-r{font-size:9px;color:#d1d5db;letter-spacing:1px;font-weight:600}.body{display:flex;flex:1;overflow:hidden}
 .sb{width:300px;background:#fff;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;flex-shrink:0}.sf{padding:10px}.sf-inp{width:100%;padding:9px 10px 9px 32px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:12px;outline:none;background:#f9fafb url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='%239ca3af' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.156a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E") 10px center no-repeat;color:#111;transition:all .15s}.sf-inp:focus{border-color:#111;background:#fff}.sf-row{display:flex;gap:5px;margin-top:6px}.sf-sel{flex:1;min-width:0;max-width:100%;box-sizing:border-box;padding:6px 7px;border:1.5px solid #e5e7eb;border-radius:7px;font-size:11px;outline:none;background:#f9fafb;color:#374151;cursor:pointer}.sf-cnt{font-size:10px;color:#9ca3af;margin-top:5px;padding-left:2px}.plist{flex:1;overflow-y:auto}
@@ -61,6 +81,10 @@
 .qbox{border-radius:12px;padding:16px 18px}.qbox.ok{background:#f0fdf4;border:2px solid #86efac}.qbox.cap{background:#fefce8;border:2px solid #fde047}.qbox.bad{background:#fef2f2;border:2px solid #fca5a5}.q-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.q-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}.q-lbl.ok{color:#15803d}.q-lbl.w{color:#a16207}.q-lbl.r{color:#b91c1c}.q-val{font-size:32px;font-weight:800;line-height:1;color:#111}.q-val span{font-size:13px;font-weight:400;color:#9ca3af;margin-left:2px}.q-mgn{text-align:right}.q-mgn .ml{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-mgn .mv{font-size:20px;font-weight:800;line-height:1;margin-top:2px}.q-note{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.4}.q-note.w{background:rgba(234,179,8,.12);color:#a16207}.q-note.r{background:rgba(220,38,38,.08);color:#b91c1c}
 /* V62.10/15: Quote totals — Subtotal + VAT as their own rows, Total as hero with separator */
 .q-totals{padding-top:12px;margin-top:12px;border-top:1px solid rgba(0,0,0,.08);display:flex;flex-direction:column;gap:5px}
+.ml-del-inline .val{display:flex;align-items:center;justify-content:flex-end}
+.ml-del-inp-inline{width:80px;text-align:right;padding:3px 8px;font-size:13px;font-weight:700;color:#16a34a;background:#f0fdf4;border:1.5px solid #86efac;border-radius:6px;font-family:inherit;outline:none;transition:all .12s;font-variant-numeric:tabular-nums}
+.ml-del-inp-inline:focus{border-color:#16a34a;background:#fff}
+.ml-del-inline.intl-hide{display:none!important}
 .q-tot-row{
   display:flex;
   justify-content:space-between;
@@ -203,13 +227,13 @@ const PMS=[
 {id:"dtf",n:"DTF",c:3,q:1,f:0,s:1,h:1},{id:"uv",n:"UV Print",c:2,q:1,f:0,s:0,h:1},
 {id:"engrave",n:"Engraving",c:2,q:1,f:0,s:0,h:1},
 {id:"emb",n:"Embroidery",c:5,q:1,f:0,s:1,h:0},{id:"sand",n:"Sand Blast",c:30,q:1,f:1,s:0,h:1},
-{id:"screen",n:"Screen Print",c:2,q:100,qS:500,qH:100,f:0,s:1,h:1},{id:"sub",n:"Sublimation",c:8,q:1,f:1,s:1,h:0},
+{id:"screen",n:"Screen Print",c:2,q:100,qS:500,qH:100,f:0,s:1,h:1},{id:"sub",n:"Sublimation",c:8,q:1,f:1,s:1,h:1},
 {id:"deboss",n:"Deboss/Emboss",c:4,q:50,f:0,s:0,h:1},
 {id:"p360",n:"360 Print",c:4,q:50,f:1,s:0,h:1},{id:"foil",n:"Gold Foil",c:4,q:50,f:0,s:0,h:1},
 {id:"trolley",n:"Trolley Screen",c:30,q:1,f:1,s:0,h:0,t:1},{id:"none",n:"No Print",c:0,q:1,f:1,s:1,h:1}
 ];
-const TIERS=[1,6,12,24,50,100,250,500,1000,2500,5000];/* V56: extended to 5000 for smoother bulk pricing */
-const JRN={1:0,6:.01,12:.04,24:.09,50:.18,100:.245,250:.36,500:.462,1000:.62,2500:.80,5000:1};/* V56: smooth bulk descent — anchors qty 100=23, 500=19.3, 1000=16.5, 2500≈13.4, 5000+=floor */;
+const TIERS=[1,6,12,24,50,75,100,150,200,250,350,500,750,1000,1500,2000,2500,3500,5000];/* V62.20: 9 new tiers added between existing anchors so prices change more often within a range; existing anchor values unchanged */
+const JRN={1:0,6:.01,12:.04,24:.09,50:.18,75:.2125,100:.245,150:.2833,200:.3217,250:.36,350:.4008,500:.462,750:.541,1000:.62,1500:.68,2000:.74,2500:.80,3500:.88,5000:1};/* V62.20: 9 new interpolated values between existing anchors — curve shape preserved exactly at every original anchor (100, 250, 500, 1000, 2500, 5000) */;
 const PROX="https://api.allorigins.win/get?url=";
 const QUICK_UNITS=[1,10,50,100,250,500,1000];
 
@@ -229,22 +253,26 @@ function wpc(m,w,s){
   if(w<=10)return[8,5,2,1][s]||1;
   return[10,8,6,2][s]||2;
 }
-function twp(m,w,d){
+function twp(m,w,d,grid){
+  /* V62.19: Sublimation on Hardline uses DTF web pricing (weight-tiered per side) */
+  if(m==='sub'&&grid==='H')m='dtf';
   var pm=PMS.find(function(x){return x.id===m;});
   if(!pm)return 0;
   if(pm.f)return wpc(m,w,0);
   var t=0;for(var i=0;i<d;i++)t+=wpc(m,w,i);return t;
 }
-function ipc(m,d,w){
+function ipc(m,d,w,grid){
   /* V54: Updated internal cost per unit (supplier sheet revision)
    * - emb:        5 per side
    * - uv:         2 per side (flat)
    * - engrave:    2 per side (flat)
    * - dtf:        web-tiered (1.0/1.5/2.0 per side based on item value)
-   * - sub:        8 flat (whole-garment)
+   * - sub:        8 flat (whole-garment) on Softline; V62.19: same as DTF on Hardline
    * - sand/trolley: 30 flat (outsource)
    * - others:     PMS.c default */
   if(m==='uvdtf')m='uv';
+  /* V62.19: Sublimation on Hardline uses DTF cost formula */
+  if(m==='sub'&&grid==='H')m='dtf';
   var pm=PMS.find(function(x){return x.id===m;});
   if(!pm)return 0;
   if(m==='emb') return 5*d;
@@ -260,6 +288,19 @@ function ipc(m,d,w){
 function isC(p){return p.type==="D"||CUST.has(p.cc);}
 function gridOf(p){if(isC(p))return"C";if(SOFT.has(p.cc))return"S";return"H";}
 function floorR(p){return 0.88;}/* V58: 12% margin floor unified for all categories */
+/* V64: products with non-standard side counts.
+   Rubik's Cube has 6 print faces; defaults to 6 and lets user pick 1-6.
+   All other products use 1-4. */
+function maxSidesFor(p){
+  if(!p) return 4;
+  if(/\brubik/i.test(p.title)) return 6;
+  return 4;
+}
+function defaultSidesFor(p){
+  if(!p) return 1;
+  if(/\brubik/i.test(p.title)) return 6;
+  return 1;
+}
 function showPrem(p){
   if(p.cc==="TP"||p.cc==="UW"||p.cc==="HS"||p.cc==="JS"||p.cc==="PS"||p.cc==="KC") return true;
   if(p.cc==="CH") return true;
@@ -306,7 +347,8 @@ function calcP(p,pm,sd,prem,tq){
       else if(p.cc==='BT') premUp=6;
     }
     var bc=p.cost;
-    var wp=twp(pm,p.web,sd),ip=ipc(pm,sd,p.web);
+    var grid=gridOf(p);
+    var wp=twp(pm,p.web,sd,grid),ip=ipc(pm,sd,p.web,grid);
     var listBase=p.web+premUp;
     var li=listBase+wp,tc=bc+ip,fr=floorR(p);
     var fl=(tc/fr);
@@ -1659,7 +1701,11 @@ function updOut(){
     }
   }
   var quickH=QUICK_UNITS.map(function(u){var l=u>=1000?(u/1000)+"K":u;return"<button class='qu-btn"+(S.qty===u?" on":"")+"' data-qu='"+u+"' type='button'>"+l+"</button>";}).join("");
-  var lt=p.tl?parseInt(p.tl)||7:7;var email="Hi again! \uD83D\uDC4B\n\nThanks for your interest in working with Merchlist \u2014 here\u2019s the breakdown for your order, already discounted for you \uD83D\uDE0A\n\n"+b("Product")+": "+p.title+(S.pr?" (Premium)":"")+"\n"+b("Print Method")+": "+pt+"\n"+b("Quantity")+": "+S.qty.toLocaleString()+" units\n"+b("Unit Price")+": "+aed(dp)+"\n"+b("Total with VAT")+": "+aed(total+vat)+"\n\n"+b("Lead Time")+": "+lt+" working day"+(lt>1?"s":"")+" from artwork approval\n\nLet me know if you have any further questions :)";
+  var lt=p.tl?parseInt(p.tl)||7:7;
+  var _del=(window._delCharge>0&&(typeof window.readShip!=='function'||window.readShip()!=='intl'))?window._delCharge:0;
+  var _delLine=_del>0?(b("UAE Delivery")+": "+aed(_del)+"\n"):"";
+  var _totLine=_del>0?(b("Total with VAT + Delivery")+": "+aed(total+vat+_del)+"\n"):(b("Total with VAT")+": "+aed(total+vat)+"\n");
+  var email="Hi again! \uD83D\uDC4B\n\nThanks for your interest in working with Merchlist \u2014 here\u2019s the breakdown for your order, already discounted for you \uD83D\uDE0A\n\n"+b("Product")+": "+p.title+(S.pr?" (Premium)":"")+"\n"+b("Print Method")+": "+pt+"\n"+b("Quantity")+": "+S.qty.toLocaleString()+" units\n"+b("Unit Price")+": "+aed(dp)+"\n"+_delLine+_totLine+"\n"+b("Lead Time")+": "+lt+" working day"+(lt>1?"s":"")+" from artwork approval\n\nLet me know if you have any further questions :)";
   el.innerHTML=
     "<div class='oa-lbl'>Quote Summary</div>"+
     "<div class='qty-row'>"+
@@ -1681,7 +1727,8 @@ function updOut(){
       "<div class='q-totals'>"+
         "<div class='q-tot-row'><span class='lbl'>Subtotal</span><span class='val'>"+aed(total)+"</span></div>"+
         "<div class='q-tot-row'><span class='lbl'>VAT 5%</span><span class='val'>"+aed(vat)+"</span></div>"+
-        "<div class='q-tot-main'><span class='tl'>Total inc. VAT</span><span class='tv'>"+aed(total+vat)+"</span></div>"+
+        "<div class='q-tot-row ml-del-inline'><span class='lbl'>UAE Delivery</span><span class='val'><span style='font-size:10px;color:#9ca3af;font-weight:600;margin-right:4px'>AED</span><input class='ml-del-inp-inline' id='ml-del-inp' type='text' inputmode='decimal' value='"+(window._delCharge>0?window._delCharge:'')+"' placeholder='0.00'></span></div>"+
+        "<div class='q-tot-main'><span class='tl'>Total inc. VAT</span><span class='tv' id='ml-tot-val'>"+aed(total+vat+(window._delCharge||0))+"</span></div>"+
       "</div>"+
     "</div>"+
     "<div class='cd tight' style='margin-top:12px;margin-bottom:0'>"+
@@ -1931,6 +1978,19 @@ function fuzzyFilter(products,query){
 function render(keep){
   var mn=document.querySelector(".mn"),sy=0;if(mn&&keep)sy=mn.scrollTop;
   var app=document.getElementById("app");
+  /* V64: ensure S.sd is valid for current product's max sides.
+     Also auto-default to product's preferred sides (e.g. 6 for Rubik's Cube)
+     when product just changed and sides is still at the previous default. */
+  if(typeof S!=='undefined' && S.si!==null && typeof P!=='undefined' && P[S.si]){
+    var _msr=maxSidesFor(P[S.si]);
+    var _dsr=defaultSidesFor(P[S.si]);
+    if(S.sd>_msr) S.sd=_dsr;
+    // Track last-product so we know to apply default on product change
+    if(S._lastSi!==S.si){
+      if(_dsr>1) S.sd=_dsr;
+      S._lastSi=S.si;
+    }
+  }
   if(!S.u){
     app.innerHTML="<div class='pin-ov'><div class='pin-c'><div class='pin-logo'>MERCHLIST</div><div class='pin-title'>Pricing Engine</div><div class='pin-sub'>Internal Sales Tool</div><input class='pini' id='pin' type='password' placeholder='\u00B7\u00B7\u00B7\u00B7' maxlength='6'><button class='pinb' id='pb' type='button'>Unlock</button><div class='pine' id='pe'></div></div></div>";
     document.getElementById("pb").onclick=function(){
@@ -1985,7 +2045,7 @@ function render(keep){
   }else{
     var pmMoqVal=pmO?(SOFT.has(p.cc)?(pmO.qS||pmO.q):(pmO.qH||pmO.q))||1:1;var pmMoq=pmO&&pmMoqVal>1&&S.qty<pmMoqVal,img=ICACHE[p.sku],imgH=img?"<img src='"+he(img)+"' alt='' onerror=\"this.parentNode.innerHTML='\uD83D\uDCE6'\">":"\uD83D\uDCE6",imgCls=img===null?" img-loading":"";
     var btnsH=pms.map(function(m){var moqShow=SOFT.has(p.cc)?(m.qS||m.q):(m.qH||m.q);return"<button class='btn "+(S.pm===m.id?"on":"")+"' data-pm='"+m.id+"' type='button'>"+m.n+(moqShow>1?"<span class='sub'>min "+moqShow+"</span>":"")+"</button>";}).join("");
-    var sidesH="";if(!pmO||!pmO.f){sidesH="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+[1,2,3,4].map(function(s){return"<button class='sd-btn "+(S.sd===s?"on":"")+"' data-sd='"+s+"' type='button'>"+s+"</button>";}).join("")+"</div></div>";}
+    var sidesH="";if(!pmO||!pmO.f){var _ms=maxSidesFor(p);var _sa=[];for(var _i=1;_i<=_ms;_i++)_sa.push(_i);sidesH="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+_sa.map(function(s){return"<button class='sd-btn "+(S.sd===s?"on":"")+"' data-sd='"+s+"' type='button'>"+s+"</button>";}).join("")+"</div></div>";}
     var premH="";if(showPrem(p)){premH="<div class='cfg-s'><div class='cfg-lbl'>Fabric</div><div class='fab-row'><button class='fab-b "+(!S.pr?"on":"")+"' data-fb='0' type='button'>Basic</button><button class='fab-b "+(S.pr?"on":"")+"' data-fb='1' type='button'>Premium</button></div></div>";}
     // V33: wdH removed — toggle moved to wdBarH in updOut()
     // V62.5: Product Details + Stock unified in ONE card with underline tabs.
@@ -2429,6 +2489,17 @@ render();
 .fmatch .fmt{font-size:12.5px;font-weight:700;color:#111}
 .fmatch .fms{font-size:10.5px;color:#9ca3af;margin-top:2px}
 .fmatch .fuse{background:#111;color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:10.5px;font-weight:700;cursor:pointer;flex-shrink:0}
+/* Finder — similar products meta (match type badge) */
+.fmatch .fmt-via{color:#9ca3af;font-weight:600}
+/* Finder — Request Product Upload panel */
+.ml-freq{border-radius:12px;padding:14px 16px;border:1.5px solid #d1d5db;background:#fff;margin-top:14px}
+.ml-freq-title{font-size:13px;font-weight:800;color:#111;margin-bottom:4px}
+.ml-freq-desc{font-size:11.5px;color:#6b7280;line-height:1.5;margin-bottom:10px}
+.ml-freq-msg{font-size:11px;color:#374151;background:#f9fafb;border-radius:8px;padding:10px 12px;margin-bottom:10px;line-height:1.6;border-left:3px solid #16a34a;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-word;white-space:pre-wrap}
+.ml-freq-btn{width:100%;background:#16a34a;color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;letter-spacing:.2px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.ml-freq-btn:hover{background:#15803d}
+.ml-freq-btn.on{background:#111}
+.ml-freq-btn:disabled{cursor:default}
 /* Misc */
 .qu-btn{padding:4px 10px;font-size:11px;font-weight:700;border-radius:6px;border:1.5px solid #e5e7eb;background:#fff}
 .qu-btn.on,.qu-btn:hover{border-color:#9ca3af}
@@ -2533,27 +2604,71 @@ function looksLikeURL(s){
   return /^https?:\/\//i.test(s)||/^www\./i.test(s)||(s.length>6&&/\.(com|ae|net|org|co|io|me)\b/.test(s)&&s.indexOf(' ')<0);
 }
 
+/* Extract product keywords from a supplier URL path.
+   e.g. /products/black-leather-notebook-a5.html → ['black','leather','notebook'] */
+function extractURLKeywords(u){
+  if(!u) return [];
+  var n=normURL(u);
+  var path=n.split('/').slice(1).join(' ');
+  path=path.replace(/\.(html?|aspx?|php|asp)\b/gi,'');
+  var tokens=path.split(/[^a-z0-9]+/i).filter(Boolean);
+  var STOPS={'product':1,'products':1,'item':1,'items':1,'p':1,'dp':1,'gp':1,'pd':1,'sku':1,'ref':1,'shop':1,'store':1,'category':1,'cat':1,'collection':1,'collections':1,'detail':1,'details':1,'view':1,'index':1,'home':1,'cn':1,'en':1,'us':1,'uk':1,'ae':1,'the':1,'and':1,'for':1,'with':1};
+  var seen={};
+  return tokens.filter(function(t){
+    t=t.toLowerCase();
+    if(t.length<3) return false;
+    if(STOPS[t]) return false;
+    if(/^\d+$/.test(t)) return false;                              // pure numbers (IDs)
+    if(/^[a-z]\d{4,}/i.test(t)) return false;                       // SKU-like codes
+    if(t.length>=8 && /[a-z]/i.test(t) && /\d/.test(t)) return false; // long alphanum IDs (B07ZPKBL9V)
+    if(seen[t]) return false;
+    seen[t]=1;
+    return true;
+  });
+}
+
 function searchByURL(q){
-  if(typeof P==='undefined') return{exact:null,domain:[],domainName:''};
+  if(typeof P==='undefined') return{exact:null,similar:[],domainName:'',keywords:[]};
   var nq=normURL(q), dq=getDomain(nq);
-  var best=null, others=[];
+  var best=null, domainMatches=[];
   P.forEach(function(p){
     var url=p.supUrl||'';
     if(!url) return;
     var score=urlMatchScore(q,url);
     if(score>=0.85){
-      if(!best||score>best.score){ if(best) others.push(best); best={p:p,score:score}; }
-      else others.push({p:p,score:score});
+      if(!best||score>best.score){
+        if(best) domainMatches.push({p:best.p,score:best.score,via:'domain'});
+        best={p:p,score:score};
+      } else {
+        domainMatches.push({p:p,score:score,via:'domain'});
+      }
     } else if(score>=0.30){
-      others.push({p:p,score:score});
+      domainMatches.push({p:p,score:score,via:'domain'});
     }
   });
-  others.sort(function(a,b){return b.score-a.score;});
-  return{exact:best,domain:others.slice(0,8),domainName:dq};
+  // No exact → also do keyword search against catalogue
+  var keywordMatches=[], keywords=[];
+  if(!best){
+    keywords=extractURLKeywords(q);
+    if(keywords.length>0 && typeof improvedTextSearch==='function'){
+      var kRes=improvedTextSearch(keywords.join(' '));
+      keywordMatches=kRes.map(function(x){return{p:x.p,score:x.score,via:'keyword'};});
+    }
+  }
+  // Merge + dedupe by SKU, keep higher score
+  var bySku={};
+  domainMatches.concat(keywordMatches).forEach(function(m){
+    var k=m.p.sku;
+    if(!bySku[k]||bySku[k].score<m.score) bySku[k]=m;
+  });
+  var similar=Object.keys(bySku).map(function(k){return bySku[k];});
+  similar.sort(function(a,b){return b.score-a.score;});
+  return{exact:best,similar:similar.slice(0,6),domainName:dq,keywords:keywords};
 }
 
 function renderURLResults(result,query){
   var html='';
+  // EXACT MATCH — unchanged
   if(result.exact){
     var p=result.exact.p;
     var pct=Math.round(result.exact.score*100);
@@ -2575,31 +2690,40 @@ function renderURLResults(result,query){
       '</div>'+
       (idx>=0?'<button class="ml-fcard-btn" data-ml-load="'+idx+'">Load product in calculator →</button>':'')+
     '</div>';
-  } else {
-    // Not found — show not-in-catalogue message
-    html+='<div class="ml-fno-url">'+
-      '<h3>⚠ Not in Catalogue</h3>'+
-      '<p>This supplier URL doesn\'t match any existing Merchlist product.</p>'+
-      (result.domainName?'<div class="ml-fno-domain">'+esc(result.domainName)+'</div><br>':'')+
-      '<p style="font-size:11px;color:#6b7280">You may want to source this product and add it to the catalogue.</p>'+
-    '</div>';
+    return html;
   }
-  // Domain-level matches
-  if(result.domain.length>0){
+  // NO EXACT MATCH — show notice + similar products + request panel
+  html+='<div class="ml-fno-url">'+
+    '<h3>⚠ Not in Catalogue</h3>'+
+    '<p>This supplier URL doesn\'t match any existing Merchlist product.</p>'+
+    (result.domainName?'<div class="ml-fno-domain">'+esc(result.domainName)+'</div>':'')+
+  '</div>';
+  // Similar products (merged domain + keyword matches)
+  if(result.similar && result.similar.length>0){
     html+='<div class="ml-fdomain-section">'+
-      '<div class="ml-fdomain-title">Other products from same supplier</div>';
-    result.domain.forEach(function(x){
+      '<div class="ml-fdomain-title">Similar products in our catalogue</div>';
+    result.similar.forEach(function(x){
       var p=x.p, idx=(typeof P!=='undefined')?P.indexOf(p):-1;
+      var sc=Math.round(x.score*100);
+      var via=x.via==='domain'?'Same supplier':'Keyword match';
       html+='<div class="fmatch">'+
         '<div class="fmi">'+
           '<div class="fmt">'+esc(p.title)+'</div>'+
-          '<div class="fms">'+esc(p.sku)+' &nbsp;·&nbsp; AED '+p.web.toFixed(0)+'</div>'+
+          '<div class="fms">'+esc(p.sku)+' &nbsp;·&nbsp; AED '+p.web.toFixed(0)+' &nbsp;·&nbsp; <span class="fmt-via">'+via+' '+sc+'%</span></div>'+
         '</div>'+
         (idx>=0?'<button class="fuse" data-fu="'+idx+'" type="button">Use →</button>':'')+
       '</div>';
     });
     html+='</div>';
   }
+  // Request product upload panel (URL mode only)
+  var msg='Hi George,\n\nPlease upload this product to Odoo, Mastersheet and the Website:\n\n'+query+'\n\nThanks!';
+  html+='<div class="ml-freq">'+
+    '<div class="ml-freq-title">📩 Want this product added to our catalogue?</div>'+
+    '<div class="ml-freq-desc">Send a quick request to George to upload this to Odoo, Mastersheet and the website.</div>'+
+    '<div class="ml-freq-msg">'+esc(msg)+'</div>'+
+    '<button class="ml-freq-btn" data-ml-copy-url="'+esc(query)+'" type="button">📋 Copy message — Request product upload</button>'+
+  '</div>';
   return html;
 }
 
@@ -2704,6 +2828,36 @@ function renderFinderResults(){
     btn.onclick=function(){
       var idx=parseInt(btn.getAttribute('data-fu'));
       if(typeof S!=='undefined'&&typeof render==='function'){S.si=idx;S.tab='calc';render();}
+    };
+  });
+  // Copy-message handler for Request Product Upload button
+  div.querySelectorAll('[data-ml-copy-url]').forEach(function(btn){
+    btn.onclick=function(){
+      // Decode the URL from the data attribute
+      var holder=document.createElement('textarea');
+      holder.innerHTML=btn.getAttribute('data-ml-copy-url')||'';
+      var url=holder.value;
+      var msg='Hi George,\n\nPlease upload this product to Odoo, Mastersheet and the Website:\n\n'+url+'\n\nThanks!';
+      var done=function(){
+        var orig=btn.innerHTML;
+        btn.innerHTML='✓ Copied to clipboard';
+        btn.classList.add('on');
+        btn.disabled=true;
+        setTimeout(function(){btn.innerHTML=orig;btn.classList.remove('on');btn.disabled=false;},2200);
+      };
+      var fail=function(){
+        // Fallback: select + execCommand
+        var ta=document.createElement('textarea');
+        ta.value=msg;
+        ta.style.position='fixed';ta.style.top='-1000px';ta.style.opacity='0';
+        document.body.appendChild(ta);
+        ta.select();
+        try{document.execCommand('copy');done();}catch(e){btn.innerHTML='✗ Copy failed — copy manually';}
+        document.body.removeChild(ta);
+      };
+      if(navigator.clipboard&&navigator.clipboard.writeText){
+        navigator.clipboard.writeText(msg).then(done).catch(fail);
+      } else { fail(); }
     };
   });
 }
@@ -2970,9 +3124,13 @@ window.addEventListener('load',function(){
   function writeShip(v){
     try{ localStorage.setItem(SKEY, v); }catch(e){}
   }
+  /* V64: expose readShip to main scope for email template */
+  try{ window.readShip = readShip; }catch(e){}
   
   // Delivery charge - session only (cleared on close, since it's deal-specific)
   var _delCharge = 0;
+  /* V64: expose to window so main render() scope can read it for inline q-totals + email */
+  try{ window._delCharge = 0; }catch(e){}
 
   /* ═══════════════════════════════════════════════════════════
      V18: SAND-BLAST TROPHY FILTER (override gpm)
@@ -3055,7 +3213,7 @@ window.addEventListener('load',function(){
         writeShip(v);
         wrap.querySelectorAll('.ml-ship-btn').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-ship')===v); });
         // Reset delivery charge when switching to intl
-        if (v==='intl') _delCharge = 0;
+        if (v==='intl') { _delCharge = 0; try{window._delCharge=0;}catch(e){} }
         if (typeof updOut==='function') updOut();
         renderQuoteBuilder(); // re-render quote tab if open
       };
@@ -3063,64 +3221,81 @@ window.addEventListener('load',function(){
   }
 
   /* ═══════════════════════════════════════════════════════════
-     V18: DELIVERY / INTERNATIONAL ADD-ON TO QUOTE BOX
+     V18 / V64: INLINE DELIVERY ROW IN q-totals BOX
      ═══════════════════════════════════════════════════════════ */
   function injectShipping(){
     try{
       var qbox = document.querySelector('.qbox.ok,.qbox.cap');
       if (!qbox) return;
-      // Remove any prior
-      var prev = qbox.parentNode.querySelector('.ml-del-row,.ml-intl-note');
-      while(prev){ prev.remove(); prev = qbox.parentNode.querySelector('.ml-del-row,.ml-intl-note'); }
-      
+      // Clean up legacy injected nodes from earlier versions
+      var legacy = qbox.parentNode.querySelectorAll('.ml-del-row,.ml-intl-note,.ml-grand');
+      legacy.forEach(function(n){n.remove();});
+
       var ship = readShip();
+      var inlineRow = document.querySelector('.ml-del-inline');
       if (ship === 'intl'){
+        // Hide inline delivery row, show intl note below qbox
+        if (inlineRow) inlineRow.classList.add('intl-hide');
         var n = document.createElement('div');
         n.className = 'ml-intl-note';
         n.innerHTML = '<div class="ml-intl-icon">🌍</div><div class="ml-intl-txt"><strong>International shipping</strong> — please get freight pricing from the Shipping Team before sending this quote. The total below excludes shipping.</div>';
         qbox.parentNode.insertBefore(n, qbox.nextSibling);
       } else {
-        var d = document.createElement('div');
-        d.className = 'ml-del-row';
-        d.innerHTML =
-          '<div class="ml-del-lbl">UAE Delivery</div>'+
-          '<span class="ml-del-pre">AED</span>'+
-          '<input class="ml-del-inp" id="ml-del-inp" type="text" inputmode="decimal" value="'+(_delCharge||'')+'" placeholder="0.00">';
-        qbox.parentNode.insertBefore(d, qbox.nextSibling);
-        
+        // UAE — wire the inline input that's already rendered inside q-totals
+        if (inlineRow) inlineRow.classList.remove('intl-hide');
         var inp = document.getElementById('ml-del-inp');
-        inp.addEventListener('input', function(){
-          var v = parseFloat((this.value||'').replace(/[^0-9.]/g,''))||0;
-          _delCharge = v;
-          updateGrandTotal();
-        });
+        if (inp && !inp.dataset.mlWired){
+          inp.dataset.mlWired = '1';
+          inp.addEventListener('input', function(){
+            var v = parseFloat((this.value||'').replace(/[^0-9.]/g,''))||0;
+            _delCharge = v; try{window._delCharge=v;}catch(e){}
+            updateGrandTotal();
+          });
+        }
       }
       updateGrandTotal();
     }catch(e){}
   }
   function updateGrandTotal(){
     try{
-      var totBox = document.querySelector('.q-totals');
-      if (!totBox) return;
-      // Remove prior grand total injected
-      var gt = totBox.parentNode.querySelector('.ml-grand');
-      if (gt) gt.remove();
-      
-      if (readShip()==='intl' || _delCharge<=0) return;
-      
-      // Compute new grand total = existing inc. VAT + delivery
-      var cells = totBox.querySelectorAll('.q-tot .tv');
-      if (cells.length < 3) return;
-      var incVat = parseFloat(cells[2].textContent.replace(/[^0-9.]/g,''))||0;
-      var grand = incVat + _delCharge;
-      
-      var row = document.createElement('div');
-      row.className = 'ml-grand';
-      row.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:10px 0 0;margin-top:10px;border-top:1.5px dashed rgba(0,0,0,.12)';
-      row.innerHTML =
-        '<div><div style="font-size:9px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Grand Total (with delivery)</div></div>'+
-        '<div style="font-size:18px;font-weight:900;color:#16a34a">AED '+grand.toFixed(1)+'</div>';
-      totBox.parentNode.appendChild(row);
+      var totVal = document.getElementById('ml-tot-val');
+      if (!totVal) return;
+      // Read existing subtotal + VAT from the rendered rows (avoids re-computing pricing)
+      var rows = document.querySelectorAll('.q-totals .q-tot-row .val');
+      if (rows.length < 2) return;
+      var sub = parseFloat((rows[0].textContent||'').replace(/[^0-9.]/g,''))||0;
+      var vat = parseFloat((rows[1].textContent||'').replace(/[^0-9.]/g,''))||0;
+      var del = (readShip()==='uae' ? (_delCharge||0) : 0);
+      var grand = sub + vat + del;
+      totVal.textContent = 'AED '+grand.toFixed(2);
+      // V64: also refresh the email quote box inline (without nuking the delivery input focus)
+      try{
+        var eBox = document.getElementById('eBox');
+        if (eBox){
+          // The email uses unicode-bold labels via b(), so we can't regex on <b> tags.
+          // Strategy: re-call updOut() to rebuild the entire email body, but defer it
+          // via setTimeout so the keystroke completes and the input keeps focus.
+          if (typeof updOut==='function' && !window._mlDelRefresh){
+            window._mlDelRefresh = setTimeout(function(){
+              try{
+                var focused = document.activeElement;
+                var wasDelInp = focused && focused.id === 'ml-del-inp';
+                var caret = wasDelInp ? focused.selectionStart : null;
+                updOut();
+                // Restore focus + caret to delivery input
+                if (wasDelInp){
+                  var fresh = document.getElementById('ml-del-inp');
+                  if (fresh){
+                    fresh.focus();
+                    if (caret !== null) try{fresh.setSelectionRange(caret,caret);}catch(e3){}
+                  }
+                }
+              }catch(e4){}
+              window._mlDelRefresh = null;
+            }, 250);
+          }
+        }
+      }catch(e2){}
     }catch(e){}
   }
 
@@ -3329,7 +3504,7 @@ window.addEventListener('load',function(){
     if (clearBtn) clearBtn.onclick = function(){
       if (confirm('Clear all '+readQuote().length+' items from the quote list?')){
         writeQuote([]);
-        _delCharge = 0;
+        _delCharge = 0; try{window._delCharge=0;}catch(e){}
         renderQuoteBuilder();
         updateQuoteTabBadge();
       }
@@ -3337,8 +3512,20 @@ window.addEventListener('load',function(){
     // V30: WhatsApp share removed — use copy-box instead
     var delInp = document.getElementById('qb-del-inp');
     if (delInp) delInp.addEventListener('input', function(){
-      _delCharge = parseFloat((this.value||'').replace(/[^0-9.]/g,''))||0;
-      renderQuoteBuilder();
+      _delCharge = parseFloat((this.value||'').replace(/[^0-9.]/g,''))||0; try{window._delCharge=_delCharge;}catch(e){}
+      // V64: update Grand Total in-place instead of re-rendering (preserves input focus)
+      var sumRows = document.querySelectorAll('.qb-summary .qb-sum-row');
+      var totRow = document.querySelector('.qb-summary .qb-sum-row.tot .v');
+      if (totRow){
+        // Recompute from existing rendered subtotal + VAT
+        var subEl = sumRows[1] && sumRows[1].querySelector('.v');
+        var vatEl = sumRows[2] && sumRows[2].querySelector('.v');
+        var sub = subEl ? parseFloat(subEl.textContent.replace(/[^0-9.]/g,''))||0 : 0;
+        var vat = vatEl ? parseFloat(vatEl.textContent.replace(/[^0-9.]/g,''))||0 : 0;
+        totRow.textContent = 'AED '+(sub+vat+_delCharge).toFixed(1);
+      }
+      // Refresh copy-quote text (rebuild via syncQuoteText if available)
+      if (typeof syncQuoteText==='function') syncQuoteText();
     });
   }
   
@@ -3660,7 +3847,12 @@ window.addEventListener('load',function(){
 
     if (ship === 'uae'){
       var grandUAE = subtotal + vat + (del||0);
-      lines.push(b('Total with VAT')+': AED '+fmt(grandUAE));
+      if (del && del>0){
+        lines.push(b('UAE Delivery')+': AED '+fmt(del));
+        lines.push(b('Total with VAT + Delivery')+': AED '+fmt(grandUAE));
+      } else {
+        lines.push(b('Total with VAT')+': AED '+fmt(grandUAE));
+      }
     } else {
       lines.push(b('Total')+': AED '+fmt(subtotal)+' (international order, VAT and shipping quoted separately)');
     }
@@ -4841,40 +5033,9 @@ window.addEventListener('load',function(){
      V25: CALCULATOR — INJECT SHORT DESCRIPTION INTO PRODUCT CARD
      ═══════════════════════════════════════════════════════════ */
   function injectCalcDesc(){
-    // V28: Short descriptions removed per user feedback — function neutralized
+    // V28: short product descriptions feature removed per user feedback.
+    // Keeping the empty function so v25Hook's existing callsite stays valid.
     return;
-  }
-  function _injectCalcDesc_disabled_v28(){
-    try{
-      if(typeof S==='undefined'||S.si===null||S.tab!=='calc') return;
-      var p=P[S.si]; if(!p) return;
-      var titleArea=document.querySelector('.ph-title');
-      if(!titleArea) return;
-      var parent=titleArea.parentNode;
-      // Remove old description we injected
-      var old=parent.parentNode.querySelector('.ml-calc-desc');
-      if(old) old.remove();
-      
-      var desc=DCACHE[p.sku];
-      if(desc===undefined||desc===null){
-        // Trigger load
-        if(typeof loadProductData==='function'){
-          loadProductData(p, function(pd){
-            if(pd&&pd.desc&&S.si!==null&&P[S.si].sku===p.sku){
-              injectCalcDesc(); // re-inject when loaded
-            }
-          });
-        }
-        return;
-      }
-      if(!desc) return; // no description available
-      
-      var d=document.createElement('div');
-      d.className='ml-calc-desc';
-      d.style.cssText='font-size:11.5px;color:#6b7280;line-height:1.5;margin-top:6px;font-style:italic;border-left:2px solid #e5e7eb;padding-left:9px';
-      d.textContent=desc.slice(0,260);
-      parent.parentNode.appendChild(d);
-    }catch(e){}
   }
   
   /* ═══════════════════════════════════════════════════════════
