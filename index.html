@@ -1,8 +1,38 @@
 <!DOCTYPE html>
 <!--
   ═══════════════════════════════════════════════════════════════════════
-  MERCHLIST — Pricing Engine v113
+  MERCHLIST — Pricing Engine v116
   ═══════════════════════════════════════════════════════════════════════
+  V116 changes (from v115):
+
+    ▸ CUSTOMER NAME NOW MANDATORY when capturing a quote. Both “\uD83D\uDCBE Save”
+      (→ My Recent Quotes) and “Add to Bulk Quote” are blocked until a
+      customer name is entered in the calc customer field; the field is
+      highlighted red and focused, with an inline prompt. Encourages reps to
+      attach a customer (and to save), so the dashboard / win-rate data is
+      meaningful. Copy/Share is unaffected. Render-only; pricing byte-identical.
+
+  V115 changes (from v114):
+
+    ▸ REVERTED the v114 volume nudge (the "Add N → M units…" prompt on the
+      quote) at user request. The margin guardrail and My Recent Quotes
+      dashboard + Won/Lost tagging from v114 are retained. Render-only;
+      pricing math byte-identical.
+
+  V114 changes (from v113):
+
+    ▸ SALES TOOLS (client-side, no backend):
+      • VOLUME NUDGE on the calc quote: a one-line prompt showing the next
+        price-break (e.g. "Add 38 → 250 units: unit drops to AED 12.80 (−10%)"),
+        read live from the existing tier curve. Info-only. Hidden at top tier.
+      • MARGIN GUARDRAIL: the Margin readout is colour-banded — red <25%,
+        amber 25–35%, green >35% — so reps see deal health at a glance.
+      • MY RECENT QUOTES DASHBOARD: cards for quotes (with this-week count),
+        value quoted, avg margin, win rate, and top-3 most-quoted products,
+        plus Won/Lost tagging per saved quote (adds an outcome field; powers
+        win rate). All from local quote history; per-device.
+      Render-only; pricing math byte-identical to v113.
+
   V113 changes (from v112):
 
     ▸ INTERNATIONAL CURRENCY TOGGLE moved to the topbar. When an
@@ -2220,7 +2250,7 @@ function updOut(){
   var dp=cur.px,total=dp*S.qty,vat=total*.05;
   var st=!pmO||pmO.f?"":S.sd+" side"+(S.sd>1?"s":"");
   var pt=S.pm==="none"?"no print":(pmO.n+(st?" ("+st+")":""));
-  var mc=cur.m>=30?"#16a34a":cur.m>=20?"#ca8a04":"#dc2626";
+  var mc=cur.m>35?"#16a34a":cur.m>=25?"#ca8a04":"#dc2626";
   var qC=cur.locked?(cur.px>cur.li*0.8?"cap":"bad"):"ok";
   var qL=cur.locked&&cur.px>cur.li*0.8?"Floor price applied":cur.locked?"Below web price":"Quote Price with Branding";
   var qLC=cur.locked&&cur.px>cur.li*0.8?"w":cur.locked?"r":"ok";
@@ -2280,7 +2310,7 @@ function updOut(){
       "<div class='sec-lbl'>\uD83D\uDCE7 Quote (Email / WhatsApp)</div>"+
       "<div class='email-box' id='eBox'>"+he(email).replace(/\n/g,"<br>")+"</div>"+
       "<div class='copy-row' style='display:flex;gap:8px;align-items:center;flex-wrap:wrap'>"+
-        "<input id='mlqCust' type='text' list='mlqCustList' placeholder='Customer name (optional)' autocomplete='off' style='flex:1;min-width:140px;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:6px;font-size:13px;font-weight:600;color:#111'>"+
+        "<input id='mlqCust' type='text' list='mlqCustList' placeholder='Customer name (required)' autocomplete='off' style='flex:1;min-width:140px;padding:8px 10px;border:1.5px solid #d1d5db;border-radius:6px;font-size:13px;font-weight:600;color:#111'>"+
         "<datalist id='mlqCustList'></datalist>"+
         "<button class='copy-btn' id='cBtn' type='button'>Copy Quote</button>"+
         "<button class='copy-btn' id='saveQ' type='button' style='background:#111;color:#fff'>\uD83D\uDCBE Save</button>"+
@@ -2346,6 +2376,8 @@ function updOut(){
       var pp=P[S.si]; if(!pp) return;
       var cc=calcP(pp,S.pm,S.sd,S.pr,qt(S.qty)); if(!cc) return;
       var ce=document.getElementById("mlqCust");
+      var _cust=(ce&&ce.value)?ce.value.trim():"";
+      if(!_cust){ if(ce){ ce.focus(); ce.classList.add("ml-req-err"); } var _so=sq.innerHTML; sq.textContent="Enter customer name"; sq.style.color="#dc2626"; setTimeout(function(){ sq.innerHTML=_so; sq.style.color=""; },1800); return; }
       window.MLQ.save({
         id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
         ts:Date.now(),
@@ -3685,6 +3717,7 @@ window.addEventListener('load',function(){
 .ml-curtop{display:inline-flex;align-items:center;gap:4px;margin-left:8px}
 .ml-curtop:empty{display:none}
 .ml-curtop .ml-cur-lbl{font-size:10px;color:#6b7280;font-weight:600;margin-right:2px}
+.ml-req-err{border-color:#dc2626 !important;box-shadow:0 0 0 2px rgba(220,38,38,.18) !important}
 .ml-cur-btn{padding:4px 12px;font-size:11px;font-weight:700;border:1.5px solid #d1d5db;background:#fff;color:#374151;border-radius:6px;cursor:pointer}
 .ml-cur-btn.on{background:#0f5132;border-color:#0f5132;color:#fff}
 .ml-cur-rate{flex-basis:100%;font-size:10px;color:#6b7280;margin-top:2px}
@@ -4920,6 +4953,9 @@ window.addEventListener('load',function(){
     var btn = e.target.closest('#ml-addbq, .ml-addbq-btn');
     if(!btn) return;
     e.preventDefault();
+    var _bce=document.getElementById('mlqCust');
+    var _bcust=(_bce&&_bce.value)?_bce.value.trim():'';
+    if(!_bcust){ if(_bce){ _bce.focus(); _bce.classList.add('ml-req-err'); } var _bo=btn.innerHTML; btn.innerHTML='\u26A0 Enter customer name first'; btn.style.color='#dc2626'; setTimeout(function(){ btn.innerHTML=_bo; btn.style.color=''; },1800); return; }
     if(typeof window.addCurrentToQuote !== 'function'){
       console.error('[V28] window.addCurrentToQuote is NOT a function. V18 IIFE may have failed.');
       alert('Add to Quote unavailable — check console for [V28] errors.');
@@ -7165,6 +7201,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     save:function(rec){ var a=this.all(); a.unshift(rec); if(a.length>CAP) a=a.slice(0,CAP); try{ localStorage.setItem(KEY, JSON.stringify(a)); }catch(e){} return a; },
     get:function(id){ return this.all().filter(function(q){return q.id===id;})[0]||null; },
     remove:function(id){ var a=this.all().filter(function(q){return q.id!==id;}); try{ localStorage.setItem(KEY, JSON.stringify(a)); }catch(e){} return a; },
+    setOutcome:function(id,v){ var a=this.all(); for(var i=0;i<a.length;i++){ if(a[i].id===id){ a[i].outcome=v||null; break; } } try{ localStorage.setItem(KEY, JSON.stringify(a)); }catch(e){} return a; },
     customers:function(){ var seen={}, out=[]; this.all().forEach(function(q){ var c=(q.customer||"").trim(); if(c&&!seen[c.toLowerCase()]){ seen[c.toLowerCase()]=1; out.push(c); } }); return out; }
   };
 
@@ -7198,6 +7235,33 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
   }
 
   // ── Render the list into .mn ──
+  function dashHTML(list){
+    if(!list.length) return "";
+    var now=Date.now(), wk=0, val=0, msum=0, mc2=0, won=0, lost=0, prod={};
+    list.forEach(function(q){
+      if(q.ts && (now-q.ts)<=6048e5) wk++;
+      val += (q.total||0);
+      if(q.margin!=null){ msum+=q.margin; mc2++; }
+      if(q.outcome==='won') won++; else if(q.outcome==='lost') lost++;
+      var k=q.title||q.sku; if(k){ prod[k]=(prod[k]||0)+1; }
+    });
+    var avgM = mc2? (msum/mc2).toFixed(1)+"%" : "\u2014";
+    var wr = (won+lost)? Math.round(won/(won+lost)*100)+"%" : "\u2014";
+    var top=Object.keys(prod).map(function(k){return [k,prod[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,3);
+    function cd(lbl,v,sub){ return "<div style='flex:1;min-width:84px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px'><div style='font-size:9.5px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.4px'>"+lbl+"</div><div style='font-size:18px;font-weight:800;color:#111;margin-top:2px'>"+v+"</div>"+(sub?"<div style='font-size:10px;color:#9ca3af;font-weight:600;margin-top:1px'>"+sub+"</div>":"")+"</div>"; }
+    var H="<div style='margin:0 2px 16px'><div style='display:flex;gap:8px;flex-wrap:wrap'>"+
+      cd("Quotes", list.length, wk+" this week")+
+      cd("Value quoted", money(val), "")+
+      cd("Avg margin", avgM, "")+
+      cd("Win rate", wr, (won+lost)? (won+"W / "+lost+"L") : "tag won/lost")+
+    "</div>";
+    if(top.length){
+      H+="<div style='margin-top:8px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:10px 12px'><div style='font-size:9.5px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px'>Most quoted</div>";
+      top.forEach(function(tp){ H+="<div style='display:flex;justify-content:space-between;font-size:12px;color:#374151;padding:2px 0'><span style='white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:82%'>"+esc(tp[0])+"</span><span style='font-weight:700;color:#16a34a'>"+tp[1]+"\u00d7</span></div>"; });
+      H+="</div>";
+    }
+    return H+"</div>";
+  }
   function renderRecent(host){
     var list=window.MLQ.all();
     var H="<div style='max-width:640px;margin:0 auto;padding:4px 2px'>"+
@@ -7205,6 +7269,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
         "<div style='font-size:18px;font-weight:800;color:#111'>My Recent Quotes</div>"+
         "<div style='font-size:12px;color:#9ca3af;font-weight:600'>"+list.length+" saved \u00B7 last "+CAP+"</div>"+
       "</div>";
+    H+=dashHTML(list);
     if(!list.length){
       H+="<div style='text-align:center;padding:48px 20px;color:#9ca3af'>"+
         "<div style='font-size:34px;margin-bottom:10px'>\uD83D\uDCCB</div>"+
@@ -7213,7 +7278,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       "</div>";
     } else {
       list.forEach(function(q){
-        var mc=(q.margin>=30)?"#16a34a":(q.margin>=20)?"#ca8a04":"#dc2626";
+        var mc=(q.margin>35)?"#16a34a":(q.margin>=25)?"#ca8a04":"#dc2626";
         var chev="<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>";
         var trash="<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>";
         H+="<div class='mlq-card' data-mlq-open='"+q.id+"' style='background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:14px;margin-bottom:10px;box-shadow:0 1px 2px rgba(0,0,0,.03);cursor:pointer'>"+
@@ -7232,7 +7297,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
           "<div style='display:flex;justify-content:space-between;align-items:center;margin-top:10px'>"+
             "<div style='font-size:10.5px;color:#b6bac0;font-weight:600'>"+fmtDate(q.ts)+"</div>"+
             "<div style='display:flex;gap:6px;align-items:center'>"+
-              "<button type='button' class='mlq-ico' data-mlq='view' data-id='"+q.id+"' title='Quick view' aria-label='Quick view' style='width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:7px;background:#fff;color:#6b7280;cursor:pointer;transition:transform .15s'>"+chev+"</button>"+
+              "<button type='button' data-mlq='won' data-id='"+q.id+"' title='Mark Won' style='padding:0 9px;height:30px;border:1px solid "+(q.outcome==='won'?'#16a34a':'#e5e7eb')+";border-radius:7px;background:"+(q.outcome==='won'?'#16a34a':'#fff')+";color:"+(q.outcome==='won'?'#fff':'#16a34a')+";font-size:11px;font-weight:800;cursor:pointer'>Won</button>"+"<button type='button' data-mlq='lost' data-id='"+q.id+"' title='Mark Lost' style='padding:0 9px;height:30px;border:1px solid "+(q.outcome==='lost'?'#dc2626':'#e5e7eb')+";border-radius:7px;background:"+(q.outcome==='lost'?'#dc2626':'#fff')+";color:"+(q.outcome==='lost'?'#fff':'#dc2626')+";font-size:11px;font-weight:800;cursor:pointer'>Lost</button>"+"<button type='button' class='mlq-ico' data-mlq='view' data-id='"+q.id+"' title='Quick view' aria-label='Quick view' style='width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:7px;background:#fff;color:#6b7280;cursor:pointer;transition:transform .15s'>"+chev+"</button>"+
               "<button type='button' class='mlq-ico' data-mlq='delete' data-id='"+q.id+"' title='Delete' aria-label='Delete' style='width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #fecaca;border-radius:7px;background:#fff;color:#dc2626;cursor:pointer'>"+trash+"</button>"+
             "</div>"+
           "</div>"+
@@ -7256,6 +7321,8 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
           if(dv){ var open=(dv.style.display==="none"); dv.style.display=open?"block":"none"; b.style.transform=open?"rotate(180deg)":""; b.style.color=open?"#111":"#6b7280"; }
         } else if(act==="delete"){
           if(window.confirm("Delete this saved quote?")){ window.MLQ.remove(id); renderRecent(host); }
+        } else if(act==="won"||act==="lost"){
+          var _c=window.MLQ.get(id); var _nv=(_c&&_c.outcome===act)?null:act; window.MLQ.setOutcome(id,_nv); renderRecent(host);
         }
       };
     });
