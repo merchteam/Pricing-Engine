@@ -1,8 +1,101 @@
 <!DOCTYPE html>
 <!--
   ═══════════════════════════════════════════════════════════════════════
-  MERCHLIST — Pricing Engine v117
+  MERCHLIST — Pricing Engine v123
   ═══════════════════════════════════════════════════════════════════════
+  V123 changes (from v122):
+
+    ▸ AUDIT + CLEANUP (no behaviour change):
+      • Full-engine smoke test passed: zero load errors; Calculator,
+        Quote Builder, Recent Quotes, AI Recommender and the ship-toggle
+        mount (.tb-r) all verified intact after the v118–v122 recommender work.
+      • Removed dead code: the unused _isPremium() helper (orphaned when the
+        premium ranking signal was dropped in v121).
+      • Pricing math byte-identical to v122 (calcP/floorR/TIERS untouched).
+
+  V122 changes (from v121):
+
+    ▸ AI RECOMMENDER — search ORDER fixed (phrase/title relevance first):
+      • A multi-word query is now matched against product TITLES before any
+        single word is allowed to become a tag. "short sleeve" returns Short
+        Sleeve T-shirts instead of being hijacked by "short" → Shorts tag.
+        Greedy tag matching only applies when the phrase doesn't match titles
+        (graceful fallback to category + keyword ranking).
+      • Removed the leftover "Premium feel" chip (premium no longer affects
+        ranking and you didn't want it surfaced).
+
+    ▸ Pricing math byte-identical to v121 (calcP/floorR/TIERS untouched).
+
+  V121 changes (from v120):
+
+    ▸ AI RECOMMENDER — relevance + card-chip fixes:
+      • RELEVANCE: descriptive words now drive ranking. "ceramic mugs for
+        client" surfaces actual ceramic mugs first (the word "ceramic" was
+        previously ignored once "mugs" set the category). Literal keyword
+        match is now the strongest signal (+ fuzzy), above soft signals.
+      • Removed the duplicate "IN STOCK" match-chip on cards (the corner
+        badge already shows stock) and removed the "PREMIUM" chip. "client"
+        no longer forces a premium boost that buried the real matches.
+      • Match-reason chips now show what actually matters (e.g. "ceramic ·
+        fast · within budget"); a 🔍 keyword chip shows the active refinement.
+
+    ▸ Pricing math byte-identical to v120 (calcP/floorR/TIERS untouched).
+
+  V120 changes (from v119):
+
+    ▸ AI RECOMMENDER — UI polish + colour picker overhaul:
+      • Removed the "Add N to Quote" bulk button from the results bar.
+      • COLOUR PICKER now multi-select with an unmistakable selected state:
+        larger swatches, a dark ring + white gap + corner checkmark, plus a
+        row of removable colour pills and a "Clear N colours" control — so
+        it's obvious what's active and easy to deselect.
+      • Elevated search hero (larger field, green focus ring, gradient
+        sparkle badge), refined cards (soft shadow, lift-on-hover, taller
+        image, bolder price), cleaner section styling.
+
+    ▸ Pricing math byte-identical to v119 (calcP/floorR/TIERS untouched).
+
+  V119 changes (from v118):
+
+    ▸ AI RECOMMENDER — search rebuilt to use REAL categories + tags:
+      • Words now resolve against the actual tag vocabulary, so "mug" finds
+        the real 'Cups & Mugs' tag, "bottle" → 'Bottles & Tumblers',
+        "charger" → 'Chargers & Powerbanks', "tote" → 'Tote & Jute Bags'.
+        The old hand-typed tag map that silently returned zero is gone.
+      • FUZZY matching: substring + Levenshtein-1 on tag/category words
+        (handles typos like "botle", plurals, partial words).
+      • FREE-TEXT product search: unrecognised words become a fuzzy
+        title/tag search (e.g. "diary", "thermos", "stanley").
+      • GRACEFUL fallback: zero results auto-relaxes the narrowest filter
+        (tag → colour → text) and shows "closest matches" instead of a
+        dead end.
+      • RESET icon (↺) in the search bar to start fresh in one tap.
+      • Results bar shows the in-stock count; one-tap "Add N to Quote"
+        adds all shown in-stock results to the Quote Builder.
+
+    ▸ Pricing math byte-identical to v118 (calcP/floorR/TIERS untouched).
+
+  V118 changes (from v117):
+
+    ▸ AI RECOMMENDER — levelled up (3 upgrades, no pricing impact):
+      1. OCCASION + RECIPIENT + REGION intelligence. parseNL now reads
+         occasion (Eid/Ramadan, UAE National Day, conference/GITEX,
+         onboarding, Diwali, Christmas), recipient (VIP/client, employees,
+         kids) and export region (non-UAE destinations) — shown as
+         removable chips and used to bias ranking. Export destinations
+         surface a Shipping-Team freight note.
+      2. EXPLAIN-THE-MATCH + STOCK/LEAD-TIME ranking. Each card shows why
+         it matched (in stock · within budget · Eid pick · fast …). "Best
+         match" now sorts by a real score (in-stock, occasion, budget,
+         premium, eco, colour, lead time). Urgent strongly favours
+         in-stock + fast items.
+      3. BUNDLE / GIFT-SET BUILDER. On set/gift/kit intent (or the Gift
+         Sets category) the recommender shows ready-made sets AND an
+         auto-composed set (drinkware + office + bag) fitted to budget,
+         with one-tap "Add set to Quote Builder".
+
+    ▸ Pricing math byte-identical to v117 (calcP/floorR/TIERS untouched).
+
   V117 changes (from v116):
 
     ▸ QUOTE BUILDER → SAVE. The multi-product Quote Builder tab now has a
@@ -6026,16 +6119,21 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
      - Add-to-Quote reuses window.addCurrentToQuote() (sets S.si + S.qty, restores).
      ═════════════════════════════════════════════════════════════════════════════════ -->
 <style>
-.aire-wrap{padding:22px 28px;max-width:1180px;margin:0 auto;font-family:inherit;color:#111}
-.aire-head{margin-bottom:14px;padding-bottom:14px;border-bottom:1.5px solid #f3f4f6}
-.aire-title{font-size:20px;font-weight:900;letter-spacing:-.2px;display:flex;align-items:center;gap:8px}
-.aire-sub{font-size:12px;color:#6b7280;margin-top:3px;line-height:1.5;max-width:680px}
+.aire-wrap{padding:24px 30px;max-width:1180px;margin:0 auto;font-family:inherit;color:#111}
+.aire-head{margin-bottom:16px}
+.aire-title{font-size:22px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:10px}
+.aire-title>span{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 10px rgba(22,163,74,.28)}
+.aire-sub{font-size:12.5px;color:#6b7280;margin-top:6px;line-height:1.5;max-width:680px}
 
-.aire-nlrow{position:relative;margin-bottom:10px}
-.aire-nlicon{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
-.aire-nlinp{width:100%;padding:12px 14px 12px 38px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:13.5px;font-family:inherit;box-sizing:border-box;color:#111;background:#fff;transition:border .15s}
-.aire-nlinp:focus{outline:none;border-color:#111}
-.aire-nlinp::placeholder{color:#9ca3af;font-style:italic}
+.aire-nlrow{position:relative;margin:4px 0 14px}
+.aire-nlicon{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:18px;pointer-events:none;opacity:.85}
+.aire-nlinp{width:100%;padding:15px 48px 15px 46px;border:2px solid #e5e7eb;border-radius:14px;font-size:15px;font-family:inherit;box-sizing:border-box;color:#111;background:#fff;transition:border .15s,box-shadow .15s;box-shadow:0 1px 3px rgba(0,0,0,.04);font-weight:500}
+.aire-nlinp:focus{outline:none;border-color:#16a34a;box-shadow:0 0 0 4px rgba(22,163,74,.12)}
+.aire-nlinp::placeholder{color:#9ca3af;font-style:italic;font-weight:400}
+.aire-reset{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:none;background:#f3f4f6;color:#6b7280;border-radius:7px;font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s,color .12s}
+.aire-reset:hover{background:#111;color:#fff}
+.aire-instk-n{color:#16a34a;font-weight:800}
+.aire-fbnote{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;margin-bottom:10px}
 
 .aire-parsed{margin-bottom:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 11px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .aire-parsed-lbl{font-size:10px;font-weight:800;color:#15803d;text-transform:uppercase;letter-spacing:.4px}
@@ -6067,10 +6165,21 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
 .aire-clear{padding:6px 10px;background:transparent;color:#6b7280;border:1px dashed #d1d5db;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
 .aire-clear:hover{background:#fff;color:#111;border-color:#111;border-style:solid}
 
-.aire-colrow{display:flex;gap:8px;flex-wrap:wrap}
-.aire-color{width:30px;height:30px;border-radius:50%;border:1.5px solid #e5e7eb;cursor:pointer;padding:0;transition:transform .12s, border .12s;outline:none}
-.aire-color:hover{transform:scale(1.1)}
-.aire-color.on{border:3px solid #16a34a}
+.aire-colhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.aire-colhead .aire-flbl{margin-bottom:0}
+.aire-colclear{padding:4px 10px;background:#fff;border:1px solid #e5e7eb;border-radius:7px;font-size:10px;font-weight:800;color:#dc2626;cursor:pointer;font-family:inherit;transition:all .12s;text-transform:uppercase;letter-spacing:.3px}
+.aire-colclear:hover{border-color:#dc2626;background:#fef2f2}
+.aire-colrow{display:flex;gap:11px;flex-wrap:wrap}
+.aire-color{width:36px;height:36px;border-radius:50%;border:2px solid #e5e7eb;cursor:pointer;padding:0;position:relative;transition:transform .12s,box-shadow .12s;outline:none}
+.aire-color:hover{transform:scale(1.14)}
+.aire-color.on{border-color:#fff;box-shadow:0 0 0 2px #fff,0 0 0 4px #111,0 2px 6px rgba(0,0,0,.25);transform:scale(1.08)}
+.aire-color.on::after{content:'\2713';position:absolute;top:-5px;right:-5px;width:17px;height:17px;background:#111;color:#fff;border-radius:50%;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.aire-colsel{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;padding-top:11px;border-top:1px dashed #e5e7eb}
+.aire-colselpill{display:inline-flex;align-items:center;gap:7px;padding:5px 10px;background:#fff;border:1.5px solid #e5e7eb;border-radius:16px;font-size:11.5px;font-weight:700;color:#111;cursor:pointer;transition:all .12s}
+.aire-colselpill:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2}
+.aire-colseldot{width:13px;height:13px;border-radius:50%;display:inline-block;flex-shrink:0}
+.aire-colselx{font-size:14px;font-weight:800;line-height:1;opacity:.5}
+.aire-colselpill:hover .aire-colselx{opacity:1}
 
 .aire-resbar{display:flex;justify-content:space-between;align-items:center;margin:14px 0 12px;gap:10px;flex-wrap:wrap}
 .aire-count{font-size:12px;color:#111;font-weight:700}
@@ -6080,9 +6189,9 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
 .aire-sort:hover{border-color:#111}
 
 .aire-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
-.aire-card{background:#fff;border:1.5px solid #e5e7eb;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:border .15s,transform .12s}
-.aire-card:hover{border-color:#111;transform:translateY(-1px)}
-.aire-thumb{background:#f9fafb;height:100px;display:flex;align-items:center;justify-content:center;font-size:36px;border-bottom:1px solid #f3f4f6;overflow:hidden}
+.aire-card{background:#fff;border:1px solid #ececec;border-radius:13px;overflow:hidden;display:flex;flex-direction:column;transition:border .15s,transform .15s,box-shadow .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.aire-card:hover{border-color:#16a34a;transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.09)}
+.aire-thumb{background:#f9fafb;height:118px;display:flex;align-items:center;justify-content:center;font-size:36px;border-bottom:1px solid #f3f4f6;overflow:hidden}
 .aire-thumb img{max-width:100%;max-height:100%;object-fit:contain}
 .aire-cbody{padding:9px 11px;flex:1;display:flex;flex-direction:column;gap:5px}
 .aire-ctop{display:flex;justify-content:space-between;align-items:flex-start;gap:5px}
@@ -6091,6 +6200,27 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
 .aire-stk.in{background:#dcfce7;color:#15803d}
 .aire-stk.oos{background:#fee2e2;color:#991b1b}
 .aire-cmeta{font-size:9.5px;color:#9ca3af;font-weight:600}
+/* v118: explain-the-match + bundles + export note */
+.aire-why{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.aire-whychip{font-size:8.5px;font-weight:800;letter-spacing:.2px;text-transform:uppercase;color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:1px 5px}
+.aire-region-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:9px;padding:9px 12px;font-size:12px;color:#1e3a8a;line-height:1.5;margin-bottom:10px}
+.aire-bundles{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.aire-bz-h{font-size:13px;font-weight:900;color:#92400e;margin-bottom:8px}
+.aire-bz-sub{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:#a16207;margin:8px 0 6px}
+.aire-bz-ready{display:flex;gap:8px;flex-wrap:wrap}
+.aire-bz-rcard{background:#fff;border:1px solid #fde68a;border-radius:9px;padding:7px 8px;display:flex;flex-direction:column;gap:6px;width:200px}
+.aire-bz-auto{background:#fff;border:1px solid #fde68a;border-radius:9px;padding:8px 10px}
+.aire-bz-item{display:flex;align-items:center;gap:8px;padding:4px 0}
+.aire-bz-th{width:30px;height:30px;border-radius:6px;background:#f9fafb;display:flex;align-items:center;justify-content:center;font-size:15px;overflow:hidden;flex-shrink:0}
+.aire-bz-th img{width:100%;height:100%;object-fit:cover}
+.aire-bz-nm{flex:1;min-width:0;font-size:11.5px;font-weight:600;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aire-bz-px{font-size:11px;font-weight:800;color:#92400e;white-space:nowrap}
+.aire-bz-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding-top:8px;border-top:1px solid #fef3c7;flex-wrap:wrap}
+.aire-bz-tot{font-size:11.5px;color:#78350f}
+.aire-bz-add{padding:5px 10px;font-size:10px}
+.aire-bundle-addall{padding:8px 14px;background:#92400e;color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+.aire-bundle-addall:hover{background:#78350f}
+.aire-bundle-addall.done{background:#16a34a}
 .aire-cdots{display:flex;gap:3px;flex-wrap:wrap;align-items:center;margin-top:2px}
 .aire-dot{width:11px;height:11px;border-radius:50%;border:1px solid #e5e7eb;display:inline-block;cursor:default;position:relative;transition:transform .12s}
 .aire-dot:hover{transform:scale(1.3);z-index:10}
@@ -6123,11 +6253,11 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
   z-index: 100;
 }
 
-.aire-cprice{display:flex;align-items:baseline;gap:4px;margin-top:3px}
-.aire-pxn{font-size:15px;font-weight:800;color:#111}
+.aire-cprice{display:flex;align-items:baseline;gap:4px;margin-top:4px}
+.aire-pxn{font-size:17px;font-weight:900;color:#111;letter-spacing:-.3px}
 .aire-pxu{font-size:10px;color:#6b7280;font-weight:600}
 .aire-cfoot{display:flex;align-items:center;gap:4px;font-size:9.5px;color:#6b7280;font-weight:600}
-.aire-add{margin-top:5px;width:100%;padding:6px;background:#111;color:#fff;border:none;border-radius:6px;font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.2px;transition:all .12s}
+.aire-add{margin-top:7px;width:100%;padding:8px;background:#111;color:#fff;border:none;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.2px;transition:all .12s}
 .aire-add:hover:not(:disabled){background:#16a34a}
 .aire-add:disabled{background:#e5e7eb;color:#9ca3af;cursor:not-allowed}
 .aire-add.done{background:#16a34a;color:#fff}
@@ -6300,6 +6430,8 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     nl: '',
     cat: '',
     tag: '',           /* tag-level filter (e.g. "Polos" inside "Tshirts & Polos")  */
+    q: '',             /* v119: free-text fuzzy remainder (product-name search)  */
+    kw: [],            /* v120.1: descriptive keywords for relevance ranking (e.g. "ceramic")  */
     bud: null,
     qty: 100,
     colors: {},
@@ -6312,7 +6444,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
   };
   
   function softReset(){
-    ST.nl=''; ST.cat=''; ST.tag=''; ST.bud=null; ST.qty=100;
+    ST.nl=''; ST.cat=''; ST.tag=''; ST.q=''; ST.kw=[]; ST.bud=null; ST.qty=100;
     ST.colors={}; ST.stock=false; ST.sort='match';
     ST.shown=12; ST.parsed={}; ST._fromNL={};
   }
@@ -6336,6 +6468,50 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
        Accessories', etc.). Fixed throughout. */
     var realCats = {};
     if(window.P) window.P.forEach(function(p){if(p.cat) realCats[p.cat.toLowerCase()] = p.cat;});
+
+    /* ── v119: resolve words against REAL tags/categories (substring + fuzzy).
+       Fixes the brittle hand-map where "mug" → tag 'Mugs' (which doesn't exist;
+       the real tag is 'Cups & Mugs'). Now any word is matched to whatever tag
+       actually exists in the data, so it never silently returns zero.  */
+    var realTags = {}, realTagCount = {};
+    if(window.P) window.P.forEach(function(p){ (p.tags||[]).forEach(function(t){ if(t){ var lt=t.toLowerCase(); realTags[lt]=t; realTagCount[lt]=(realTagCount[lt]||0)+1; } }); });
+    function _bestTag(keys){ var best=null,bn=-1; keys.forEach(function(k){ if((realTagCount[k]||0)>bn){ bn=realTagCount[k]; best=k; } }); return best?realTags[best]:null; }
+    function _realTagFor(want){
+      if(!want) return null;
+      var lw = String(want).toLowerCase().trim();
+      if(!lw) return null;
+      if(realTags[lw]){                                     /* exact — but a tiny straggler tag defers to a much richer tag that contains it (heals 'Chargers'→'Chargers & Powerbanks', 'Tumblers'→'Bottles & Tumblers', 'Awards'→'Trophies & Awards') */
+        var exC = realTagCount[lw]||0, rich=[]; var kk;
+        for(kk in realTags){ if(kk!==lw && kk.indexOf(lw)!==-1) rich.push(kk); }
+        if(rich.length && exC<=10){ var rb=_bestTag(rich); if(rb && (realTagCount[rb.toLowerCase()]||0) >= exC*3) return rb; }
+        return realTags[lw];
+      }
+      var k, c=[];
+      for(k in realTags){ if(lw.length>=3 && k.indexOf(lw)!==-1) c.push(k); }   /* tag contains word: mug → cups & mugs (prefer most-populous) */
+      if(c.length) return _bestTag(c);
+      var sing = lw.replace(/s$/,''); c=[];
+      if(sing !== lw){ for(k in realTags){ if(sing.length>=3 && k.indexOf(sing)!==-1) c.push(k); } }
+      if(c.length) return _bestTag(c);
+      c=[];
+      for(k in realTags){ var ws=k.split(/[^a-z0-9]+/); for(var wi=0; wi<ws.length; wi++){ if(ws[wi].length>=4 && levenshtein(sing, ws[wi])<=1){ c.push(k); break; } } }   /* fuzzy typo */
+      if(c.length) return _bestTag(c);
+      for(k in realTags){ if(k.length>=4 && lw.indexOf(k)!==-1) c.push(k); }     /* word contains tag */
+      if(c.length) return _bestTag(c);
+      return null;
+    }
+    function _realCatFor(want){
+      if(!want) return null;
+      var lw = String(want).toLowerCase().trim();
+      if(realCats[lw]) return realCats[lw];
+      var k;
+      for(k in realCats){ if(k.indexOf(lw) !== -1 && lw.length >= 3) return realCats[k]; }
+      for(k in realCats){ var ws=k.split(/[^a-z0-9]+/); for(var wi=0; wi<ws.length; wi++){ if(ws[wi].length>=4 && levenshtein(lw.replace(/s$/,''), ws[wi])<=1) return realCats[k]; } }
+      return null;
+    }
+    function _modalCatForTag(tag){
+      var c={}; window.P.forEach(function(p){ if(p.tags && p.tags.indexOf(tag)!==-1 && p.cat) c[p.cat]=(c[p.cat]||0)+1; });
+      var best=null,bn=-1; for(var k in c){ if(c[k]>bn){bn=c[k];best=k;} } return best;
+    }
     var catTagSyn = {
       /* Drinkware */
       'drinkware':       {cat:'drinkware'},
@@ -6563,12 +6739,12 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
              pair is atomic so we never end up with a tag that belongs to a
              different category than the one we set. */
           ST.parsed.cat = entryCat;
-          if(entry.tag) ST.parsed.tag = entry.tag;
+          if(entry.tag){ var _rt = _realTagFor(entry.tag); if(_rt) ST.parsed.tag = _rt; }
         } else if(ST.parsed.cat === entryCat){
           /* Same cat as already set — safe to fill in the tag from a more
              specific keyword (e.g. "drinkware mugs" → cat from "drinkware",
              then tag from "mugs"). */
-          if(!ST.parsed.tag && entry.tag) ST.parsed.tag = entry.tag;
+          if(!ST.parsed.tag && entry.tag){ var _rt2 = _realTagFor(entry.tag); if(_rt2) ST.parsed.tag = _rt2; }
         }
         /* else: keyword maps to a DIFFERENT category than the one we set
            (rare — usually means the user's prompt is ambiguous). Skip it
@@ -6576,6 +6752,57 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
         if(ST.parsed.cat && ST.parsed.tag) break;
       }
     }
+
+    /* ── v119: token-level match against REAL tags/categories (covers words
+       the curated map misses, and keeps cat+tag consistent so we never
+       produce a zero-result cat/tag mismatch).  */
+    var _STOP = {the:1,and:1,for:1,with:1,our:1,your:1,need:1,want:1,some:1,want:1,looking:1,please:1,under:1,below:1,max:1,around:1,about:1,aed:1,dhs:1,per:1,unit:1,units:1,people:1,persons:1,pcs:1,pieces:1,guests:1,attendees:1,employees:1,staff:1,members:1,team:1,gift:1,gifts:1,set:1,sets:1,give:1,buy:1,order:1};
+    var _toks = s.trim().split(/\s+/).filter(function(w){ return w.length >= 3 && !_STOP[w] && !/^\d+$/.test(w); });
+    for(var tk=0; tk<_toks.length && !ST.parsed.tag; tk++){
+      var rtag = _realTagFor(_toks[tk]);
+      if(rtag){
+        var mc = _modalCatForTag(rtag);
+        if(!ST.parsed.cat){ if(mc) ST.parsed.cat = mc; ST.parsed.tag = rtag; }
+        else if(ST.parsed.cat === mc){ ST.parsed.tag = rtag; }
+      }
+    }
+    if(!ST.parsed.cat){
+      for(var tc=0; tc<_toks.length && !ST.parsed.cat; tc++){
+        var rcat = _realCatFor(_toks[tc]);
+        if(rcat) ST.parsed.cat = rcat;
+      }
+    }
+
+    /* ── v121.1: PHRASE / TITLE RELEVANCE WINS over a greedy single-token tag.
+       "short sleeve" must surface Short Sleeve T-shirts, not be hijacked by
+       "short" → Shorts. If every descriptive word in the query appears in real
+       product TITLES, that interpretation beats the tag guess: drop the tag,
+       set a free-text title search, and keep the category only if the matched
+       products are concentrated in one. */
+    (function(){
+      var COLW = {}; if(window.ML_COLORS){ for(var c in window.ML_COLORS){ COLW[c.toLowerCase()]=1; (window.ML_COLORS[c].m||[]).forEach(function(m){ COLW[m.toLowerCase()]=1; }); } }
+      var INT = {client:1,clients:1,customer:1,customers:1,partner:1,partners:1,vip:1,executive:1,executives:1,staff:1,employee:1,employees:1,team:1,gift:1,gifts:1,kit:1,kits:1,bundle:1,hamper:1,premium:1,luxury:1,eco:1,sustainable:1,urgent:1,fast:1,asap:1,quick:1,soon:1,rush:1,express:1,stock:1,available:1,cheap:1,quality:1};
+      var mt = _toks.filter(function(w){ return !COLW[w] && !INT[w]; });
+      if(mt.length < 2) return;
+      var stem = function(w){ return w.replace(/s$/,''); };
+      var matched = [], catc = {}, tot = 0;
+      for(var i=0; i<window.P.length; i++){
+        var p = window.P[i];
+        if(p.type === 'D' || !p.web) continue;
+        var tl = (p.title||'').toLowerCase();
+        if(mt.every(function(w){ return tl.indexOf(w) !== -1 || tl.indexOf(stem(w)) !== -1; })){
+          matched.push(p); tot++;
+          if(p.cat) catc[p.cat] = (catc[p.cat]||0) + 1;
+        }
+      }
+      if(!matched.length) return;
+      delete ST.parsed.tag;                 /* the greedy tag (e.g. Shorts) was wrong */
+      var bestCat=null, bn=-1; for(var k in catc){ if(catc[k]>bn){ bn=catc[k]; bestCat=k; } }
+      if(bestCat && bn/tot >= 0.8) ST.parsed.cat = bestCat; else delete ST.parsed.cat;
+      ST.parsed.q  = mt.join(' ');
+      ST.parsed.kw = mt;
+      ST._phrase = true;
+    })();
     
     /* Premium intent — flag it for downstream (no UI control today, but stored) */
     if(/\b(premium|luxury|luxe|high[- ]end|exec(?:utive)?|deluxe|elegant)\b/i.test(s)) ST.parsed.premium = true;
@@ -6633,6 +6860,72 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       }
     }
     if(firstColor) ST.parsed.colors = [firstColor];
+
+    /* ── v118: occasion / recipient / region / bundle intelligence ── */
+    var OCC = [
+      {key:'eid', label:'Eid / Ramadan', re:/\b(eid|ramadan|ramzan|iftar|suhoor)\b/i,
+        tags:['Chocolates','Dates','Candles','Gift Boxes','Premium'], cats:['Food & Candy','Home & Wellness','Gift Sets'],
+        kw:['bukhoor','oudh','oud','prayer','arabic','qahwa','dates','tasbih','attar','incense','bakhoor'], premium:true},
+      {key:'nationalday', label:'UAE National Day', re:/\b(national day|flag day|uae day|union day|commemoration day)\b/i,
+        tags:[], cats:[], kw:['uae','flag','emirat','falcon','camel','ghaf','sadu'], colors:['Red']},
+      {key:'conference', label:'Conference / Event', re:/\b(conference|exhibition|expo|gitex|summit|trade ?show|seminar|booth|convention|event)\b/i,
+        tags:['Lanyards','Notebooks','Pens','Totes'], cats:['Office & Accessories','Bags & Totebags','Travel & Tech','Tradeshow & Exhibitions'], kw:[]},
+      {key:'onboarding', label:'Onboarding / Welcome', re:/\b(onboard(?:ing)?|welcome kit|welcome pack|new hire|new joiner|new employee|induction|starter kit)\b/i,
+        tags:['Office Sets','Notebooks','Pens'], cats:['Gift Sets','Office & Accessories'], kw:['welcome','onboard']},
+      {key:'diwali', label:'Diwali', re:/\b(diwali|deepavali)\b/i,
+        tags:['Chocolates','Candles','Gift Boxes'], cats:['Gift Sets','Food & Candy'], kw:[]},
+      {key:'christmas', label:'Christmas', re:/\b(christmas|xmas|holiday season|festive|new year)\b/i,
+        tags:[], cats:[], kw:['christmas','santa','festive']}
+    ];
+    for(var oi=0; oi<OCC.length; oi++){
+      if(OCC[oi].re.test(s)){
+        ST.parsed.occasion = OCC[oi];
+        if(OCC[oi].premium) ST.parsed.premium = true;
+        if(OCC[oi].colors && !ST.parsed.colors) ST.parsed.colors = [OCC[oi].colors[0]];
+        break;
+      }
+    }
+
+    /* recipient */
+    if(/\b(vip|vips|executives?|exec|c[- ]?suite|leadership|directors?|ceo|board|clients?|customers?|partners?|delegates?|guests?)\b/i.test(s)){
+      ST.parsed.recipient = {key:'vip', label:'VIP / Client'}; ST.parsed.premium = true;
+    } else if(/\b(employee|employees|staff|team|workforce|colleagues?)\b/i.test(s)){
+      ST.parsed.recipient = {key:'staff', label:'Employees'};
+    } else if(/\b(kid|kids|child|children|baby|babies|school)\b/i.test(s)){
+      ST.parsed.recipient = {key:'kids', label:'Kids', cat:'Kids & Children'};
+    }
+
+    /* region — export awareness */
+    var EXPORT = /\b(saudi|ksa|riyadh|jeddah|dammam|qatar|doha|kuwait|bahrain|manama|oman|muscat|india|mumbai|delhi|uk|london|usa|america|egypt|cairo|africa|europe|export|overseas|international|abroad)\b/i;
+    var LOCAL  = /\b(uae|dubai|abu ?dhabi|sharjah|ajman|fujairah|emirates?|local|in country|domestic)\b/i;
+    var em = s.match(EXPORT);
+    if(em && !LOCAL.test(s)){ ST.parsed.region = {name: em[0].trim(), intl:true}; }
+
+    /* bundle / gift-set intent */
+    if(/\b(bundle|gift ?sets?|hamper|kit|welcome kit|goodie bag|gift pack|combo|set of \d|gift box)\b/i.test(s)) ST.parsed.bundle = true;
+    if(ST.parsed.occasion && (ST.parsed.occasion.key==='onboarding' || ST.parsed.occasion.key==='eid' || ST.parsed.occasion.key==='diwali')) ST.parsed.bundle = true;
+
+    /* ── v120.1: descriptive keywords (e.g. "ceramic" in "ceramic mugs for client").
+       Strip everything already understood (category, tag, colours, occasion,
+       recipient, region, intent words) — what remains describes the product and
+       drives relevance ranking so the literal match ranks first. If we never
+       matched a category, the same words also drive a free-text fuzzy search. */
+    var _used = {};
+    function _eat(str){ if(!str) return; String(str).toLowerCase().split(/[^a-z0-9]+/).forEach(function(w){ if(w){ _used[w]=1; _used[w.replace(/s$/,'')]=1; } }); }
+    _eat(ST.parsed.cat); _eat(ST.parsed.tag);
+    if(ST.parsed.colors) ST.parsed.colors.forEach(_eat);
+    if(ST.parsed.occasion){ _eat(ST.parsed.occasion.label); (ST.parsed.occasion.kw||[]).forEach(_eat); }
+    if(ST.parsed.recipient) _eat(ST.parsed.recipient.label);
+    if(ST.parsed.region) _eat(ST.parsed.region.name);
+    if(window.ML_COLORS){ for(var _cn in window.ML_COLORS){ _used[_cn.toLowerCase()]=1; (window.ML_COLORS[_cn].m||[]).forEach(function(m){ _used[m.toLowerCase()]=1; }); } }
+    var _intent = {client:1,clients:1,customer:1,customers:1,partner:1,partners:1,delegate:1,delegates:1,guest:1,guests:1,vip:1,vips:1,executive:1,executives:1,exec:1,staff:1,employee:1,employees:1,team:1,kids:1,child:1,children:1,gift:1,gifts:1,set:1,sets:1,kit:1,kits:1,bundle:1,hamper:1,combo:1,premium:1,luxury:1,luxe:1,eco:1,sustainable:1,'eco-friendly':1,urgent:1,fast:1,asap:1,quick:1,soon:1,rush:1,express:1,stock:1,available:1,under:1,below:1,max:1,around:1,about:1,budget:1,cheap:1,need:1,want:1,looking:1,for:1,with:1,the:1,and:1,our:1,your:1,people:1,persons:1,pcs:1,pieces:1,units:1,members:1,aed:1,dhs:1};
+    var _kw = _toks.filter(function(w){
+      if(_used[w] || _used[w.replace(/s$/,'')]) return false;
+      if(_intent[w] || _STOP[w]) return false;
+      return w.length >= 3;
+    });
+    if(_kw.length) ST.parsed.kw = _kw;
+    if(!ST.parsed.cat && !ST.parsed.tag && _kw.length) ST.parsed.q = _kw.join(' ');
   }
   
   /* applyParsed now tracks WHICH filters were set by the NL parser
@@ -6663,6 +6956,17 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       ST.tag = '';
       delete ST._fromNL.tag;
     }
+
+    /* free-text (v119) */
+    if(ST.parsed.q){
+      ST.q = ST.parsed.q;
+      ST._fromNL.q = true;
+    } else if(ST._fromNL.q){
+      ST.q = '';
+      delete ST._fromNL.q;
+    }
+    /* descriptive keywords (v120.1) — always refreshed from the parse */
+    ST.kw = (ST.parsed.kw && ST.parsed.kw.length) ? ST.parsed.kw.slice() : [];
     
     /* budget */
     if(ST.parsed.budget != null){
@@ -6715,11 +7019,17 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     if(!ST._fromNL) ST._fromNL = {};
     if(key === 'cat'){ ST.cat = ''; delete ST.parsed.cat; delete ST._fromNL.cat; }
     else if(key === 'tag'){ ST.tag = ''; delete ST.parsed.tag; delete ST._fromNL.tag; }   
+    else if(key === 'q'){ ST.q = ''; delete ST.parsed.q; delete ST._fromNL.q; }
+    else if(key === 'kw'){ ST.kw = []; delete ST.parsed.kw; }
     else if(key === 'budget'){ ST.bud = null; delete ST.parsed.budget; delete ST._fromNL.bud; }
     else if(key === 'qty'){ ST.qty = 100; delete ST.parsed.qty; delete ST._fromNL.qty; }
     else if(key === 'stock'){ ST.stock = false; delete ST.parsed.stock; delete ST._fromNL.stock; }
     else if(key === 'urgent'){ ST.sort = 'match'; delete ST.parsed.urgent; delete ST._fromNL.sort; }
     else if(key === 'premium'){ delete ST.parsed.premium; }   
+    else if(key === 'occasion'){ delete ST.parsed.occasion; delete ST.parsed.bundle; }
+    else if(key === 'recipient'){ delete ST.parsed.recipient; }
+    else if(key === 'region'){ delete ST.parsed.region; }
+    else if(key === 'bundle'){ delete ST.parsed.bundle; }
     else if(key.indexOf('color:') === 0){
       var c = key.split(':')[1];
       delete ST.colors[c];
@@ -6755,6 +7065,16 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       if(ST.tag && (!p.tags || p.tags.indexOf(ST.tag) === -1)) return false;
       if(ST.stock && !_inStock(p)) return false;
       if(ST.bud != null && parseFloat(p.web) > ST.bud) return false;
+      if(ST.q){
+        var qws = ST.q.toLowerCase().split(/\s+/).filter(Boolean);
+        var hay = (p.title + ' ' + (p.tags||[]).join(' ') + ' ' + (p.cat||'')).toLowerCase();
+        var okq = qws.every(function(qw){
+          if(hay.indexOf(qw) !== -1) return true;
+          if(qw.length >= 4){ var hw = hay.split(/[^a-z0-9]+/); for(var hi=0; hi<hw.length; hi++){ if(hw[hi].length>=4 && levenshtein(qw, hw[hi])<=1) return true; } }
+          return false;
+        });
+        if(!okq) return false;
+      }
       if(activeColors.length){
         /* ALL Softline (type='A') products are manufactured-to-order in any
            colour — fabric apparel where the dye is part of production, not
@@ -6795,12 +7115,16 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       case 'lead': arr.sort(function(a,b){return (a.tl||999) - (b.tl||999);}); break;
       case 'moq':  arr.sort(function(a,b){return (a.moq||999) - (b.moq||999);}); break;
       default:
-        /* 'match' — always float in-stock to the top so the user's
-           first row is always actionable. Stable within each tier.  */
+        /* 'match' — v118: rank by computed match score (in-stock, occasion,
+           budget, premium, eco, colour, lead time), then in-stock, then lead.  */
+        var sm = {};
+        arr.forEach(function(p){ sm[p.sku] = scoreProduct(p).score; });
         arr.sort(function(a,b){
+          var d = (sm[b.sku]||0) - (sm[a.sku]||0);
+          if(d !== 0) return d;
           var ai = _inStock(a)?0:1, bi = _inStock(b)?0:1;
           if(ai !== bi) return ai - bi;
-          return 0;
+          return (a.tl||999) - (b.tl||999);
         });
     }
     return arr;
@@ -6840,11 +7164,15 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     var items = [];
     if(ST.parsed.cat)    items.push({k:'cat',    l:'\uD83D\uDCE6 '+he(ST.parsed.cat)});
     if(ST.parsed.tag)    items.push({k:'tag',    l:'\uD83C\uDFF7\uFE0F '+he(ST.parsed.tag)});  
+    if(ST.parsed.q)      items.push({k:'q',      l:'\uD83D\uDD0D \u201C'+he(ST.parsed.q)+'\u201D'});
+    else if(ST.parsed.kw && ST.parsed.kw.length) items.push({k:'kw', l:'\uD83D\uDD0D '+he(ST.parsed.kw.join(' '))});
     if(ST.parsed.budget) items.push({k:'budget', l:'\uD83D\uDCB0 \u2264 '+ST.parsed.budget+' AED'});
     if(ST.parsed.qty)    items.push({k:'qty',    l:'\uD83D\uDC65 '+ST.parsed.qty+' units'});
     if(ST.parsed.urgent) items.push({k:'urgent', l:'\u26A1 Urgent (sort by lead time)'});
     if(ST.parsed.stock)  items.push({k:'stock',  l:'\u2713 In-stock only'});
-    if(ST.parsed.premium) items.push({k:'premium', l:'\u2728 Premium feel'});   
+    if(ST.parsed.occasion) items.push({k:'occasion', l:'\uD83C\uDF89 '+he(ST.parsed.occasion.label)});
+    if(ST.parsed.recipient) items.push({k:'recipient', l:'\uD83C\uDFAF '+he(ST.parsed.recipient.label)});
+    if(ST.parsed.region && ST.parsed.region.intl) items.push({k:'region', l:'\uD83C\uDF0D '+he(ST.parsed.region.name)+' \u00B7 export'});
     if(ST.parsed.colors) ST.parsed.colors.forEach(function(c){
       items.push({k:'color:'+c, l:'\uD83C\uDFA8 '+c});
     });
@@ -6877,6 +7205,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       + '<div class="aire-cbody">'
       +   '<div class="aire-ctop"><div class="aire-cname">'+he(p.title)+'</div>'+stkBadge+'</div>'
       +   '<div class="aire-cmeta">'+he(p.sku)+' \u00B7 '+he(p.sup||'\u2014')+'</div>'
+      +   (function(){ var rs=scoreProduct(p).reasons; return rs.length ? '<div class="aire-why">'+rs.slice(0,4).map(function(r){return '<span class="aire-whychip">'+he(r)+'</span>';}).join('')+'</div>' : ''; })()
       +   (cols.length ? '<div class="aire-cdots">' + cols.map(function(c){
             /* same tooltip-text logic as Calculator strip  */
             var label=c.bucket;
@@ -6923,13 +7252,138 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       + '</div>';
   }
   
+  /* ════════════════════════════════════════════════════════════
+     v118: MATCH SCORING + BUNDLE BUILDER
+     ════════════════════════════════════════════════════════════ */
+  function scoreProduct(p){
+    var sc = 0, reasons = [];
+    var inSt = _inStock(p);
+    if(inSt) sc += 3;   /* rank boost only — the IN STOCK badge already shows this, no duplicate chip */
+
+    /* v120.1: literal descriptive keywords (e.g. "ceramic" in "ceramic mugs")
+       are the STRONGEST signal so the exact thing searched ranks first. */
+    if(ST.kw && ST.kw.length){
+      var hay = (p.title + ' ' + (p.tags||[]).join(' ')).toLowerCase();
+      var hw = null;
+      ST.kw.forEach(function(k){
+        if(!k) return;
+        if(hay.indexOf(k) !== -1){ sc += 6; if(reasons.indexOf(k)===-1) reasons.push(k); return; }
+        if(k.length >= 4){
+          if(!hw) hw = hay.split(/[^a-z0-9]+/);
+          for(var i=0; i<hw.length; i++){ if(hw[i].length>=4 && levenshtein(k, hw[i])<=1){ sc += 5; if(reasons.indexOf(k)===-1) reasons.push(k); break; } }
+        }
+      });
+    }
+
+    if(ST.bud != null && parseFloat(p.web) <= ST.bud){ sc += 2; reasons.push('within budget'); }
+    var occ = ST.parsed.occasion;
+    if(occ){
+      var hit = false;
+      if(occ.cats && occ.cats.indexOf(p.cat) !== -1) hit = true;
+      if(!hit && occ.tags && p.tags){ for(var t=0; t<occ.tags.length; t++){ if(p.tags.indexOf(occ.tags[t]) !== -1){ hit = true; break; } } }
+      if(!hit && occ.kw){ var tl=(p.title||'').toLowerCase(); for(var k=0; k<occ.kw.length; k++){ if(tl.indexOf(occ.kw[k]) !== -1){ hit = true; break; } } }
+      if(hit){ sc += 4; reasons.push(occ.label.split(' ')[0]+' pick'); }
+    }
+    var rec = ST.parsed.recipient;
+    if(rec && rec.cat && p.cat === rec.cat){ sc += 3; reasons.push(rec.label.toLowerCase()); }
+    var ecoWanted = /\b(eco|sustainab|recycl|bamboo|organic)\b/i.test(ST.nl||'');
+    if(ecoWanted && p.tags && (p.tags.indexOf('Eco-Friendly')!==-1 || p.tags.indexOf('Eco-friendly')!==-1)){ sc += 2; reasons.push('eco-friendly'); }
+    var activeColors = Object.keys(ST.colors).filter(function(c){return ST.colors[c];});
+    if(activeColors.length){ sc += 1; reasons.push(activeColors[0].toLowerCase()); }
+    if((p.tl||99) <= 4){ sc += (ST.parsed.urgent ? 3 : 1); reasons.push('fast'); }
+    else if(ST.parsed.urgent && inSt){ sc += 1; }
+    return {score: sc, reasons: reasons};
+  }
+
+  function _bundleCheapestInCat(cat){
+    var cands = window.P.filter(function(p){ return p.type!=='D' && p.cat===cat && parseFloat(p.web)>0; });
+    if(ST.bud != null){ var within = cands.filter(function(p){ return parseFloat(p.web) <= ST.bud; }); if(within.length) cands = within; }
+    cands.sort(function(a,b){
+      var ai=_inStock(a)?0:1, bi=_inStock(b)?0:1; if(ai!==bi) return ai-bi;
+      return (parseFloat(a.web)||0) - (parseFloat(b.web)||0);
+    });
+    return cands[0] || null;
+  }
+  function buildAutoBundle(){
+    var slots = ['Drinkware','Office & Accessories','Bags & Totebags'];
+    var items = [];
+    slots.forEach(function(c){ var p = _bundleCheapestInCat(c); if(p) items.push(p); });
+    if(items.length < 2) return null;
+    if(ST.bud != null){
+      var sum = function(){ return items.reduce(function(s,p){ return s + (parseFloat(priceAt(p, ST.qty))||0); }, 0); };
+      while(items.length > 2 && sum() > ST.bud){
+        items.sort(function(a,b){ return (parseFloat(priceAt(b,ST.qty))||0) - (parseFloat(priceAt(a,ST.qty))||0); });
+        items.shift();
+      }
+    }
+    return items;
+  }
+  function _bundleCard(p, perUnit){
+    var img = (window.ICACHE||{})[p.sku];
+    var ic = img ? '<img src="'+he(img)+'" alt="" onerror="this.parentNode.innerHTML=\'\\uD83C\\uDF81\'">' : '\uD83C\uDF81';
+    return '<div class="aire-bz-item"><span class="aire-bz-th" data-sku-img="'+he(p.sku)+'">'+ic+'</span>'
+      + '<span class="aire-bz-nm">'+he(p.title)+'</span>'
+      + '<span class="aire-bz-px">AED '+priceAt(p, ST.qty)+'</span></div>';
+  }
+  function renderBundles(){
+    if(!(ST.parsed.bundle || ST.cat === 'Gift Sets')) return '';
+    var html = '<div class="aire-bundles"><div class="aire-bz-h">\uD83C\uDF81 Gift-set ideas</div>';
+
+    /* Ready-made sets from the catalogue */
+    var ready = window.P.filter(function(p){ return p.type!=='D' && p.cat==='Gift Sets' && parseFloat(p.web)>0 && (ST.bud==null || parseFloat(p.web)<=ST.bud); });
+    ready.sort(function(a,b){ var ai=_inStock(a)?0:1, bi=_inStock(b)?0:1; if(ai!==bi) return ai-bi; return scoreProduct(b).score - scoreProduct(a).score; });
+    ready = ready.slice(0, 3);
+    if(ready.length){
+      html += '<div class="aire-bz-sub">Ready-made sets</div><div class="aire-bz-ready">'
+        + ready.map(function(p){
+            var inSt=_inStock(p);
+            return '<div class="aire-bz-rcard" data-sku="'+he(p.sku)+'">'
+              + _bundleCard(p)
+              + '<button class="aire-add aire-bz-add" data-add-sku="'+he(p.sku)+'" '+(inSt?'':'disabled')+'>+ Add</button></div>';
+          }).join('')
+        + '</div>';
+    }
+
+    /* Auto-composed bundle */
+    var auto = buildAutoBundle();
+    if(auto && auto.length >= 2){
+      var perSet = auto.reduce(function(s,p){ return s + (parseFloat(priceAt(p, ST.qty))||0); }, 0);
+      var skus = auto.map(function(p){ return p.sku; }).join(',');
+      html += '<div class="aire-bz-sub">Build-a-set'+(ST.bud!=null?' (within AED '+ST.bud+')':'')+'</div>'
+        + '<div class="aire-bz-auto">'
+        +   auto.map(function(p){ return _bundleCard(p); }).join('')
+        +   '<div class="aire-bz-foot">'
+        +     '<div class="aire-bz-tot">Set total <strong>AED '+perSet.toFixed(1)+'</strong> / unit \u00B7 '+auto.length+' items @ '+ST.qty+'</div>'
+        +     '<button class="aire-bundle-addall" data-bundle-add="'+he(skus)+'">+ Add set to Quote Builder</button>'
+        +   '</div>'
+        + '</div>';
+    }
+    html += '</div>';
+    return html;
+  }
+
   function renderAIRE(host){
     var list = sortList(filteredList());
+
+    /* v119: graceful fallback — if nothing matched, relax the narrowest filter
+       (tag, then colour, then free-text) and show closest matches, not a dead end. */
+    var fbNote = '';
+    if(list.length === 0){
+      if(ST.tag){ var _st=ST.tag; ST.tag=''; var _f=sortList(filteredList()); ST.tag=_st; if(_f.length){ list=_f; fbNote='No exact \u201C'+he(_st)+'\u201D match \u2014 showing closest in '+he(ST.cat||'the catalogue'); } }
+      if(list.length === 0 && Object.keys(ST.colors).length){ var _sc=ST.colors; ST.colors={}; var _f2=sortList(filteredList()); ST.colors=_sc; if(_f2.length){ list=_f2; fbNote='No match in that colour \u2014 showing closest options'; } }
+      if(list.length === 0 && ST.q){ var _sq=ST.q; ST.q=''; var _f3=sortList(filteredList()); ST.q=_sq; if(_f3.length){ list=_f3; fbNote='No match for \u201C'+he(_sq)+'\u201D \u2014 showing closest'; } }
+    }
     var visible = list.slice(0, ST.shown);
     var hasMore = list.length > ST.shown;
-    
+    var inStockN = list.filter(_inStock).length;
+    var activeColors = Object.keys(ST.colors).filter(function(c){return ST.colors[c];});
+    var colSelHtml = activeColors.map(function(c){
+      var def = window.ML_COLORS[c] || {h:'#ccc'};
+      return '<span class="aire-colselpill" data-colrm="'+he(c)+'"><span class="aire-colseldot" style="background:'+def.h+(c==='White'?';box-shadow:inset 0 0 0 1px #e5e7eb':'')+'"></span>'+he(c)+'<span class="aire-colselx">\u00D7</span></span>';
+    }).join('');
+
     var parsedHtml = renderParsedChips(list.length);
-    var anyParsed = !!(ST.parsed.cat || ST.parsed.tag || ST.parsed.budget || ST.parsed.qty || ST.parsed.urgent || ST.parsed.stock || ST.parsed.premium || (ST.parsed.colors && ST.parsed.colors.length));
+    var anyParsed = !!(ST.parsed.cat || ST.parsed.tag || ST.parsed.q || ST.parsed.kw && ST.parsed.kw.length || ST.parsed.budget || ST.parsed.qty || ST.parsed.urgent || ST.parsed.stock || ST.parsed.premium || ST.parsed.occasion || ST.parsed.recipient || ST.parsed.region || (ST.parsed.colors && ST.parsed.colors.length));
     var showSuggestions = !ST.nl.trim() && !anyParsed;   
     
     host.innerHTML = ''
@@ -6940,7 +7394,8 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       +   '</div>'
       +   '<div class="aire-nlrow">'
       +     '<span class="aire-nlicon">\uD83E\uDE84</span>'
-      +     '<input class="aire-nlinp" id="aire-nl" type="text" placeholder="e.g. green bottles under 30 AED for 200 people, urgent" value="'+he(ST.nl)+'" />'
+      +     '<input class="aire-nlinp" id="aire-nl" type="text" placeholder="e.g. blue mugs under 30 AED for 200 people, urgent" value="'+he(ST.nl)+'" />'
+      +     '<button class="aire-reset" id="aire-reset" type="button" title="Reset \u2014 start fresh" aria-label="Reset">\u21BB</button>'
       +   '</div>'
       +   (showSuggestions ? renderSuggestionRow() : '')
       +   (parsedHtml ? '<div class="aire-parsed" id="aire-parsed">'+parsedHtml+'</div>' : '<div id="aire-parsed" style="display:none"></div>')
@@ -6955,11 +7410,17 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       +     '</div>'
       +   '</div>'
       +   '<div class="aire-colours">'
-      +     '<div class="aire-flbl">Colour <span class="aire-flbl-sub">(pick one \u00B7 click again to clear)</span></div>'
+      +     '<div class="aire-colhead">'
+      +       '<div class="aire-flbl">Colour <span class="aire-flbl-sub">(tap to toggle \u00B7 pick any)</span></div>'
+      +       (activeColors.length ? '<button class="aire-colclear" id="aire-colclear" type="button">Clear '+activeColors.length+' colour'+(activeColors.length>1?'s':'')+'</button>' : '')
+      +     '</div>'
       +     '<div class="aire-colrow" id="aire-colrow">' + renderColorChips() + '</div>'
+      +     (activeColors.length ? '<div class="aire-colsel" id="aire-colsel">' + colSelHtml + '</div>' : '')
       +   '</div>'
+      +   (ST.parsed.region && ST.parsed.region.intl ? '<div class="aire-region-note">\uD83C\uDF0D <strong>Export order'+(ST.parsed.region.name?' \u00B7 '+he(ST.parsed.region.name):'')+'</strong> \u2014 international freight is quoted separately by the Shipping Team; prices shown exclude shipping.</div>' : '')
+      +   renderBundles()
       +   '<div class="aire-resbar">'
-      +     '<div class="aire-count">' + list.length + ' product' + (list.length===1?'':'s') + '</div>'
+      +     '<div class="aire-count">' + list.length + ' product' + (list.length===1?'':'s') + (inStockN?' \u00B7 <span class="aire-instk-n">'+inStockN+' in stock</span>':'') + '</div>'
       +     '<div class="aire-sortwrap">'
       +       '<span>Sort by</span>'
       +       '<select class="aire-ctrl aire-sort" id="aire-sort">'
@@ -6971,6 +7432,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       +       '</select>'
       +     '</div>'
       +   '</div>'
+      +   (fbNote ? '<div class="aire-fbnote">\u21AA '+fbNote+'</div>' : '')
       +   (list.length
         ? '<div class="aire-grid">' + visible.map(renderCard).join('') + '</div>'
           + (hasMore ? '<div class="aire-more-wrap"><button class="aire-more" id="aire-more">See more (' + (list.length - ST.shown) + ' more)</button></div>' : '')
@@ -7110,6 +7572,14 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       softReset();
       renderAIRE(host);
     });
+
+    /* v119: reset icon — same as Clear all, reachable from the search row */
+    var resetBtn = host.querySelector('#aire-reset');
+    if(resetBtn) resetBtn.addEventListener('click', function(){
+      softReset();
+      renderAIRE(host);
+      refocus(host, 'aire-nl', 0);
+    });
     
     var more = host.querySelector('#aire-more');
     if(more) more.addEventListener('click', function(){
@@ -7122,14 +7592,29 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       var btn = e.target.closest('.aire-color');
       if(!btn) return;
       var c = btn.dataset.color;
-      /* single-select — clicking a colour clears others; click again to deselect  */
-      if(ST.colors[c]){
-        ST.colors = {};
-      } else {
-        ST.colors = {};
-        ST.colors[c] = true;
-      }
+      /* v120: multi-select — tap to toggle each colour on/off */
+      if(ST.colors[c]){ delete ST.colors[c]; } else { ST.colors[c] = true; }
       if(ST._fromNL) delete ST._fromNL.colors;   
+      ST.shown = 12;
+      renderAIRE(host);
+    });
+
+    /* v120: clear all selected colours */
+    var colClear = host.querySelector('#aire-colclear');
+    if(colClear) colClear.addEventListener('click', function(){
+      ST.colors = {};
+      if(ST._fromNL) delete ST._fromNL.colors;
+      ST.shown = 12;
+      renderAIRE(host);
+    });
+
+    /* v120: remove one colour via its selected-pill */
+    var colSel = host.querySelector('#aire-colsel');
+    if(colSel) colSel.addEventListener('click', function(e){
+      var pill = e.target.closest('[data-colrm]');
+      if(!pill) return;
+      delete ST.colors[pill.dataset.colrm];
+      if(ST._fromNL && !Object.keys(ST.colors).length) delete ST._fromNL.colors;
       ST.shown = 12;
       renderAIRE(host);
     });
@@ -7179,6 +7664,29 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
       var orig = addBtn.innerHTML;
       addBtn.innerHTML = '\u2713 Added';
       setTimeout(function(){ addBtn.classList.remove('done'); addBtn.innerHTML = orig; }, 1500);
+    });
+
+    /* v118: Add whole auto-composed set to Quote Builder */
+    host.addEventListener('click', function(e){
+      var setBtn = e.target.closest('[data-bundle-add]');
+      if(!setBtn || setBtn.classList.contains('done')) return;
+      var skus = (setBtn.dataset.bundleAdd || '').split(',').filter(Boolean);
+      if(!skus.length) return;
+      if(typeof window.S === 'undefined' || typeof window.addCurrentToQuote !== 'function') return;
+      var origSi = window.S.si, origQty = window.S.qty;
+      var added = 0;
+      skus.forEach(function(sku){
+        var idx = -1;
+        if(window.P) for(var i=0; i<window.P.length; i++){ if(window.P[i].sku === sku){ idx = i; break; } }
+        if(idx < 0) return;
+        window.S.si = idx; window.S.qty = ST.qty;
+        try{ window.addCurrentToQuote(); added++; }catch(err){ console.error('[v118 bundle add]', err); }
+      });
+      window.S.si = origSi; window.S.qty = origQty;
+      setBtn.classList.add('done');
+      var orig = setBtn.innerHTML;
+      setBtn.innerHTML = '\u2713 Added '+added+' to Quote Builder';
+      setTimeout(function(){ setBtn.classList.remove('done'); setBtn.innerHTML = orig; }, 1800);
     });
   }
   
