@@ -1,8 +1,134 @@
 <!DOCTYPE html>
 <!--
   ═══════════════════════════════════════════════════════════════════════
-  MERCHLIST — Pricing Engine v123
+  MERCHLIST — Pricing Engine v130
   ═══════════════════════════════════════════════════════════════════════
+  V130 changes (from v128):
+
+    ▸ COUNTRY DESTINATION = SEARCH (not a dropdown). Top bar shows the UAE
+      button and a "🌍 Ship to… (search country)" field. Type to search all
+      200+ countries (e.g. "saud" → Saudi Arabia, "kor" → North/South Korea);
+      pick any country regardless of restriction. After selection the status
+      shows: restricted destinations turn the field red and the quote area
+      shows the "contact Logistics" notice; shippable ones price normally with
+      the AED⇄local-currency switch. No more long restricted list to scroll.
+      Flags are derived from the ISO code, so the full country set is covered.
+
+    ▸ MULTI-METHOD BRANDING (e.g. t-shirt: 1-side embroidery + 1-side print;
+      bottle: 1-side print + 1-side engrave). A "Single Branding / Multiple
+      Branding" toggle (Single is default — unchanged). Multiple uses the SAME
+      rounded method-button + sides UI as Single, in clean "Method 1 / Method
+      2" rows with + Add / × remove. Pricing rule: sides of the SAME method
+      stack into that method's diminishing per-side curve, so DTF 1-side +
+      DTF 1-side == DTF 2-sides exactly; different methods price independently
+      and add together. calcP gained an optional `apps` arg (groups sides by
+      method); Single mode never uses it → single-method pricing byte-
+      identical (regression = 0 diffs). Saved with the quote + restored on
+      re-open.
+
+    ▸ HARDLINE products now allow up to 6 print sides (was 4). Softline/Custom
+      stay at 4; Rubik's Cube stays 6. Per-side pricing already supported >4
+      sides, so no pricing change for existing quotes.
+
+    ▸ QUOTES SEARCH / FILTER + FOLLOW-UP REMINDERS (Recent Quotes tab): live
+      search (customer / product / SKU), All / Pending / Won / Lost filters,
+      and an "⏰ Follow up" flag + banner for pending quotes with no decision
+      in 3+ days.
+
+    Quotes and Analytics remain separate tabs; Product Finder (URL lookup +
+    fuzzy text search) remains its own tab.
+
+    ▸ v130 scrub fixes: re-opening a multi-method quote now restores Multiple
+      mode and prices correctly (was reverting to single); switching back to
+      Single no longer leaves stale extra methods on a saved quote; adding a
+      Multiple-Branding item to the Quote Builder now prices and labels all
+      methods; the currency switch is hidden for restricted destinations;
+      "No Print" removed from secondary method rows; phone-responsive ship
+      search.
+
+  V128 changes (from v127):
+
+    ▸ ANALYTICS → SALES COACH (conversion-focused, action-first). A new panel
+      at the top of Analytics turns the rear-view dashboard into "what to do
+      now to win more":
+      • Weighted pipeline FORECAST: open pipeline value × win rate = expected
+        revenue, so reps see what their pipeline is really worth.
+      • FOLLOW-UP QUEUE: open/untagged quotes aging past ~4 days, ranked by
+        value×age (warm/cold colour by age), so the most valuable cooling
+        deals surface first. On your own quotes: one-tap Re-open (reload to
+        re-send) and Won/Lost quick-tag. Following up is the cheapest win.
+      • PRESCRIPTIVE TIPS: "your edge" + "watch-outs" derived from won-vs-lost
+        — best margin band, strongest-converting product, and where
+        discounting isn't buying the win.
+      Works for both My-quotes and Odoo data (Odoo follow-up is informational).
+      Exposed window.MLQ.applyQuote so the queue can re-open a quote.
+
+    ▸ Pricing math byte-identical to v127 (calcP/floorR/TIERS untouched).
+
+  V127 changes (from v126):
+
+    ▸ ANALYTICS — Odoo import + per-salesperson stats. The Analytics tab now
+      has a data-source switch: "My quotes" (local saved quotes) and "Odoo
+      data" (imported sales orders/quotations).
+      • Import an Odoo export as CSV or JSON (client-side, stored only in the
+        browser). Columns are auto-detected (Salesperson, Customer, Product,
+        Amount, Status, Date, Qty) with a one-click remap panel for any schema.
+      • Odoo status → outcome: sale/done/invoiced/confirmed → Won, cancel →
+        Lost, draft/sent/quotation → Pending.
+      • SALESPERSON FILTER: pick "All (team)" for a leaderboard + team totals,
+        or a single rep for their personal stats. Re-import any time to refresh.
+      • Honest scope: this is import-based (snapshot), not a live credentialed
+        link to Odoo — a true auto-sync needs a backend/proxy.
+      Self-contained IIFE; no pricing/stock/other tab touched.
+
+    ▸ Pricing math byte-identical to v126 (calcP/floorR/TIERS untouched).
+
+  V126 changes (from v125):
+
+    ▸ NEW "📊 Analytics" TAB — per-salesperson insights from their own saved
+      quotes (MLQ, stored locally per device). Sections:
+      • KPI row: total quotes, value quoted (+avg deal), win rate (W/L),
+        avg margin (colour-banded), won value, open pipeline.
+      • Win / Loss stacked bar + values + pending pipeline.
+      • Most-quoted products and top customers (by value), each with per-item
+        win rate.
+      • Margin health: quote distribution + WIN RATE by margin band (does
+        discounting actually win?). Branding-method mix.
+      • 8-week quoting-activity trend.
+      • Auto-generated "What this tells you" insights (win rate, strongest
+        converter, margin-vs-win pattern, biggest account, untagged pipeline).
+      Empty state prompts the rep to save + tag quotes. Self-contained IIFE
+      that hooks render() (mirrors the Recent Quotes pattern); no pricing,
+      stock, or other tab touched.
+
+    ▸ Pricing math byte-identical to v125 (calcP/floorR/TIERS untouched).
+
+  V125 changes (from v124):
+
+    ▸ RESTRICTED SHIPPING DESTINATIONS (from Logistics list). The destination
+      picker now includes a "🚫 Restricted — contact Logistics" group with all
+      46 restricted countries (India, China, Egypt, Lebanon + 42 more). When a
+      restricted destination is selected, ALL pricing is hidden and the Quote
+      Summary shows "🚫 Cannot ship to [country] — please contact the Logistics
+      team." The destination selector turns red so it's unmistakable. No price,
+      copy, or save is possible for a restricted destination.
+      • window.MLSHIP.restrictedName() returns the country name if the current
+        destination is restricted, else null. window.MLSHIP.RESTRICTED = list.
+
+    ▸ Pricing math byte-identical to v124 (calcP/floorR/TIERS untouched).
+
+  V124 changes (from v123):
+
+    ▸ QUANTITY INPUT FIX (sales-reported "restricted typing"). When typing a
+      multi-digit qty with a pause, the debounced rebuild re-focused the field
+      and the select-all-on-focus guard (_qiProg) was being re-created per
+      rebuild — so the new focus handler selected-all and the next digit
+      replaced the previous one. _qiProg is now a single shared flag that
+      survives the rebuild, so typing "250" no longer collapses to "0"/"50".
+      Tap-to-replace on a genuine tap still works.
+
+    ▸ Pricing math byte-identical to v123 (calcP/floorR/TIERS untouched).
+
   V123 changes (from v122):
 
     ▸ AUDIT + CLEANUP (no behaviour change):
@@ -487,6 +613,23 @@
 .ph{display:flex;gap:14px;align-items:flex-start}.ph-img{width:80px;height:80px;border-radius:10px;background:#f3f4f6;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;font-size:24px;color:#d1d5db;position:relative}.ph-img img{width:100%;height:100%;object-fit:cover}.ph-img.img-loading{background:linear-gradient(90deg,#f3f4f6 25%,#e5e7eb 50%,#f3f4f6 75%);background-size:200% 100%;animation:shimmer 1.3s infinite}@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}.ph-info{flex:1;min-width:0}.ph-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}.ph-title{font-size:16px;font-weight:700;color:#111;line-height:1.25;flex:1}.ph-price{font-size:13px;font-weight:700;color:#111;white-space:nowrap;flex-shrink:0;text-align:right}.ph-price .pl{font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:1px}.ph-sku{font-size:10px;color:#9ca3af;margin-top:3px;font-weight:500}.bds{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}.bd{padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;letter-spacing:.3px}.bd.stk{background:#dcfce7;color:#15803d}.bd.cat{background:#f3f4f6;color:#374151;border:1px solid #e5e7eb}.bd.oos{background:#fee2e2;color:#b91c1c}.bd.S{background:#dcfce7;color:#166534}.bd.H{background:#f3f4f6;color:#374151}.bd.C{background:#f3e8ff;color:#6b21a8}
 .specs{display:flex;flex-wrap:wrap;gap:14px 18px;padding:11px 14px;background:#fafafa;border-radius:9px;align-items:flex-start;font-size:11px}.spec .l{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px}.spec .v{font-size:11px;font-weight:600;color:#111;margin-top:2px}
 .cfg-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}.cfg-g{flex:1;min-width:160px}.cfg-s{flex:0 0 auto}.cfg-lbl{font-size:9px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}.btns{display:flex;flex-wrap:wrap;gap:4px}.btn{padding:5px 11px;border:1.5px solid #e5e7eb;border-radius:7px;background:#f9fafb;font-size:11px;font-weight:600;cursor:pointer;color:#374151;transition:all .12s;line-height:1.2}.btn:hover{border-color:#9ca3af;background:#fff}.btn.on{border-color:#111;background:#111;color:#fff}.btn .sub{font-size:8px;display:block;color:#9ca3af;font-weight:500;margin-top:1px}.btn.on .sub{color:rgba(255,255,255,.55)}.sides-row{display:flex;gap:3px}.sd-btn{width:32px;height:32px;border:1.5px solid #e5e7eb;border-radius:7px;background:#f9fafb;font-size:12px;font-weight:700;cursor:pointer;color:#374151;display:flex;align-items:center;justify-content:center;transition:all .12s}.sd-btn.on{border-color:#111;background:#111;color:#fff}.fab-row{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:7px;overflow:hidden}.wd-row{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:7px;overflow:hidden}.wd-b{padding:8px 14px;font-size:11px;font-weight:700;color:#6b7280;background:transparent;border:none;cursor:pointer;transition:all .15s;letter-spacing:.3px;white-space:nowrap}.wd-b.on{background:#111;color:#fff}.wd-b:hover:not(.on){color:#111}.fab-b{padding:5px 13px;font-size:11px;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#374151;transition:all .12s}.fab-b.on{background:#111;color:#fff}.moq-warn{margin-top:8px;padding:7px 10px;background:#fffbeb;border:1px solid #fde68a;border-radius:6px;font-size:11px;color:#92400e}
+.bm-toggle{display:inline-flex;border:1.5px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:2px}
+.bm-tb{padding:7px 14px;font-size:11.5px;font-weight:700;color:#6b7280;background:#fff;border:none;cursor:pointer;font-family:inherit;transition:all .12s}
+.bm-tb:hover:not(.on){color:#111}
+.bm-tb.on{background:#111;color:#fff}
+.bm-list{margin-top:10px;background:#fafbfc;border:1px solid #eef0f2;border-radius:10px;padding:11px}
+.bm-row2{padding:9px;background:#fff;border:1px solid #eef0f2;border-radius:9px;margin-bottom:9px}
+.bm-mlbl{display:flex;align-items:center;justify-content:space-between}
+.bm-mlbl .bm-x{margin-left:8px;width:20px;height:20px;font-size:13px}
+.bm-x{flex:0 0 auto;width:26px;height:26px;border:1.5px solid #e5e7eb;border-radius:7px;background:#fff;color:#9ca3af;font-size:15px;line-height:1;cursor:pointer;font-weight:700}
+.bm-x:hover{border-color:#dc2626;color:#dc2626}
+.bm-add{font-family:inherit;font-size:11.5px;font-weight:700;color:#2563eb;background:transparent;border:none;padding:3px 0;cursor:pointer}
+.bm-add:hover{text-decoration:underline}
+.bm-hint{font-size:10px;color:#9ca3af;font-weight:500;margin-top:5px;line-height:1.4}
+.qa-sub{display:flex;gap:6px;background:#f1f3f5;border-radius:10px;padding:4px;margin:0 2px 14px}
+.qa-tb{flex:1;padding:9px 12px;border:none;border-radius:7px;background:transparent;font-family:inherit;font-size:12.5px;font-weight:800;color:#6b7280;cursor:pointer;transition:all .12s}
+.qa-tb:hover:not(.on){color:#111}
+.qa-tb.on{background:#fff;color:#111;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .qty-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}.qty-wrap{display:flex;align-items:center;border:2px solid #e5e7eb;border-radius:9px;overflow:hidden;background:#fff;transition:border .15s}.qty-wrap:focus-within{border-color:#111}.qty-btn{width:36px;height:42px;background:transparent;border:none;font-size:18px;cursor:pointer;color:#6b7280;display:flex;align-items:center;justify-content:center;user-select:none}.qty-btn:hover{background:#f3f4f6}.qty-inp{width:80px;height:42px;border:none;outline:none;font-size:18px;font-weight:700;text-align:center;background:transparent;color:#111;-moz-appearance:textfield}.qty-inp::-webkit-inner-spin-button,.qty-inp::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.qty-lbl{font-size:12px;color:#6b7280}.er{color:#dc2626;font-weight:700}
 .quick-units{display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap}.qu-btn{padding:5px 12px;border:1.5px solid #e5e7eb;border-radius:6px;background:#f9fafb;font-size:11px;font-weight:700;cursor:pointer;color:#374151;transition:all .12s}.qu-btn:hover{border-color:#9ca3af;background:#fff}.qu-btn.on{border-color:#111;background:#111;color:#fff}
 .qbox{border-radius:12px;padding:16px 18px}.qbox.ok{background:#f0fdf4;border:2px solid #86efac}.qbox.cap{background:#fefce8;border:2px solid #fde047}.qbox.bad{background:#fef2f2;border:2px solid #fca5a5}.q-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}.q-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px}.q-lbl.ok{color:#15803d}.q-lbl.w{color:#a16207}.q-lbl.r{color:#b91c1c}.q-val{font-size:32px;font-weight:800;line-height:1;color:#111}.q-val span{font-size:13px;font-weight:400;color:#9ca3af;margin-left:2px}.q-mgn{text-align:right}.q-mgn .ml{font-size:9px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:.4px}.q-mgn .mv{font-size:20px;font-weight:800;line-height:1;margin-top:2px}.q-note{font-size:11px;padding:7px 10px;border-radius:6px;margin-bottom:10px;line-height:1.4}.q-note.w{background:rgba(234,179,8,.12);color:#a16207}.q-note.r{background:rgba(220,38,38,.08);color:#b91c1c}
@@ -912,6 +1055,7 @@ function floorR(p){return 0.85;}/* 15% margin floor unified for all categories  
 function maxSidesFor(p){
   if(!p) return 4;
   if(/\brubik/i.test(p.title)) return 6;
+  if(p.type==='B') return 6; /* Hardline: up to 6 print sides */
   return 4;
 }
 function defaultSidesFor(p){
@@ -948,7 +1092,7 @@ function gpm(p){
     return is?m.s:m.h;
   });
 }
-function calcP(p,pm,sd,prem,tq){
+function calcP(p,pm,sd,prem,tq,apps){
   try{
     if(!p||!p.web||!p.cost)return null;
     // backwards-compat — old saved quotes (from before UV merge) may have pm='uvdtf'
@@ -965,7 +1109,14 @@ function calcP(p,pm,sd,prem,tq){
       else if(p.cc==='BT') premUp=6;
     }
     var bc=p.cost;
-    var wp=twp(pm,p.web,sd,p.type),ip=ipc(pm,sd,p.web,p.type);
+    var wp,ip;
+    if(apps&&apps.length){
+      /* group sides by method so e.g. DTF 1-side + DTF 1-side == DTF 2-sides
+         (uses the method's diminishing per-side curve); different methods price independently */
+      var _bm={}; for(var _a=0;_a<apps.length;_a++){ var _ap=apps[_a]; if(!_ap||!_ap.m)continue; _bm[_ap.m]=(_bm[_ap.m]||0)+(parseInt(_ap.sd)||0); }
+      wp=0;ip=0;
+      for(var _m in _bm){ if(!Object.prototype.hasOwnProperty.call(_bm,_m))continue; wp+=twp(_m,p.web,_bm[_m],p.type); ip+=ipc(_m,_bm[_m],p.web,p.type); }
+    } else { wp=twp(pm,p.web,sd,p.type); ip=ipc(pm,sd,p.web,p.type); }
     var listBase=p.web+premUp;
     var li=listBase+wp,tc=bc+ip,fr=floorR(p);
     var fl=(tc/fr);
@@ -977,6 +1128,15 @@ function calcP(p,pm,sd,prem,tq){
   }catch(e){return null;}
 }
 function qt(q){var t=1;for(var i=0;i<TIERS.length;i++)if(q>=TIERS[i])t=TIERS[i];return t;}
+/* v129 multi-method branding: build application list + human label.
+   Returns null when no additional method → calcP single-method path (byte-identical). */
+function mlAppList(){ if(typeof S==='undefined') return null; if(S.brandMode==='multi'){ var arr=[{m:S.pm,sd:S.sd}]; if(S.brand2&&S.brand2.length) arr=arr.concat(S.brand2.map(function(a){return {m:a.m,sd:a.sd};})); return arr; } return null; }
+function mlBrandLabel(pm,sd,apps){
+  function one(m,d){ var mo=PMS.find(function(x){return x.id===m;}); if(m==='none'||!mo) return 'No print'; var st=mo.f?'':(d+' side'+(d>1?'s':'')); return mo.n+(st?' ('+st+')':''); }
+  if(apps&&apps.length) return apps.map(function(a){return one(a.m,a.sd);}).join(' + ');
+  if(pm==='none') return 'no print';
+  return one(pm,sd);
+}
 // ─────────────────────────────────────────────────────────────────────────
 
 var DIMS={"TML-JA-024":"MTC - 7.8 \u00d7 7 x 7.8 cm","TML-JA-027":"MTC - 7.8 \u00d7 7 x 7.8 cm","TML-UW-024":"Diameter - 1.5 cm","TML-DW-001":"W8.1 x H9.5 cm","TML-DW-002":"HAK - 7 x 7 x H26.8 cm","TML-DW-004":"W8.5 x H13 cm","TML-DW-005":"W73 x H208 mm","TML-DW-006":"HAK - 6.5 x 6.5 x H230 mm","TML-DW-007":"W8 x H9.5 cm","TML-DW-008":"HAK - 8.8 x 8.8 x H11 cm","TML-DW-009":"W86 x H115 mm","TML-DW-010":"HAK - 7.6 x 7.6 x H17.6 cm","TML-DW-011":"8 x 8 x H9.8 cm","TML-DW-012":"HAK - 7 x 7 x H25.5","TML-DW-013":"10 x 10 \u00d7 11","TML-DW-014":"6.6 x 6.6 \u00d7 23","TML-DW-015":"6 x 6.4 x 20.3 cm","TML-DW-016":"7 x 7 x 26","TML-DW-017":"11.9 x 8.3 x 10.4","TML-DW-020":"6.5 x 6.5 x 20.5","TML-DW-023":"22.0 x 8.5 x 8.5","TML-DW-024":"9.7 x 9.8 x 43","TML-DW-025":"7 x 7 x 25","TML-DW-027":"7.9 x 8.3 x 24.3","TML-DW-029":"11.5 x 3 mm","TML-DW-030":"11.2 x 7 x 11","TML-DW-031":"11 x 11 x 3.5 cm","TML-DW-032":"Diameter - 100 mm","TML-DW-033":"7.5 x 7.5 x 23","TML-DW-035":"Product - W88 x H207 / Box - 9.5 x 9.5 x 21.5 cm","TML-DW-036":"8 x 8 x 10.2","TML-DW-037":"6.7 x 6.7 x 24.5","TML-DW-038":"5 x 5 x 25","TML-DW-039":"8 x 8 x 25","TML-DW-040":"7.7 x 7.7 x 25","TML-DW-042":"85x60x50 mm (Cup), 105x105x15 mm (Saucer)","TML-DW-043":"9 x 9 x 19","TML-DW-045":"7.5 x 7.5 x 14","TML-DW-047":"29 x 13 x 26.5 cm","TML-DW-048":"Item Size: 80x55x45 mm (Cup), 110x110x17 mm (Saucer)","TML-DW-049":"H25cm, Diameter - 6cm","TML-DW-051":"6.5 x 6.5 x 4.5","TML-DW-052":"7.5 x 7.5 x 25","TML-DW-053":"7.5 x 7.5 x 21","TML-DW-054":"8.8 x 8.8 x 12.5","TML-DW-058":"7.2 x 7.2 x 26.6","TML-DW-059":"8.5 x 8.5 x 9.5","TML-DW-060":"8.4 x 8.4 x 16.6","TML-DW-061":"13 x 8.5 x 12","TML-DW-062":"8 x 8 x 10.2","TML-DW-063":"10 x 8.2 x 24","TML-DW-064":"9.2 x 9.2 x 15","TML-DW-065":"9.2 x 9.2 x 14.9","TML-DW-066":"7 x 7 x 24","TML-DW-067":"7 x 7 x 15","TML-DW-068":"24 x 7 x 7","TML-DW-071":"7.5 x 7.7 x 25.5","TML-DW-077":"9.6 \u00d7 9.6 \u00d7 3.2","TML-DW-079":"12 x 8.7 x 14.7","TML-DW-080":"10 x 14.8 x 31.8","TML-DW-081":"104 x 104 x 90.8","TML-DW-084":"8 x 8 x 11.7","TML-DW-086":"8 x 10 cm","TML-DW-088":"7 x 7 x 26","TML-DW-089":"7.2 x 7.2 x 22","TML-DW-090":"7.4 x 7.4 x 25.5","TML-DW-091":"7 x 7 x 28","TML-DW-094":"11.8 x 8.7 x 10.5","TML-DW-095":"7.2 x 7.7 x 20.6","TML-DW-096":"6.7 x 6.7 x 7.9","TML-DW-097":"7.8 x 7.8 x 28.3","TML-DW-098":"7.2 x 7.2 x 25","TML-DW-099":"8.45 x 8.45 x 25.35","TML-DW-100":"7.3 x 7.3 x 25.5","TML-DW-102":"11.9 x 8.3 x 10.4","TML-DW-103":"11 x 11 x 2","TML-DW-107":"8.5 x 8.5 x 24.2","TML-DW-108":"7 x 7 x 24.5","TML-DW-109":"175 x 115 x 173 mm Cups Item Size: 59 x 59 x 65 mm","TML-DW-110":"7.5 x 24 x 7.5","TML-DW-111":"8.59 x 8.59 x 29","TML-DW-112":"7.7 x 7.7 x 26.6","TML-DW-113":"7.78 x 7.78 x 13.3 cm","TML-DW-115":"10 \u00d7 10 x 10 cm","TML-DW-120":"8.5 x 8.5 x 23.3","TML-DW-121":"10 x 10 x 10","TML-DW-122":"11 x 8.2 x 7.2 cm","TML-DW-123":"8 x 8 x 20","TML-DW-126":"8.0 x 8.0 x 25.0 cm","TML-DW-128":"10 X 1.5 cm","TML-DW-129":"5.8 \u00d7 6.4 cm","TML-DW-130":"9.5 x 19.5 cm","TML-DW-131":"7 x 21.5 cm","TML-DW-132":"7.3 x 7.4 x 20.5","TML-DW-133":"7.62 x 6.98 x 21.59","TML-DW-134":"4.6 x 7.6 x 19","TML-DW-135":"14 x 14 x 8.8","TML-DW-136":"9 x 9 x 12.5","TML-DW-139":"0.7 x 8.7 x 19.5 cm","TML-DW-143":"8 x 8 x 16","TML-DW-144":"32.6 x 8.7 x 8.7 cm","TML-DW-145":"14.9 x 9.7 x 24.2 cm","TML-DW-146":"7.5 x 7.5 x 24 cm","TML-DW-147":"8.7 x 8.7 x 28","TML-DW-148":"31.5 x 30.8 x 10.7","TML-DW-149":"5 x 5 x 25","TML-DW-150":"9.8 x 9.8 x 13.5","TML-DW-152":"6.9 x 6.9 x 26.4","TML-DW-153":"8.8 x 8.8 x 10.9","TML-DW-154":"84 x 84 x 185","TML-DW-155":"10.0 x 7.2 x 7.2","TML-DW-156":"23.5 x 7 x 7","TML-DW-157":"7.4 x 7.4 x 21","TML-DW-158":"8.4 x 8.4 x 15.5","TML-DW-160":"7.8 x 7.8 x 13","TML-DW-161":"7.5 x 7.5 x 27.5","TML-DW-163":"5.65 x 5.65 x 18.8 cm","TML-DW-168":"8.9 x 8.9 x 16.7","TML-DW-169":"10 x 10 x 21","TML-DW-170":"8 x 7.7 x 23.5","TML-DW-171":"7.3 x 7.3 x 23","TML-DW-172":"8.3 x 8.3 x 14.3","TML-DW-173":"7.6 x 7.6 x 19.5 cm","TML-DW-174":"9 x 9 x 17","TML-DW-175":"8.89 x 8.89 x 17.46 cm","TML-DW-176":"8.0 x 8.0 x 31.5","TML-CH-014":"W11.94 x H24.03 cm","TML-CH-016":"22 x 19 x 1","TML-CH-022":"Cap circumference - 60/Depth - 11/Brim width - 16.5/ Brim length - 10 cm","TML-CH-023":"27 x 19 x 12","TML-CH-029":"Adult: W30 x H40 cm, Kids: W26 x H38 cm","TML-BT-001":"38 \u00d7 41 cm","TML-BT-002":"40 x 47 x 17","TML-BT-003":"28 x 14 x 34 cm","TML-BT-004":"31 x 41 x 12 cm","TML-BT-010":"34 x 42 cm","TML-BT-011":"37 x 41 cm","TML-BT-012":"53 x 27 x 24.5 cm","TML-BT-013":"38 x 30 x 10","TML-BT-014":"30 x 38 x 12 cm","TML-BT-015":"38.0 x 42.0 cm","TML-BT-016":"43 x 33 x 19 cm","TML-BT-017":"40 x 33 x 15 cm","TML-BT-018":"48 x 15 x 36 cm","TML-BT-021":"55 x 35 x 23.5","TML-BT-025":"20.0 x 15.0 x 15.0 cm","TML-BT-026":"48 x 35 x 13.5 cm","TML-BT-027":"49.0 x 26.0 x 26.0 cm","TML-BT-028":"45 x 35 x 12 cm","TML-BT-029":"20 x 6 x 15 cm","TML-BT-032":"29.5 x 13 x 39","TML-BT-033":"45 x 25 x 25","TML-BT-034":"30 x 38 x 12","TML-BT-035":"42 x 38 x 10","TML-BT-039":"20 x 33 x 16 cm","TML-BT-040":"45.0 x 16.0 x 29.0 cm","TML-BT-041":"42.0 x 31.8 x 14.0 cm","TML-BT-048":"40 x 13 x 47 cm","TML-BT-049":"20.5 x 6.0 x 24.0 cm","TML-BT-052":"39 x 17.5 x 59 cm","TML-BT-053":"220 x 160 mm","TML-BT-054":"40 x 13.5 x 60 cm","TML-BT-055":"29.3 x 20 cm (packaging method)","TML-BT-056":"36 x 42 cm (packaging method)","TML-BT-058":"30 x 35 x 8.5","TML-BT-059":"52 \u00d7 29 \u00d7 31","TML-BT-062":"20 x 6 x 27","TML-BT-063":"18.5 x 12.5 x 23.5 cm","TML-BT-064":"40.0 x 30.0 x 13.0 cm","TML-BT-065":"21.0 x 16.0 x 23.0 cm","TML-BT-067":"45 x 22 x 27","TML-BT-069":"21.5 x 16.5 cm (packaging method)","TML-BT-070":"38.0 x 24.0 x 56.0 cm","TML-BT-071":"47.7 x 25.7 cm (packaging method)","TML-BT-072":"31.0 x 16.0 x 45.0 cm","TML-BT-073":"40.0 x 30.0 x 2.0 cm","TML-BT-074":"32.0 x 9.0 x 25.0 cm","TML-BT-075":"225 x 155 mm","TML-BT-076":"W320 x H420 mm","TML-BT-079":"W240 x H210 mm","TML-BT-081":"60 w x 36.5 h x 12.8 d cm","TML-BT-085":"15.0 x 21.0 cm","TML-BT-087":"20 x 6 x 27","TML-BT-088":"64 \u00d7 42 \u00d7 49","TML-BT-089":"40 x 1 x 45","TML-BT-090":"22 x 12.5 cm","TML-BT-092":"24.5 x 11 x 11","TML-BT-093":"29 x 10 x 40","TML-BT-094":"19 x 11 x 3","TML-BT-095":"50 x 25 x 25 cm","TML-BT-097":"32 x 18 x 45 cm","TML-BT-100":"35 x 19 x 52 cm","TML-BT-101":"41.5 \u00d7 36.5 \u00d7 38","TML-BT-102":"48 \u00d7 12 x 35 cm","TML-BT-104":"57 \u00d7 39 \u00d7 25","TML-BT-105":"43 / 35 cm","TML-BT-106":"51.0 x 24.5 x 28.5 cm","TML-BT-108":"W465 x H350 mm","TML-BT-110":"48.26 x 35.56 x 14.478","TML-BT-111":"52 x 27 x 25 cm","TML-BT-113":"60 \u00d7 50 \u00d7 31.5","TML-BT-114":"73 \u00d7 51 \u00d7 27","TML-BT-115":"37 \u00d7 50.5 \u00d7 2.5","TML-BT-116":"48 \u00d7 39 \u00d7 55","TML-BT-117":"W11.5 x H9.5 cm (chamfer - 1.5 cm)","TML-BT-118":"25 x 17 x 15 cm","TML-BT-120":"44 x 29 x 14","TML-BT-122":"23 x 18/ 23 /18 cm","TML-BT-123":"22 h x 28.8 w cm","TML-BT-124":"35 \u00d7 20 x 46","TML-BT-125":"42 x 31.8 x 14","TML-BT-128":"W350 x H270 mm","TML-BT-129":"65 \u00d7 49 \u00d7 48","TML-BT-130":"40 \u00d7 30.5 \u00d7 43","TML-BT-131":"56 \u00d7 49 \u00d7 50","TML-BT-132":"24 x 6 x 13","TML-BT-133":"2 x 13 x 17","TML-BT-134":"L43 x W13 x H30 cm (Handle H20 cm)","TML-BT-135":"34 x 13 x 26","TML-BT-136":"58 \u00d7 57 \u00d7 45","TML-BT-139":"74.5 \u00d7 31 \u00d7 43","TML-BT-140":"W220 x H65 mm","TML-BT-143":"31 x 12.5 x 31","TML-BT-146":"52 x 45 x20","TML-OA-005":"23\u00d720 cm","TML-OA-006":"19.5 x 22.2 x 2.4","TML-OA-007":"26.3 x 20.3 cm","TML-OA-008":"146 x 210 mm","TML-OA-011":"143 x 11 mm","TML-OA-012":"144 x 12 mm","TML-OA-013":"58 mm","TML-OA-014":"53 mm","TML-OA-015":"4 x 7.5 x 0.37 cm","TML-OA-016":"70 mm","TML-OA-017":"15 x 15 x 5 cm","TML-OA-018":"3 x 5.5 x 14.5 cm","TML-OA-020":"W36.5cm x H26cm (D?)","TML-OA-021":"45 x 40 mm","TML-OA-024":"10 x 1.2 cm","TML-OA-026":"20 x 4 x 23 cm","TML-OA-027":"6 x 5 x 22.8 cm","TML-OA-028":"13 x 19 cm","TML-OA-029":"28 cm","TML-OA-030":"14 x 1 x 1","TML-OA-031":"13.8 x 1 x 1","TML-OA-033":"16.6 x 13 x 6","TML-OA-034":"16 x 21 cm","TML-OA-035":"20 x 15 x 6.5","TML-OA-036":"150 x 70 cm (D?)","TML-OA-037":"33 x 33mm","TML-OA-038":"60 x 89 mm","TML-OA-040":"14.5 x 17.5 cm","TML-OA-042":"21 x 15 x 2.5","TML-OA-043":"14.2 x 1.5 x 21","TML-OA-045":"13 x 21 cm (D?)","TML-OA-046":"15.5 x 21.8 x 1.7","TML-OA-047":"15 x 1.6 x 21.2","TML-OA-052":"13.8 x 1 x 1 cm","TML-OA-056":"H36.5 cm, (Stand base - DIA7.5 x H2 cm)","TML-OA-059":"22.35 x 15.24 x 1.27","TML-OA-064":"18.5 x 10.5 x 10.5","TML-OA-067":"72 x 180 mm","TML-OA-068":"146 x 12 mm","TML-OA-069":"142 x 11 mm","TML-OA-070":"W11 x H143 mm","TML-OA-072":"20.5 x 2.5 x 25.5","TML-OA-073":"3.2 x 0.35 x 8.5","TML-OA-074":"1.2 x 1 x 14","TML-OA-075":"21.5 x 1 x 31.5","TML-OA-076":"14 x 1.7 x 21","TML-OA-077":"13.5 x 4 x 22.5","TML-OA-081":"53 mm","TML-OA-082":"75 x 75 mm","TML-OA-089":"90mm","TML-OA-091":"13.2 x 20.7 x 1","TML-OA-092":"9.5 x 6.5 x 0.8","TML-OA-094":"5 cm x 20 cm","TML-OA-096":"7.5 x 7.5 x 28","TML-OA-097":"145 x 15 x 210 mm","TML-OA-098":"11.5 x 11.5 x 11.5 cm","TML-OA-099":"5 x 2.6 x 5 cm","TML-OA-101":"33 x 18.7 x 0.5 cm","TML-OA-106":"21 x 14.8 x 1.2 cm","TML-OA-107":"L10.4x H23 x W4.5 cm","TML-OA-108":"L15 cm x H22.8 cm","TML-OA-109":"1.3 x 1.3 x 13.7 cm","TML-OA-110":"Diameter - 13.7 cm","TML-OA-111":"13.5cm","TML-OA-112":"14cm","TML-OA-114":"14.5 x 1 cm","TML-OA-115":"40x40 mm","TML-OA-116":"58.3 \u00d7 24 \u00d7 37 cm","TML-OA-117":"30x8x8 cm","TML-OA-118":"80 x 30 mm","TML-OA-119":"140 x 11 mm","TML-OA-121":"24 x 19.5 x 2 cm","TML-OA-122":"12 x 4.4 x 2 cm","TML-OA-123":"26 x 29 x 10.5 cm","TML-OA-124":"90 x 150 mm","TML-OA-125":"W8.89 x H13.97 inches","TML-OA-126":"19 x 14 x 22 cm","TML-OA-127":"8 x 7.8 x 8.3 cm","TML-OA-128":"143 x 13 mm","TML-OA-129":"1 x 1 x14.2 cm","TML-OA-130":"31 x 25 x 2.8 cm","TML-OA-131":"34.5 \u00d7 29.5 \u00d7 24 cm","TML-OA-132":"14 cm x 1.1 cm","TML-OA-133":"30.5\u00d723 cm","TML-OA-134":"23\u00d730.5 cm","TML-OA-135":"18 x 4.5 x 20.5 cm","TML-OA-136":"W100 x H100 mm","TML-OA-137":"14 x 21 x 2 cm","TML-OA-138":"15 x 2.2 x 21 cm","TML-OA-139":"14.7 x 21.0 x 1.5 cm","TML-OA-141":"21 x 8 x 7 cm","TML-OA-142":"21.5 x 14.2 x 1.5 cm","TML-OA-143":"21 x 14 x 1.5 cm","TML-OA-144":"14.0 x 1.2 x 1.2 cm","TML-OA-145":"9.5 x 3.0 x 24.0 cm","TML-OA-146":"13.5 x 21.0 cm (D?)","TML-OA-147":"45.5 \u00d7 31 \u00d7 23 cm","TML-OA-148":"47 \u00d7 25.5 \u00d7 37 cm","TML-OA-149":"26 x 14.5 x 10.5 cm","TML-OA-150":"21.0 x 14.0 x 0.5 cm","TML-OA-151":"80.0 x 40.0 cm (packaging method)","TML-OA-152":"8 cm","TML-OA-153":"14.5 x 21 cm","TML-OA-156":"23.0 x 5.0 x 1.6 cm","TML-OA-159":"11.5 x 3 x 18.5 cm","TML-OA-161":"21.3 x 14.5 x 2.1 cm","TML-OA-163":"24.0 x 19.5 x 2.0 cm","TML-OA-164":"13.9 x 1.3 cm","TML-OA-165":"13.7 x 1.1 cm","TML-OA-168":"W145 x H211 mm","TML-OA-169":"W140 x H210 mm","TML-OA-170":"W11 x H140 mm","TML-OA-171":"W145 x H210 mm","TML-OA-172":"W145 x H210 mm","TML-OA-177":"13.5 x 1.2 x 1.2 cm","TML-OA-179":"10.5 x 4 x 27 cm","TML-OA-180":"9.3 x 3 cm","TML-OA-181":"30 cm","TML-OA-182":"14 \u00d7 1.2 cm","TML-OA-183":"30 cm","TML-OA-184":"11.7 x 4.3 x 2.8","TML-OA-185":"16.5 x 8.2 x 10.4 cm","TML-OA-186":"7.5 x 7.5 cm","TML-OA-187":"W11 x H135 mm","TML-OA-188":"W98 x H135 mm","TML-OA-189":"20 mm","TML-OA-190":"28 x 4 x 28 cm","TML-OA-191":"80 x 20 mm","TML-OA-192":"13.7 x 1 cm (diameter)","TML-OA-193":"14 x 1 cm","TML-OA-194":"15 cm x 1.0 cm","TML-OA-196":"W11 x H138 mm","TML-OA-198":"Diameter - 32 mm","TML-OA-199":"2 x 90 cm","TML-OA-200":"68 x 33 mm","TML-OA-201":"24.0 x 6.3 cm","TML-OA-205":"22.5 x 8.2 x 5.7 cm","TML-OA-206":"10 x 29 x 7 cm","TML-OA-207":"17.5 x 16 cm","TML-OA-208":"10 x 24 x 3 cm","TML-OA-209":"W19 X H22 cm","TML-OA-210":"15 x 20 x 3.3 cm","TML-OA-212":"5 x 15 x 2 cm","TML-OA-214":"3.2 x 3.2 cm","TML-OA-215":"20 x 25 x 1.5 cm","TML-OA-216":"9.3 x 12.5 x 0.4","TML-OA-217":"8 x 11 x 1","TML-OA-218":"9.3 x 14 x 5.9","TML-OA-222":"18\u00d720 cm","TML-OA-224":"14.2 x 21 cm","TML-OA-225":"15.5 x 21 x 1.4 cm","TML-OA-227":"2 x 9 cm","TML-OA-228":"90 \u00d7 90 x 105 mm","TML-OA-229":"7 x 28 x 7 cm","TML-OA-232":"38 \u00d7 24.5 \u00d7 24 cm","TML-OA-233":"25.5 x 26.2 x 8.6 cm","TML-OA-235":"41.5 \u00d7 31.5 \u00d7 22.5 cm","TML-OA-237":"14 x 0.95 cm","TML-OA-238":"60 \u00d7 31.5 \u00d7 35 cm","TML-OA-239":"12 x 25 x 4 cm","TML-OA-241":"7.5 x 2.4 x 0.7 cm","TML-OA-243":"10 cm","TML-OA-244":"20 \u00d7 2 x 25 cm","TML-OA-245":"49.5 \u00d7 42.5 \u00d7 23 cm","TML-OA-246":"W155 x H226 mm","TML-OA-247":"24.5 x 11.5 cm","TML-OA-248":"24.5 x 11.5 cm","TML-OA-252":"30 \u00d7 4 x 87 mm","TML-OA-253":"L12.6 x H26.4 x W4.8 cm","TML-OA-254":"16 x 13 x 3 cm","TML-OA-255":"14 x 1.25 cm","TML-OA-256":"235 x 30 x 225 mm","TML-OA-257":"5.5 x 5.5 x 4.4 cm","TML-OA-259":"15 x 17.5 cm","TML-OA-260":"1.1 x 1.1 x 14.1 cm","TML-OA-261":"40 \u00d7 17 \u00d7 23.5 cm","TML-OA-262":"14.1 x 1.5 x 1 cm","TML-OA-263":"40 x 80 x 0.25","TML-OA-265":"W14 x H135 mm","TML-OA-266":"140 x 12 mm","TML-OA-267":"W10 x H135 mm","TML-OA-270":"7 \u00d7 7 \u00d7 10 cm","TML-OA-272":"L23 cm x H31.5 cm","TML-OA-273":"29.0 x 22.0 x 9.4 cm","TML-OA-274":"60 mm","TML-OA-275":"80 x 129 mm","TML-OA-276":"45 x 190 mm","TML-OA-277":"17 \u00d7 5 x 26.5 cm","TML-OA-278":"41.5 \u00d7 41.5 \u00d7 29 cm","TML-OA-279":"17.5 x 23 cm","TML-OA-280":"25 x 35 mm","TML-OA-281":"28 x 45 mm","TML-OA-282":"135 x 8 mm","TML-OA-283":"26.8 x 12.0 x 12.0 cm","TML-OA-284":"26.8 x 12.0 x 12.0 cm","TML-OA-285":"14.0 x 1.4 x 1.4 cm","TML-OA-286":"7.5 x 0.6 x 11 cm","TML-OA-287":"32 mm","TML-OA-288":"15 \u00d7 4 x 19 cm","TML-OA-289":"211 \u00d7 143 \u00d7 18 mm","TML-OA-290":"13.5 x 27 x 5.1 cm","TML-OA-291":"14.2 x 1.5 x 21 mm","TML-OA-294":"17 x 13 x 10 cm","TML-OA-296":"141 x 10 mm","TML-OA-298":"141 x 10 mm","TML-OA-299":"25.7 x 22.6 cm (D?)","TML-OA-300":"9.5 x 1.3 x 6.5 cm","TML-OA-301":"35.5 x 28 x 10.5cms","TML-OA-303":"28.5 x 2.5 x 24 cm","TML-OA-304":"10.0 x 6.5 x 0.9 cm","TML-OA-307":"14 x 7 x 7","TML-OA-308":"W11 x H140 mm","TML-OA-309":"12 x 139 mm","TML-OA-310":"140 x 12 mm","TML-OA-311":"6 x 8 x 2 cm","TML-OA-313":"21\u00d735 cm","TML-OA-314":"14.5 x 1.5 x 9","TML-OA-316":"10.5 \u00d7 4.7 x 22.3 cm","TML-OA-317":"14.6 \u00d7 1.6 x 21 cm","TML-OA-318":"14.5 x 1.5 x 21 cm","TML-OA-319":"5.3 \u00d7 5.3 \u00d7 6.2 cm","TML-OA-320":"14 x 21 x 2 cm","TML-OA-324":"14.0 x 1.2 x 1.2 cm","TML-OA-326":"W13 x H138 mm","TML-OA-328":"12.1 x 8 x 8 cm","TML-OA-329":"35 cm","TML-OA-330":"14.5 x 21.0 x 1.3 cm","TML-OA-332":"9 x 5.3 x 23.7 cm","TML-OA-336":"95 x 65 mm","TML-OA-338":"15 x 21.3 cm","TML-OA-339":"9.0 x 8.3 x 8.3 cm","TML-OA-340":"1.1 \u00d7 1.5 x 14 cm","TML-OA-341":"75 x 25 mm","TML-OA-344":"18.7 x 7.5 x 7.9 cm","TML-OA-346":"8 x 8 x 5 cm","TML-OA-347":"25.5 x 33.5 cm","TML-OA-348":"15\u00d722.5 cm","TML-OA-349":"16 x 11.5 x 7.3 cm","TML-OA-351":"16 x 11.5 x 7.3 cm","TML-OA-357":"15 x 3.5 x 18 cm","TML-OA-358":"16 x 11.5 x 7.3 cm","TML-OA-360":"21 x 7 x 2","TML-PP-034":"24.7 x 17.2 cm","TML-PP-038":"240\u00d725 mm","TML-PP-040":"8.4 x 7.1 x 3.9","TML-PP-046":"5.5 x 28 x 10.5 cms","TML-PP-047":"37 x 10 x 30 cm","TML-PP-048":"10 x 11 x 7.5","TML-PP-051":"23 x 20 x 3 cm","TML-TA-003":"11.2 x 8.3 x 7.6 cm","TML-TA-005":"W34 x H34 mm","TML-TA-006":"6.5 x 10 x 1.5","TML-TA-007":"6.3 x 15 x 1.2","TML-TA-008":"13 x 13 x 7 cm box size","TML-TA-012":"13.5 x 7.1 x 1.6 cm","TML-TA-015":"9 x 9 x 0.9 cm","TML-TA-016":"14.3 x 1.9 x 6.8 cm","TML-TA-019":"50 x 60 mm","TML-TA-020":"25.5 x 1.5 x 25.5 cm","TML-TA-022":"AirPods (each): 19.2 x 18.26 x 30.79 mm, Charging Case: 46.4 x 21.38 x 54.4 mm","TML-TA-024":"4.5 x 1.2 x 1 cm","TML-TA-025":"35 x 1.5 x 23.5 cm","TML-TA-026":"6.7 x 1.8 x 13.6 cm","TML-TA-027":"82 x 24 mm","TML-TA-029":"15 x 3.2 x 1.2 cm","TML-TA-031":"34.4 \u00d7 34.4 \u00d7 31 mm","TML-TA-032":"9.7 x 6.45 x 1.55 cm","TML-TA-033":"98 x 98 x 85.5 mm","TML-TA-034":"6.9 x 1.8 x 14.4 cm","TML-TA-035":"8 x 1.6 x 8 cm","TML-TA-036":"10 \u00d7 6.43 \u00d7 0.98 cm","TML-TA-038":"8.0 x 4.3 x 2.7 cm","TML-TA-039":"58 x 20 mm","TML-TA-040":"6.9 x 8 x 2.3 cm","TML-TA-042":"15.1 x 2.3 x 12.6 cm","TML-TA-044":"13.0 x 3.0 x 5.0 cm","TML-TA-045":"14.4 x 7.3 x 2.0 cm","TML-TA-046":"15.0 x 16.0 x 16.0 cm","TML-TA-047":"14.5 x 11 x 0.6","TML-TA-049":"11 \u00d7 7 \u00d7 2 cm","TML-TA-050":"10.5 \u00d7 7 \u00d7 1.7 cm","TML-TA-052":"3.2 x 1.3 x 0.1 cm","TML-TA-053":"90 x 145 mm","TML-TA-055":"10 x 5.56 x 1.47 cm","TML-TA-056":"50 \u00d7 26.6 \u00d7 51.5 cm","TML-TA-058":"12 X 16 X 16cm","TML-TA-060":"105 cm","TML-TA-061":"8.6 x 4.1 x 0.9 cm","TML-TA-062":"12.5 x 12.5 x 5.0 cm","TML-TA-064":"13.5 x 6.7 x 9.0 cm","TML-TA-066":"6 x 6.5 x 6cm","TML-TA-067":"6.2 x 4.7 x 5.5 cm","TML-TA-068":"44.5 \u00d7 14.5 \u00d7 52 cm","TML-TA-069":"46.5 \u00d7 40.5 \u00d7 35 cm","TML-TA-070":"48.5 \u00d7 20 \u00d7 46 cm","TML-TA-071":"45.5 \u00d7 36.5 \u00d7 27.8 cm","TML-TA-072":"39 \u00d7 28 \u00d7 28.1 cm","TML-TA-073":"4.5 x 16 cm","TML-TA-074":"12.5 x 25 cm","TML-TA-075":"W69 x H136 mm","TML-TA-077":"6.5 \u00d7 6.5 x 10.5","TML-TA-078":"6.3 x 1.3 x 9 cm","TML-TA-079":"14.5 x 11 x 1.5","TML-TA-080":"36.5 \u00d7 32.5 \u00d7 50.5","TML-TA-081":"9.0 x 10.5 x 3.5","TML-TA-083":"6.5 \u00d7 1.1 x 9.5","TML-TA-084":"24.5 \u00d7 16.5 \u00d7 32.5","TML-TA-085":"5 x 4 x 7.5 cm","TML-TA-086":"18 x 9 x 3","TML-TA-087":"5.5 x 7.4 x 5.3","TML-TA-088":"3.2 x 3.2 cm","TML-TA-089":"6.5 x 9.5 cm","TML-TA-090":"2.8 x 6 x 7.3","TML-TA-091":"16 x 7 x 2","TML-TA-092":"8.51 x 8.51 x 3.05","TML-TA-093":"13.5 x 9 x 4","TML-TA-094":"11.5 x 3.7 x 2.7","TML-TA-095":"17.1 x 5.54 x 2.72","TML-TA-096":"5000mAh","TML-TA-097":"51 \u00d7 29 \u00d7 24","TML-TA-098":"55 \u00d7 37 \u00d7 17 cm","TML-TA-100":"3.78 x 3.78 x 0.71","TML-TA-101":"34.5 \u00d7 29 \u00d7 21.5 cm","TML-TA-102":"54.5 \u00d7 41.5 \u00d7 36.5 cm","TML-TA-103":"8.6 x 5.4 x 0.1 cm","TML-TA-104":"13.7 x 6.8 x 3.2 cm","TML-TA-105":"37 \u00d7 25 \u00d7 13.5 cm","TML-TA-106":"6 \u00d7 2.3 x 7 cm","TML-TA-107":"6.6 \u00d7 2.4 x 7.4 cm","TML-TA-109":"5.5 x 2.5 x 4.7 cm","TML-TA-111":"14.5 x 6.8 x 1.6 cm","TML-GS-006":"27.5 x 4.5 x 25.5 cm","TML-GS-009":"35.5 x 28 x 10.5cms","TML-GS-010":"35.5 x 28 x 10.5cms","TML-GS-011":"35.5 x 28 x 10.5cms","TML-GS-013":"35.5 x 28 x 10.5cms","TML-GS-015":"35.5 x 28 x 10.5cms","TML-GS-016":"35.5 x 28 x 10.5cms","TML-GS-017":"28 x 22 x 6.3cms","TML-GS-018":"35.5 x 28 x 10.5cms","TML-GS-019":"2.5 mm thickness","TML-GS-022":"21.0 x 25.2 cm","TML-GS-023":"21.0 x 25.2 cm (D?)","TML-GS-027":"37 x 10 x 30 cm","TML-GS-028":"20.5 \u00d7 6 x 10.5 cm","TML-GS-033":"22.5 \u00d7 22.0 \u00d7 4.1 cm","TML-GW-001-WHT":"16.5 x 4.5 x 21 cm","TML-GW-001-BLK":"16.5 x 4.5 x 21 cm","TML-GW-001-BRW":"16.5 x 4.5 x 21 cm","TML-HW-007":"21.08 x 9.9 x 1 cm","TML-HW-011":"7.5 x 7.2 x 0.9 cm","TML-HW-012":"22.0 x 7.0 cm","TML-HW-014":"44.0 x 24.5 cm","TML-HW-015":"18.8 x 13.9 x 6.9 cm","TML-HW-016":"43.5 \u00d7 25 \u00d7 30.5 cm","TML-HW-017":"6.2 x 4.3 x 15 cm","TML-HW-018":"L17.5 x W7.5 cm","TML-HW-021":"15.0 x 6.5 x 3.5 cm","TML-HW-022":"12.0 x 13.5 cm","TML-HW-023":"6.7 x 4.0 x 14.7 cm","TML-HW-024":"97x97 mm","TML-HW-026":"19.0 x 11.0 x 0.8 cm","TML-HW-027":"10.0 x 7.0 x 1.5 cm","TML-HW-028":"11.5 x 9.5 x 1.0 cm","TML-HW-029":"20 x 5.5 x 2 cm","TML-HW-031":"W16.6 x H13.7 cm","TML-HW-032":"W13 x H17.2 cm","TML-HW-033":"88 x 30 cm","TML-HW-035":"17 x 23 cm","TML-HW-037":"23.0 x 2.0 x 3.0 cm","TML-HW-042":"5.5 \u00d7 5.5 x 5.5 cm","TML-HW-043":"8 x 8 x 15 cm","TML-HW-046":"Thickness - 0.3 cm","TML-HW-047":"3.1 x 7.6 x 1.3","TML-HW-048":"1 x 1.5 x 5.6 cm, Ring - D2.5","TML-HW-049":"30 x 18 x 2 cm","TML-HW-051":"18 x 18 x 16.5","TML-HW-055":"21.0 cm x 29.7 cm","TML-HW-056":"9.5 x 4.0 x 12.2 cm","TML-HW-057":"W9.2 x H4 cm","TML-HW-058":"120 x 60 x 8","TML-HW-059":"6.7 x 6.7 x .3.6 cm","TML-HW-061":"11.5 \u00d7 2.7 x 11.5 cm","TML-HW-062":"11.3 x 11.3 x 5.59","TML-HW-063":"25.4 x 25.4 x 3.05","TML-HW-064":"24.13 x 24.13 x 9.14","TML-HW-065":"22.86 x 22.86 x 22.86","TML-HW-066":"14.5 \u00d7 3 x 5 cm","TML-HW-067":"6.2 \u00d7 1 x 8.7 cm","TML-HW-070":"L11.5 x H9.5 cm (Chamfer - 0.5 cm)","TML-HW-071":"8 \u00d7 0.12 x 5.2 cm","TML-HW-076":"22.8 x 8 x 4.1","TML-HW-080":"18.5 x 8.0 x 0.5 cm","TML-HW-081":"6.5 x 16 x 11 cm","TML-HW-082":"33 x 33 x 47","TML-HW-083":"7 \u00d7 7 x 7.4 cm","TML-HW-084":"16.3 x 6.3 x 5.9","TML-HW-085":"30.5 \u00d7 21.5 \u00d7 20.5 cm","TML-HW-086":"9.9 x 4.5 x 1.3","TML-HW-087":"15.0 x 3.2 x 0.0 cm (D?)","TML-HW-088":"9 x 9 x 3.59","TML-HW-089":"W8 x H185 mm","TML-HW-091":"12.8 x 10.3 x 2.7 cm","TML-HW-109":"10 x 3 cm","TML-HW-110":"12 x 8 x 8 cm","TML-PM-001":"11 x 8.5 x 0.5","TML-PM-005":"Small - H7 x T1 x Dia14 cmMedium - H7.5 x T1 x Dia16 cmLarge - H8 x T1 x Dia18 cm","TML-PM-006":"Small - L50 x W30 cm Medium - L40 x W30 cm","TML-KC-014":"25.0 x 25.0 cm"};
@@ -2321,14 +2481,28 @@ function loadProductData(p, cb){
 }
 function loadImg(p, cb){loadProductData(p, function(pd){cb(pd&&pd.img?pd.img:false);});}
 
-var S={u:false,tab:"calc",dt:"details",q:"",cf:"ALL",gf:"ALL",sup:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,wd:true,fq:"",fr:null,fl:false};
+var S={u:false,tab:"calc",dt:"details",q:"",cf:"ALL",gf:"ALL",sup:"ALL",si:null,pm:"dtf",sd:1,qty:100,pr:false,wd:true,fq:"",fr:null,fl:false,brand2:[],brandMode:"single"};
 
 function updOut(){
   var el=document.getElementById("OA");if(!el)return;
   var p=S.si!==null?P[S.si]:null;
   if(!p||p.type==="D"||!p.web||!p.cost){el.innerHTML="";return;} /* was isC(p)  */
+  /* ── v125: restricted destination — hide all pricing, show Logistics notice. */
+  var _rst = (window.MLSHIP && window.MLSHIP.restrictedName) ? window.MLSHIP.restrictedName() : null;
+  if(_rst){
+    var _rn = _rst.replace(/&/g,'&amp;');
+    el.innerHTML =
+      "<div class='oa-lbl'>Quote Summary</div>" +
+      "<div class='ml-restrict'>" +
+        "<div class='ml-restrict-ic'>\uD83D\uDEAB</div>" +
+        "<div class='ml-restrict-t'>Cannot ship to " + _rn + "</div>" +
+        "<div class='ml-restrict-s'>" + _rn + " is on the restricted-shipping list, so pricing is hidden.</div>" +
+      "</div>";
+    return;
+  }
   var pmO=PMS.find(function(m){return m.id===S.pm;});
-  var cur=calcP(p,S.pm,S.sd,S.pr,qt(S.qty));
+  var _apps=mlAppList();
+  var cur=calcP(p,S.pm,S.sd,S.pr,qt(S.qty),_apps);
   if(!cur){el.innerHTML="<p style='color:red;font-size:12px'>Cannot calculate — check pricing data.</p>";return;}
   // Screen Print MOQ hard-stop — below SP MOQ, hide price entirely and
   //      show actionable inline note suggesting DTF / Embroidery.
@@ -2360,8 +2534,7 @@ function updOut(){
     return;
   }
   var dp=cur.px,total=dp*S.qty,vat=total*.05;
-  var st=!pmO||pmO.f?"":S.sd+" side"+(S.sd>1?"s":"");
-  var pt=S.pm==="none"?"no print":(pmO.n+(st?" ("+st+")":""));
+  var pt=mlBrandLabel(S.pm,S.sd,_apps);
   var mc=cur.m>35?"#16a34a":cur.m>=25?"#ca8a04":"#dc2626";
   var qC=cur.locked?(cur.px>cur.li*0.8?"cap":"bad"):"ok";
   var qL=cur.locked&&cur.px>cur.li*0.8?"Floor price applied":cur.locked?"Below web price":"Quote Price with Branding";
@@ -2369,7 +2542,7 @@ function updOut(){
   // Screen recommender (V62.10: subtle inline note instead of bordered tip block)
   var rec="";
   var scrMoq=p.type==="A"?500:100; /* was isSoft(p)  */
-  if(S.qty>=scrMoq&&S.pm!=="screen"&&S.pm!=="none"){
+  if(S.qty>=scrMoq&&S.pm!=="screen"&&S.pm!=="none"&&!_apps){
     var pms2=gpm(p);
     if(pms2.find(function(m){return m.id==="screen";})){
       var sc2=calcP(p,"screen",1,S.pr,qt(S.qty));
@@ -2437,17 +2610,17 @@ function updOut(){
   // _focusQI does it twice (immediate + next animation frame) and clamps the
   // caret to the new value's length so it always lands cleanly.
   var qIn=document.getElementById("qI");
-  var _qiProg=false;
+  if(typeof window._qiProg==="undefined") window._qiProg=false;  /* v124: shared across updOut rebuilds so the programmatic-refocus guard survives the debounced rebuild (fixes digit-replaces-previous) */
   function _focusQI(pos){
     var place=function(){
       var e=document.getElementById("qI");
       if(!e) return;
       var max=(e.value||"").length;
       var p=(pos==null||pos>max)?max:pos;
-      _qiProg=true;
+      window._qiProg=true;
       try{e.focus({preventScroll:true});}catch(_){e.focus();}
       try{e.setSelectionRange(p,p);}catch(_){}
-      _qiProg=false;
+      window._qiProg=false;
     };
     place();
     if(typeof requestAnimationFrame==="function") requestAnimationFrame(place);
@@ -2468,7 +2641,7 @@ function updOut(){
   qIn.onblur=function(){clearTimeout(window._qiDeb);if(!S.qty){S.qty=0;}updOut();};
   // select-all on a genuine tap so a single tap-and-type cleanly replaces the qty;
   // skipped during programmatic refocus so mid-typing the caret/text is preserved
-  qIn.onfocus=function(){if(_qiProg)return;var self=this;setTimeout(function(){try{self.select();}catch(_){}},0);};
+  qIn.onfocus=function(){if(window._qiProg)return;var self=this;setTimeout(function(){try{self.select();}catch(_){}},0);};
   document.querySelectorAll("[data-qu]").forEach(function(te){te.onclick=function(){S.qty=parseInt(te.getAttribute("data-qu"));render(true);};});
   document.querySelectorAll("[data-ta]").forEach(function(te){te.onclick=function(){var _ta=te.getAttribute("data-ta");if(_ta){S.pm=_ta;render(true);}};});
   document.getElementById("cBtn").onclick=function(){
@@ -2486,7 +2659,7 @@ function updOut(){
     if(sq) sq.onclick=function(){
       if(!window.MLQ){return;}
       var pp=P[S.si]; if(!pp) return;
-      var cc=calcP(pp,S.pm,S.sd,S.pr,qt(S.qty)); if(!cc) return;
+      var cc=calcP(pp,S.pm,S.sd,S.pr,qt(S.qty),mlAppList()); if(!cc) return;
       var ce=document.getElementById("mlqCust");
       var _cust=(ce&&ce.value)?ce.value.trim():"";
       if(!_cust){ if(ce){ ce.focus(); ce.classList.add("ml-req-err"); } var _so=sq.innerHTML; sq.textContent="Enter customer name"; sq.style.color="#dc2626"; setTimeout(function(){ sq.innerHTML=_so; sq.style.color=""; },1800); return; }
@@ -2496,6 +2669,7 @@ function updOut(){
         customer:(ce&&ce.value?ce.value.trim():""),
         sku:pp.sku, title:pp.title,
         qty:S.qty, pm:S.pm, sd:S.sd, pr:!!S.pr, wd:(S.wd!==false),
+        brand2:((S.brandMode==='multi'&&S.brand2)?S.brand2.map(function(a){return {m:a.m,sd:a.sd};}):[]),
         ship:(typeof window.readShip==="function"?window.readShip():"uae"),
         dest:(window.MLSHIP?window.MLSHIP.readDest():""),
         destName:(window.MLSHIP&&window.MLSHIP.dest()?window.MLSHIP.dest().n:""),
@@ -2732,6 +2906,11 @@ function render(keep){
     var _msr=maxSidesFor(P[S.si]);
     var _dsr=defaultSidesFor(P[S.si]);
     if(S.sd>_msr) S.sd=_dsr;
+    /* v129: keep additional branding methods valid for the current product */
+    if(S.brand2&&S.brand2.length){
+      var _vp=gpm(P[S.si]).map(function(m){return m.id;});
+      S.brand2=S.brand2.filter(function(a){return _vp.indexOf(a.m)>=0;}).map(function(a){ var mo=PMS.find(function(x){return x.id===a.m;}); var d=(mo&&mo.f)?1:Math.min(Math.max(parseInt(a.sd)||1,1),_msr); return {m:a.m,sd:d}; });
+    }
     // Track last-product so we know to apply default on product change
     if(S._lastSi!==S.si){
       if(_dsr>1) S.sd=_dsr;
@@ -2781,7 +2960,7 @@ function render(keep){
   var p=S.si!==null?P[S.si]:null,pms=p?gpm(p):[],pmO=PMS.find(function(m){return m.id===S.pm;}),g=p?(p.type==="A"?"S":p.type==="D"?"C":"H"):"",gn=(p&&p.tags&&p.tags.length)?p.tags.slice(0,2).join(" / "):(p?typeLabel(p):""); /* g = CSS class derived from type letter, used in template literal below  */
   var main="";
   if(S.tab==="finder"){
-    main="<div class='fwrap'><h2>Product Finder</h2><p class='desc'>Search by product name or SKU to find the right item quickly.</p>"+
+    main="<div class='fwrap'><h2>Product Finder</h2><p class='desc'>Find the right item fast. <strong>URL lookup:</strong> paste a supplier product URL to check if it's already in the Merchlist catalogue. <strong>Text search:</strong> type a product name or SKU for fuzzy matching.</p>"+
       "<div class='finp-row'><input class='finp' id='fIn' placeholder='Search product name or SKU\u2026' value='"+he(S.fq)+"'><button class='fgo' id='fGo' type='button'>Find</button></div>"+buildFinder()+"</div>";
   }else if(!p){
     main="<div class='empty'><div class='ic'>\u2190</div><div class='t'>Pick a product to start</div><div class='s'>Browse the list on the left, or search by name or SKU</div></div>";
@@ -2794,6 +2973,31 @@ function render(keep){
     var btnsH=pms.map(function(m){var moqShow=(p.type==="A")?(m.qS||m.q):(m.qH||m.q);return"<button class='btn "+(S.pm===m.id?"on":"")+"' data-pm='"+m.id+"' type='button'>"+m.n+(moqShow>1?"<span class='sub'>min "+moqShow+"</span>":"")+"</button>";}).join(""); /* was isSoft(p)  */
     var sidesH="";if(!pmO||!pmO.f){var _ms=maxSidesFor(p);var _sa=[];for(var _i=1;_i<=_ms;_i++)_sa.push(_i);sidesH="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+_sa.map(function(s){return"<button class='sd-btn "+(S.sd===s?"on":"")+"' data-sd='"+s+"' type='button'>"+s+"</button>";}).join("")+"</div></div>";}
     var premH="";if(showPrem(p)){premH="<div class='cfg-s'><div class='cfg-lbl'>Fabric</div><div class='fab-row'><button class='fab-b "+(!S.pr?"on":"")+"' data-fb='0' type='button'>Basic</button><button class='fab-b "+(S.pr?"on":"")+"' data-fb='1' type='button'>Premium</button></div></div>";}
+    /* v129.3: Branding — Single (default) or Multiple; Multiple reuses the same
+       rounded button + sides UI as Single for visual consistency */
+    var _isMulti=(S.brandMode==='multi') && pms.length && S.pm!=='none';
+    function _brandRow(label, mId, sdVal, isPrim, idx){
+      var mo=PMS.find(function(x){return x.id===mId;});
+      var _mopts=pms.filter(function(m){return m.id!=='none';});
+      var mbtns=_mopts.map(function(m){ return "<button class='btn"+(mId===m.id?' on':'')+"' "+(isPrim?"data-b1m='"+m.id+"'":"data-am='"+idx+":"+m.id+"'")+" type='button'>"+he(m.n)+"</button>"; }).join("");
+      var sblock="";
+      if(!mo||!mo.f){ var _ms2=maxSidesFor(p),_sb=""; for(var _k=1;_k<=_ms2;_k++)_sb+="<button class='sd-btn"+(sdVal===_k?' on':'')+"' "+(isPrim?"data-b1s='"+_k+"'":"data-as='"+idx+":"+_k+"'")+" type='button'>"+_k+"</button>"; sblock="<div class='cfg-s'><div class='cfg-lbl'>Sides</div><div class='sides-row'>"+_sb+"</div></div>"; }
+      var rm=isPrim?"":"<button class='bm-x' data-b2-del='"+idx+"' type='button' title='Remove'>\u00D7</button>";
+      return "<div class='bm-row2'><div class='cfg-row'><div class='cfg-g'><div class='cfg-lbl bm-mlbl'><span>"+label+"</span>"+rm+"</div><div class='btns'>"+mbtns+"</div></div>"+sblock+"</div></div>";
+    }
+    var brandToggleH=(pms.length&&S.pm!=='none')
+      ? "<div class='bm-toggle'><button type='button' class='bm-tb"+(!_isMulti?' on':'')+"' data-bm='single'>Single Branding</button><button type='button' class='bm-tb"+(_isMulti?' on':'')+"' data-bm='multi'>Multiple Branding</button></div>"
+      : "";
+    var brandingH, fabRowH;
+    if(_isMulti){
+      var _rows=_brandRow('Method 1', S.pm, S.sd, true, -1);
+      _rows+=(S.brand2||[]).map(function(a,idx){ return _brandRow('Method '+(idx+2), a.m, a.sd, false, idx); }).join("");
+      brandingH="<div class='cfg-lbl'>Branding</div>"+brandToggleH+"<div class='bm-list'>"+_rows+"<button class='bm-add' data-b2-add='1' type='button'>+ Add another method</button><div class='bm-hint'>Each method is priced for its sides, then added into the unit price.</div></div>";
+      fabRowH=premH?("<div class='cfg-row' style='margin-top:8px'>"+premH+"</div>"):"";
+    } else {
+      brandingH="<div class='cfg-lbl'>Branding</div>"+brandToggleH+"<div class='cfg-row' style='margin-top:8px'><div class='cfg-g'><div class='cfg-lbl'>Method</div><div class='btns'>"+btnsH+"</div></div>"+premH+sidesH+"</div>";
+      fabRowH="";
+    }
     // wdH removed — toggle moved to wdBarH in updOut()
     // Product Details + Stock unified in ONE card with underline tabs.
     // - Product header always visible at top
@@ -2853,7 +3057,7 @@ function render(keep){
         stockPaneH+
         // Subtle section divider (no label text per user request)
         "<div class='cd-divider'></div>"+
-        "<div class='cfg-row'><div class='cfg-g'><div class='cfg-lbl'>Branding Method</div><div class='btns'>"+btnsH+"</div></div>"+sidesH+premH+"</div>"+
+        brandingH+fabRowH+
       (pmMoq?"<div class='moq-warn'>\u26A0 "+pmO.n+" requires min "+pmMoqVal+" units</div>":"")+
       "</div><div id='OA'></div>";
   }
@@ -2910,9 +3114,17 @@ function render(keep){
     var dpDetails=document.querySelector(".dt-pane.details"); if(dpDetails) dpDetails.style.display=(v==="details"?"block":"none");
     var dpStock=document.querySelector(".dt-pane.stock"); if(dpStock) dpStock.style.display=(v==="stock"?"block":"none");
   };});
-  document.querySelectorAll(".pi").forEach(function(el){el.onclick=function(){S.si=parseInt(el.getAttribute("data-i"));S.pr=false;var pm2=gpm(P[S.si]);if(!pm2.find(function(m){return m.id===S.pm;}))S.pm=pm2[0]?pm2[0].id:"dtf";render();};});
+  document.querySelectorAll(".pi").forEach(function(el){el.onclick=function(){S.si=parseInt(el.getAttribute("data-i"));S.pr=false;S.brand2=[];S.brandMode="single";var pm2=gpm(P[S.si]);if(!pm2.find(function(m){return m.id===S.pm;}))S.pm=pm2[0]?pm2[0].id:"dtf";render();};});
   document.querySelectorAll("[data-pm]").forEach(function(el){el.onclick=function(){S.pm=el.getAttribute("data-pm");var pm=PMS.find(function(m){return m.id===S.pm;});if(pm&&pm.f)S.sd=1;render(true);};});
   document.querySelectorAll("[data-sd]").forEach(function(el){el.onclick=function(){S.sd=parseInt(el.getAttribute("data-sd"));render(true);};});
+  /* v129 multi-method wiring (button UI) */
+  document.querySelectorAll("[data-bm]").forEach(function(el){el.onclick=function(){ var mode=el.getAttribute("data-bm"); S.brandMode=mode; if(mode==='multi'&&(!S.brand2||!S.brand2.length)){ var _p=P[S.si]; var _av=gpm(_p).map(function(m){return m.id;}).filter(function(x){return x!=="none";}); var _nm=_av.filter(function(x){return x!==S.pm;})[0]||_av[0]||S.pm; S.brand2=[{m:_nm,sd:1}]; } render(true); };});
+  document.querySelectorAll("[data-b1m]").forEach(function(el){el.onclick=function(){ S.pm=el.getAttribute("data-b1m"); var pm=PMS.find(function(m){return m.id===S.pm;}); if(pm&&pm.f)S.sd=1; render(true); };});
+  document.querySelectorAll("[data-b1s]").forEach(function(el){el.onclick=function(){ S.sd=parseInt(el.getAttribute("data-b1s"))||1; render(true); };});
+  document.querySelectorAll("[data-am]").forEach(function(el){el.onclick=function(){ var v=el.getAttribute("data-am").split(":"); var i=parseInt(v[0]); if(S.brand2&&S.brand2[i]){ S.brand2[i].m=v[1]; var _mo=PMS.find(function(x){return x.id===v[1];}); if(_mo&&_mo.f)S.brand2[i].sd=1; } render(true); };});
+  document.querySelectorAll("[data-as]").forEach(function(el){el.onclick=function(){ var v=el.getAttribute("data-as").split(":"); var i=parseInt(v[0]); if(S.brand2&&S.brand2[i]){ S.brand2[i].sd=parseInt(v[1])||1; } render(true); };});
+  document.querySelectorAll("[data-b2-del]").forEach(function(el){el.onclick=function(){ var i=parseInt(el.getAttribute("data-b2-del")); if(S.brand2){S.brand2.splice(i,1);} render(true); };});
+  document.querySelectorAll("[data-b2-add]").forEach(function(el){el.onclick=function(){ if(!S.brand2)S.brand2=[]; var _p=P[S.si]; var _av=gpm(_p).map(function(m){return m.id;}).filter(function(x){return x!=="none";}); var _nm=_av.filter(function(x){return x!==S.pm;})[0]||_av[0]||S.pm; S.brand2.push({m:_nm,sd:1}); render(true); };});
   document.querySelectorAll("[data-fb]").forEach(function(el){el.onclick=function(){S.pr=el.getAttribute("data-fb")==="1";render(true);};});
   // Web Discount handler — document-level so it survives updOut() re-renders
   if(!window._wdHandlerInstalled){
@@ -3853,6 +4065,39 @@ window.addEventListener('load',function(){
 
 /* ── INTERNATIONAL NOTICE ── */
 .ml-intl-note{display:flex;align-items:flex-start;gap:9px;padding:11px 13px;background:#fff7ed;border:1.5px solid #fed7aa;border-radius:9px;margin-top:10px}
+.ml-restrict{margin-top:10px;padding:24px 20px;background:#fef2f2;border:2px solid #fecaca;border-radius:12px;text-align:center}
+.ml-restrict-ic{font-size:42px;line-height:1;margin-bottom:10px}
+.ml-restrict-t{font-size:18px;font-weight:900;color:#b91c1c;margin-bottom:9px;letter-spacing:-.3px}
+.ml-restrict-s{font-size:13px;color:#7f1d1d;line-height:1.55;max-width:400px;margin:0 auto}
+.ml-restrict-s strong{font-weight:800}
+.ml-dest-sel.restricted{border-color:#dc2626 !important;color:#b91c1c !important;background:#fef2f2 !important;font-weight:800}
+.ml-dest-wrap{position:relative;display:inline-block}
+.ml-dest-inp{padding:6px 24px 6px 9px;font-size:11px;font-weight:700;border:1.5px solid #e5e7eb;background:#fff;color:#374151;border-radius:6px;cursor:text;letter-spacing:.2px;width:170px;font-family:inherit;outline:none}
+.ml-dest-inp::placeholder{color:#9ca3af;font-weight:600}
+.ml-dest-inp:focus{border-color:#111}
+.ml-dest-inp.on{border-color:#16a34a;background:#f0fdf4;color:#166534;font-weight:800}
+.ml-dest-inp.on::placeholder{color:#86efac}
+.ml-dest-inp.restricted{border-color:#dc2626 !important;color:#fff !important;background:#dc2626 !important}
+.ml-dest-clr{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:18px;height:18px;border:none;background:rgba(0,0,0,.08);color:#166534;border-radius:50%;font-size:13px;line-height:1;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.ml-dest-clr:hover{background:rgba(0,0,0,.18)}
+.ml-dest-inp.restricted ~ .ml-dest-clr{color:#fff;background:rgba(255,255,255,.3)}
+.ml-dest-inp.restricted ~ .ml-dest-clr:hover{background:rgba(255,255,255,.5)}
+.ml-dest-list{display:none;position:absolute;top:calc(100% + 4px);right:0;width:260px;max-height:300px;overflow-y:auto;background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.16);z-index:2000;padding:4px}
+.ml-dest-list.open{display:block}
+.ml-dest-opt{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:7px;cursor:pointer;font-size:12.5px}
+.ml-dest-opt:hover{background:#f3f4f6}
+.ml-dest-fl{font-size:15px;flex:0 0 auto}
+.ml-dest-nm{flex:1;font-weight:700;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ml-dest-cur{font-size:10px;font-weight:700;color:#9ca3af;flex:0 0 auto}
+.ml-dest-rst{font-size:8.5px;font-weight:800;color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:5px;padding:1px 5px;flex:0 0 auto;text-transform:uppercase;letter-spacing:.3px}
+.ml-dest-none{padding:12px;text-align:center;color:#9ca3af;font-size:12px}
+@media (max-width: 600px){
+  .ml-ship-wrap{margin-right:0;gap:4px;padding:2px}
+  .ml-ship-btn{padding:5px 8px;font-size:10px}
+  .ml-dest-inp{width:118px;padding:5px 20px 5px 7px;font-size:10px}
+  .ml-dest-list{width:min(82vw,260px);right:0;max-height:60vh}
+  .ml-curtop{display:none}
+}
 .ml-intl-icon{font-size:16px;line-height:1;margin-top:1px}
 .ml-intl-txt{flex:1;font-size:11.5px;color:#9a3412;line-height:1.45}
 .ml-intl-txt strong{color:#7c2d12;font-weight:800}
@@ -3943,27 +4188,60 @@ window.addEventListener('load',function(){
 
   // Curated export destinations for a Dubai gifting exporter. cur=currency, z=freight zone.
   var COUNTRIES=[
-    {c:'SA',n:'Saudi Arabia',cur:'SAR',z:'gcc',f:'\uD83C\uDDF8\uD83C\uDDE6'},
-    {c:'KW',n:'Kuwait',cur:'KWD',z:'gcc',f:'\uD83C\uDDF0\uD83C\uDDFC'},
-    {c:'QA',n:'Qatar',cur:'QAR',z:'gcc',f:'\uD83C\uDDF6\uD83C\uDDE6'},
-    {c:'BH',n:'Bahrain',cur:'BHD',z:'gcc',f:'\uD83C\uDDE7\uD83C\uDDED'},
-    {c:'OM',n:'Oman',cur:'OMR',z:'gcc',f:'\uD83C\uDDF4\uD83C\uDDF2'},
-    {c:'EG',n:'Egypt',cur:'EGP',z:'mena',f:'\uD83C\uDDEA\uD83C\uDDEC'},
-    {c:'JO',n:'Jordan',cur:'JOD',z:'mena',f:'\uD83C\uDDEF\uD83C\uDDF4'},
-    {c:'LB',n:'Lebanon',cur:'USD',z:'mena',f:'\uD83C\uDDF1\uD83C\uDDE7'},
-    {c:'GB',n:'United Kingdom',cur:'GBP',z:'eur',f:'\uD83C\uDDEC\uD83C\uDDE7'},
-    {c:'DE',n:'Germany',cur:'EUR',z:'eur',f:'\uD83C\uDDE9\uD83C\uDDEA'},
-    {c:'FR',n:'France',cur:'EUR',z:'eur',f:'\uD83C\uDDEB\uD83C\uDDF7'},
-    {c:'NL',n:'Netherlands',cur:'EUR',z:'eur',f:'\uD83C\uDDF3\uD83C\uDDF1'},
-    {c:'CH',n:'Switzerland',cur:'CHF',z:'eur',f:'\uD83C\uDDE8\uD83C\uDDED'},
-    {c:'US',n:'United States',cur:'USD',z:'amer',f:'\uD83C\uDDFA\uD83C\uDDF8'},
-    {c:'CA',n:'Canada',cur:'CAD',z:'amer',f:'\uD83C\uDDE8\uD83C\uDDE6'},
-    {c:'IN',n:'India',cur:'INR',z:'apac',f:'\uD83C\uDDEE\uD83C\uDDF3'},
-    {c:'SG',n:'Singapore',cur:'SGD',z:'apac',f:'\uD83C\uDDF8\uD83C\uDDEC'},
-    {c:'AU',n:'Australia',cur:'AUD',z:'apac',f:'\uD83C\uDDE6\uD83C\uDDFA'},
-    {c:'CN',n:'China',cur:'CNY',z:'apac',f:'\uD83C\uDDE8\uD83C\uDDF3'},
-    {c:'JP',n:'Japan',cur:'JPY',z:'apac',f:'\uD83C\uDDEF\uD83C\uDDF5'}
+    {c:'AF',n:'Afghanistan',cur:'AFN'},{c:'AL',n:'Albania',cur:'ALL'},{c:'DZ',n:'Algeria',cur:'DZD'},{c:'AD',n:'Andorra',cur:'EUR'},
+    {c:'AO',n:'Angola',cur:'AOA'},{c:'AG',n:'Antigua and Barbuda',cur:'XCD'},{c:'AR',n:'Argentina',cur:'ARS'},{c:'AM',n:'Armenia',cur:'AMD'},
+    {c:'AU',n:'Australia',cur:'AUD'},{c:'AT',n:'Austria',cur:'EUR'},{c:'AZ',n:'Azerbaijan',cur:'AZN'},{c:'BS',n:'Bahamas',cur:'BSD'},
+    {c:'BH',n:'Bahrain',cur:'BHD'},{c:'BD',n:'Bangladesh',cur:'BDT'},{c:'BB',n:'Barbados',cur:'BBD'},{c:'BY',n:'Belarus',cur:'BYN'},
+    {c:'BE',n:'Belgium',cur:'EUR'},{c:'BZ',n:'Belize',cur:'BZD'},{c:'BJ',n:'Benin',cur:'XOF'},{c:'BT',n:'Bhutan',cur:'BTN'},
+    {c:'BO',n:'Bolivia',cur:'BOB'},{c:'BA',n:'Bosnia and Herzegovina',cur:'BAM'},{c:'BW',n:'Botswana',cur:'BWP'},{c:'BR',n:'Brazil',cur:'BRL'},
+    {c:'BN',n:'Brunei',cur:'BND'},{c:'BG',n:'Bulgaria',cur:'BGN'},{c:'BF',n:'Burkina Faso',cur:'XOF'},{c:'BI',n:'Burundi',cur:'BIF'},
+    {c:'CV',n:'Cabo Verde',cur:'CVE'},{c:'KH',n:'Cambodia',cur:'KHR'},{c:'CM',n:'Cameroon',cur:'XAF'},{c:'CA',n:'Canada',cur:'CAD'},
+    {c:'CF',n:'Central African Republic',cur:'XAF'},{c:'TD',n:'Chad',cur:'XAF'},{c:'CL',n:'Chile',cur:'CLP'},{c:'CN',n:'China',cur:'CNY'},
+    {c:'CO',n:'Colombia',cur:'COP'},{c:'KM',n:'Comoros',cur:'KMF'},{c:'CD',n:'Congo (DRC)',cur:'CDF'},{c:'CG',n:'Congo (Republic)',cur:'XAF'},
+    {c:'CR',n:'Costa Rica',cur:'CRC'},{c:'CI',n:'Cote d\'Ivoire',cur:'XOF'},{c:'HR',n:'Croatia',cur:'EUR'},{c:'CU',n:'Cuba',cur:'CUP'},
+    {c:'CY',n:'Cyprus',cur:'EUR'},{c:'CZ',n:'Czechia',cur:'CZK'},{c:'DK',n:'Denmark',cur:'DKK'},{c:'DJ',n:'Djibouti',cur:'DJF'},
+    {c:'DM',n:'Dominica',cur:'XCD'},{c:'DO',n:'Dominican Republic',cur:'DOP'},{c:'EC',n:'Ecuador',cur:'USD'},{c:'EG',n:'Egypt',cur:'EGP'},
+    {c:'SV',n:'El Salvador',cur:'USD'},{c:'GQ',n:'Equatorial Guinea',cur:'XAF'},{c:'ER',n:'Eritrea',cur:'ERN'},{c:'EE',n:'Estonia',cur:'EUR'},
+    {c:'SZ',n:'Eswatini',cur:'SZL'},{c:'ET',n:'Ethiopia',cur:'ETB'},{c:'FK',n:'Falkland Islands',cur:'FKP'},{c:'FJ',n:'Fiji',cur:'FJD'},
+    {c:'FI',n:'Finland',cur:'EUR'},{c:'FR',n:'France',cur:'EUR'},{c:'GA',n:'Gabon',cur:'XAF'},{c:'GM',n:'Gambia',cur:'GMD'},
+    {c:'GE',n:'Georgia',cur:'GEL'},{c:'DE',n:'Germany',cur:'EUR'},{c:'GH',n:'Ghana',cur:'GHS'},{c:'GR',n:'Greece',cur:'EUR'},
+    {c:'GD',n:'Grenada',cur:'XCD'},{c:'GT',n:'Guatemala',cur:'GTQ'},{c:'GN',n:'Guinea',cur:'GNF'},{c:'GW',n:'Guinea-Bissau',cur:'XOF'},
+    {c:'GY',n:'Guyana',cur:'GYD'},{c:'HT',n:'Haiti',cur:'HTG'},{c:'HN',n:'Honduras',cur:'HNL'},{c:'HK',n:'Hong Kong',cur:'HKD'},
+    {c:'HU',n:'Hungary',cur:'HUF'},{c:'IS',n:'Iceland',cur:'ISK'},{c:'IN',n:'India',cur:'INR'},{c:'ID',n:'Indonesia',cur:'IDR'},
+    {c:'IR',n:'Iran',cur:'IRR'},{c:'IQ',n:'Iraq',cur:'IQD'},{c:'IE',n:'Ireland',cur:'EUR'},{c:'IL',n:'Israel',cur:'ILS'},
+    {c:'IT',n:'Italy',cur:'EUR'},{c:'JM',n:'Jamaica',cur:'JMD'},{c:'JP',n:'Japan',cur:'JPY'},{c:'JO',n:'Jordan',cur:'JOD'},
+    {c:'KZ',n:'Kazakhstan',cur:'KZT'},{c:'KE',n:'Kenya',cur:'KES'},{c:'KI',n:'Kiribati',cur:'AUD'},{c:'KW',n:'Kuwait',cur:'KWD'},
+    {c:'KG',n:'Kyrgyzstan',cur:'KGS'},{c:'LA',n:'Laos',cur:'LAK'},{c:'LV',n:'Latvia',cur:'EUR'},{c:'LB',n:'Lebanon',cur:'LBP'},
+    {c:'LS',n:'Lesotho',cur:'LSL'},{c:'LR',n:'Liberia',cur:'LRD'},{c:'LY',n:'Libya',cur:'LYD'},{c:'LI',n:'Liechtenstein',cur:'CHF'},
+    {c:'LT',n:'Lithuania',cur:'EUR'},{c:'LU',n:'Luxembourg',cur:'EUR'},{c:'MO',n:'Macao',cur:'MOP'},{c:'MG',n:'Madagascar',cur:'MGA'},
+    {c:'MW',n:'Malawi',cur:'MWK'},{c:'MY',n:'Malaysia',cur:'MYR'},{c:'MV',n:'Maldives',cur:'MVR'},{c:'ML',n:'Mali',cur:'XOF'},
+    {c:'MT',n:'Malta',cur:'EUR'},{c:'MH',n:'Marshall Islands',cur:'USD'},{c:'MR',n:'Mauritania',cur:'MRU'},{c:'MU',n:'Mauritius',cur:'MUR'},
+    {c:'YT',n:'Mayotte',cur:'EUR'},{c:'MX',n:'Mexico',cur:'MXN'},{c:'FM',n:'Micronesia',cur:'USD'},{c:'MD',n:'Moldova',cur:'MDL'},
+    {c:'MC',n:'Monaco',cur:'EUR'},{c:'MN',n:'Mongolia',cur:'MNT'},{c:'ME',n:'Montenegro',cur:'EUR'},{c:'MA',n:'Morocco',cur:'MAD'},
+    {c:'MZ',n:'Mozambique',cur:'MZN'},{c:'MM',n:'Myanmar',cur:'MMK'},{c:'NA',n:'Namibia',cur:'NAD'},{c:'NR',n:'Nauru',cur:'AUD'},
+    {c:'NP',n:'Nepal',cur:'NPR'},{c:'NL',n:'Netherlands',cur:'EUR'},{c:'NZ',n:'New Zealand',cur:'NZD'},{c:'NI',n:'Nicaragua',cur:'NIO'},
+    {c:'NE',n:'Niger',cur:'XOF'},{c:'NG',n:'Nigeria',cur:'NGN'},{c:'NU',n:'Niue',cur:'NZD'},{c:'KP',n:'North Korea',cur:'KPW'},
+    {c:'MK',n:'North Macedonia',cur:'MKD'},{c:'NO',n:'Norway',cur:'NOK'},{c:'OM',n:'Oman',cur:'OMR'},{c:'PK',n:'Pakistan',cur:'PKR'},
+    {c:'PW',n:'Palau',cur:'USD'},{c:'PS',n:'Palestine',cur:'ILS'},{c:'PA',n:'Panama',cur:'PAB'},{c:'PG',n:'Papua New Guinea',cur:'PGK'},
+    {c:'PY',n:'Paraguay',cur:'PYG'},{c:'PE',n:'Peru',cur:'PEN'},{c:'PH',n:'Philippines',cur:'PHP'},{c:'PL',n:'Poland',cur:'PLN'},
+    {c:'PT',n:'Portugal',cur:'EUR'},{c:'QA',n:'Qatar',cur:'QAR'},{c:'RO',n:'Romania',cur:'RON'},{c:'RU',n:'Russia',cur:'RUB'},
+    {c:'RW',n:'Rwanda',cur:'RWF'},{c:'SH',n:'Saint Helena',cur:'SHP'},{c:'KN',n:'Saint Kitts and Nevis',cur:'XCD'},{c:'LC',n:'Saint Lucia',cur:'XCD'},
+    {c:'PM',n:'Saint Pierre and Miquelon',cur:'EUR'},{c:'VC',n:'Saint Vincent and the Grenadines',cur:'XCD'},{c:'WS',n:'Samoa',cur:'WST'},{c:'SM',n:'San Marino',cur:'EUR'},
+    {c:'ST',n:'Sao Tome and Principe',cur:'STN'},{c:'SA',n:'Saudi Arabia',cur:'SAR'},{c:'SN',n:'Senegal',cur:'XOF'},{c:'RS',n:'Serbia',cur:'RSD'},
+    {c:'SC',n:'Seychelles',cur:'SCR'},{c:'SL',n:'Sierra Leone',cur:'SLE'},{c:'SG',n:'Singapore',cur:'SGD'},{c:'SK',n:'Slovakia',cur:'EUR'},
+    {c:'SI',n:'Slovenia',cur:'EUR'},{c:'SB',n:'Solomon Islands',cur:'SBD'},{c:'SO',n:'Somalia',cur:'SOS'},{c:'ZA',n:'South Africa',cur:'ZAR'},
+    {c:'KR',n:'South Korea',cur:'KRW'},{c:'SS',n:'South Sudan',cur:'SSP'},{c:'ES',n:'Spain',cur:'EUR'},{c:'LK',n:'Sri Lanka',cur:'LKR'},
+    {c:'SD',n:'Sudan',cur:'SDG'},{c:'SR',n:'Suriname',cur:'SRD'},{c:'SE',n:'Sweden',cur:'SEK'},{c:'CH',n:'Switzerland',cur:'CHF'},
+    {c:'SY',n:'Syria',cur:'SYP'},{c:'TW',n:'Taiwan',cur:'TWD'},{c:'TJ',n:'Tajikistan',cur:'TJS'},{c:'TZ',n:'Tanzania',cur:'TZS'},
+    {c:'TH',n:'Thailand',cur:'THB'},{c:'TL',n:'Timor-Leste',cur:'USD'},{c:'TG',n:'Togo',cur:'XOF'},{c:'TK',n:'Tokelau',cur:'NZD'},
+    {c:'TO',n:'Tonga',cur:'TOP'},{c:'TT',n:'Trinidad and Tobago',cur:'TTD'},{c:'TN',n:'Tunisia',cur:'TND'},{c:'TR',n:'Turkey',cur:'TRY'},
+    {c:'TM',n:'Turkmenistan',cur:'TMT'},{c:'TV',n:'Tuvalu',cur:'AUD'},{c:'UG',n:'Uganda',cur:'UGX'},{c:'UA',n:'Ukraine',cur:'UAH'},
+    {c:'AE',n:'United Arab Emirates',cur:'AED'},{c:'GB',n:'United Kingdom',cur:'GBP'},{c:'US',n:'United States',cur:'USD'},{c:'UY',n:'Uruguay',cur:'UYU'},
+    {c:'UZ',n:'Uzbekistan',cur:'UZS'},{c:'VU',n:'Vanuatu',cur:'VUV'},{c:'VA',n:'Vatican City',cur:'EUR'},{c:'VE',n:'Venezuela',cur:'VES'},
+    {c:'VN',n:'Vietnam',cur:'VND'},{c:'YE',n:'Yemen',cur:'YER'},{c:'ZM',n:'Zambia',cur:'ZMW'},{c:'ZW',n:'Zimbabwe',cur:'ZWL'}
   ];
+  var RESTRICTED_SET={IN:1,CN:1,KR:1,ID:1,TH:1,MY:1,PK:1,BD:1,LK:1,TR:1,EG:1,MA:1,AF:1,BY:1,CF:1,KM:1,CU:1,GQ:1,FK:1,GW:1,IR:1,KI:1,KP:1,YT:1,NR:1,NU:1,RU:1,PM:1,ST:1,SL:1,SB:1,SO:1,SH:1,SD:1,SY:1,TJ:1,TK:1,TM:1,TV:1,YE:1,IQ:1,IL:1,PS:1,LB:1};
+  function flagOf(c){ if(!c||c.length!==2) return "\uD83C\uDF0D"; var A=0x1F1E6; return String.fromCodePoint(A+c.charCodeAt(0)-65, A+c.charCodeAt(1)-65); }
   var ZONES={
     gcc :{n:'GCC',          perKg:6,  min:80,  lead:3},
     mena:{n:'MENA',         perKg:10, min:120, lead:5},
@@ -4002,6 +4280,10 @@ window.addEventListener('load',function(){
   function fxAge(){ if(!FX.ts) return ''; var days=Math.floor((Date.now()-FX.ts)/86400000); return FX.src==='live'?(days<=0?'today':days+'d ago'):(FX.src==='baked'?'offline':'cached'); }
 
   window.MLSHIP={ COUNTRIES:COUNTRIES, ZONES:ZONES, readDest:readDest, writeDest:writeDest, dest:dest, convert:convert, fmtCur:fmtCur, freight:freight, fxSrc:function(){return FX.src;}, fxAge:fxAge };
+  /* v125: restricted-destination check — returns the country name if the current
+     destination is on the Logistics restricted list, else null. */
+  window.MLSHIP.isRestricted = function(c){ return !!RESTRICTED_SET[c]; };
+  window.MLSHIP.restrictedName = function(){ if(readShip()!=='intl') return null; var d=readDest(); if(d && RESTRICTED_SET[d]){ var co=dest(); return co?co.n:d; } return null; };
 
   // Display currency: null = AED (default/contractual). When set to a currency
   // code, mlFmt() renders AED amounts converted to that currency for the quote.
@@ -4085,37 +4367,35 @@ window.addEventListener('load',function(){
   function injectShipToggle(){
     var tbr = document.querySelector('.tb-r');
     if (!tbr || document.getElementById('ml-ship')) return;
-
     var current = readShip();
     var curDest = readDest();
-    var opts='<option value="">\uD83C\uDF0D International\u2026</option>';
-    var zlabel={gcc:'GCC',mena:'MENA',eur:'Europe',amer:'Americas',apac:'Asia-Pacific'};
-    var order=['gcc','mena','eur','amer','apac'];
-    order.forEach(function(zk){
-      var grp=COUNTRIES.filter(function(co){return co.z===zk;});
-      if(!grp.length) return;
-      opts+='<optgroup label="'+zlabel[zk]+'">';
-      grp.forEach(function(co){ opts+='<option value="'+co.c+'"'+(current==='intl'&&curDest===co.c?' selected':'')+'>'+co.f+' '+co.n+' ('+co.cur+')</option>'; });
-      opts+='</optgroup>';
-    });
+    var curCo = (function(){ for(var i=0;i<COUNTRIES.length;i++) if(COUNTRIES[i].c===curDest) return COUNTRIES[i]; return null; })();
+    var isIntl = (current==='intl');
+    var restr = isIntl && curCo && RESTRICTED_SET[curCo.c];
+    var fieldVal = (isIntl && curCo) ? (flagOf(curCo.c)+' '+curCo.n) : '';
     var wrap = document.createElement('div');
     wrap.className = 'ml-ship-wrap';
     wrap.id = 'ml-ship';
     wrap.innerHTML =
       '<button class="ml-ship-btn'+(current==='uae'?' on':'')+'" data-ship="uae" type="button">\uD83C\uDDE6\uD83C\uDDEA UAE</button>'+
-      '<select class="ml-dest-sel'+(current==='intl'?' on':'')+'" id="ml-dest" aria-label="Destination country">'+opts+'</select>'+'<span class="ml-curtop" id="ml-curtop"></span>';
+      '<div class="ml-dest-wrap">'+
+        '<input class="ml-dest-inp'+(isIntl?' on':'')+(restr?' restricted':'')+'" id="ml-dest-inp" type="text" autocomplete="off" placeholder="\uD83C\uDF0D Ship to\u2026 (search country)" value="'+he(fieldVal)+'">'+
+        (isIntl?'<button class="ml-dest-clr" id="ml-dest-clr" type="button" aria-label="Clear">\u00D7</button>':'')+
+        '<div class="ml-dest-list" id="ml-dest-list"></div>'+
+      '</div>'+
+      '<span class="ml-curtop" id="ml-curtop"></span>';
     tbr.parentNode.insertBefore(wrap, tbr);
 
-    function applyShip(){
-      if (typeof updOut==='function') updOut();
-      try{ renderQuoteBuilder(); }catch(e){}
-      try{ buildCurTop(); }catch(e){}
-    }
+    var uaeBtn = wrap.querySelector('[data-ship="uae"]');
+    var inp = wrap.querySelector('#ml-dest-inp');
+    var list = wrap.querySelector('#ml-dest-list');
+
+    function applyShip(){ if (typeof updOut==='function') updOut(); try{ renderQuoteBuilder(); }catch(e){} try{ buildCurTop(); }catch(e){} }
     function buildCurTop(){
       var box=document.getElementById('ml-curtop'); if(!box) return;
       var co=null, dc=readDest(); for(var i=0;i<COUNTRIES.length;i++){ if(COUNTRIES[i].c===dc){ co=COUNTRIES[i]; break; } }
       var rate = co ? window.MLSHIP.convert(1, co.cur) : null;
-      if(readShip()!=='intl' || !co || rate==null){ box.innerHTML=''; return; }
+      if(readShip()!=='intl' || !co || rate==null || (window.MLSHIP.isRestricted && window.MLSHIP.isRestricted(dc))){ box.innerHTML=''; return; }
       var cur=window._mlDispCur;
       box.innerHTML =
         '<span class="ml-cur-lbl">Show in</span>'+
@@ -4125,25 +4405,34 @@ window.addEventListener('load',function(){
         b.onclick=function(){ window._mlDispCur=b.getAttribute('data-cur')||null; if(typeof updOut==='function')updOut(); buildCurTop(); try{renderQuoteBuilder();}catch(e){} };
       });
     }
-    var uaeBtn = wrap.querySelector('[data-ship="uae"]');
-    var sel = wrap.querySelector('#ml-dest');
-    uaeBtn.onclick = function(){
-      writeShip('uae'); writeDest(''); window._mlDispCur=null;
-      uaeBtn.classList.add('on'); if(sel){ sel.classList.remove('on'); sel.value=''; }
+    function toUAE(){ writeShip('uae'); writeDest(''); window._mlDispCur=null; uaeBtn.classList.add('on'); inp.classList.remove('on','restricted'); inp.value=''; var c=document.getElementById('ml-dest-clr'); if(c)c.remove(); list.classList.remove('open'); applyShip(); }
+    function selectCountry(co){
+      writeShip('intl'); writeDest(co.c); window._mlDispCur=null;
+      _delCharge=0; try{window._delCharge=0;}catch(e){}
+      uaeBtn.classList.remove('on'); inp.classList.add('on'); inp.classList.toggle('restricted', !!RESTRICTED_SET[co.c]);
+      inp.value=flagOf(co.c)+' '+co.n; list.classList.remove('open');
+      if(!document.getElementById('ml-dest-clr')){ var c=document.createElement('button'); c.className='ml-dest-clr'; c.id='ml-dest-clr'; c.type='button'; c.setAttribute('aria-label','Clear'); c.textContent='\u00D7'; c.onclick=toUAE; inp.parentNode.insertBefore(c, list); }
       applyShip();
-    };
-    if(sel) sel.onchange = function(){
-      var v=this.value;
-      window._mlDispCur=null; // reset to AED whenever destination changes
-      if(!v){ // back to UAE if placeholder chosen
-        writeShip('uae'); writeDest(''); uaeBtn.classList.add('on'); this.classList.remove('on');
-      } else {
-        writeShip('intl'); writeDest(v);
-        _delCharge = 0; try{window._delCharge=0;}catch(e){}
-        uaeBtn.classList.remove('on'); this.classList.add('on');
-      }
-      applyShip();
-    };
+    }
+    var POP={SA:0,QA:1,KW:2,BH:3,OM:4,GB:5,US:6,IN:7,SG:8,AU:9,CA:10,DE:11,FR:12,NL:13,CH:14,EG:15,JO:16,LB:17,CN:18,JP:19};
+    function renderList(q){
+      q=(q||'').trim().toLowerCase();
+      function score(co){ var n=co.n.toLowerCase(); if(!q) return 5; if(n===q) return 0; if(n.indexOf(q)===0) return 1; var ws=n.split(/[\s\-']+/); for(var i=0;i<ws.length;i++){ if(ws[i].indexOf(q)===0) return 2; } if(co.c.toLowerCase()===q) return 1; if(n.indexOf(q)>=0) return 3; return 99; }
+      var matches=COUNTRIES.filter(function(co){return co.c!=='AE';}).map(function(co){return {co:co,s:score(co)};}).filter(function(x){return x.s<99;});
+      matches.sort(function(a,b){ if(a.s!==b.s) return a.s-b.s; var pa=(POP[a.co.c]==null?999:POP[a.co.c]), pb=(POP[b.co.c]==null?999:POP[b.co.c]); if(pa!==pb) return pa-pb; return a.co.n<b.co.n?-1:1; });
+      list.innerHTML = matches.slice(0,40).map(function(x){ var co=x.co;
+        var rst = RESTRICTED_SET[co.c] ? '<span class="ml-dest-rst">Restricted</span>' : '';
+        return '<div class="ml-dest-opt" data-cc="'+co.c+'"><span class="ml-dest-fl">'+flagOf(co.c)+'</span><span class="ml-dest-nm">'+he(co.n)+'</span><span class="ml-dest-cur">'+co.cur+'</span>'+rst+'</div>';
+      }).join('') || '<div class="ml-dest-none">No country found</div>';
+      list.querySelectorAll('[data-cc]').forEach(function(o){ o.onmousedown=function(e){ e.preventDefault(); var cc=o.getAttribute('data-cc'); for(var i=0;i<COUNTRIES.length;i++) if(COUNTRIES[i].c===cc){ selectCountry(COUNTRIES[i]); break; } }; });
+      list.classList.add('open');
+    }
+
+    uaeBtn.onclick = toUAE;
+    inp.onfocus = function(){ inp.value=''; renderList(''); };
+    inp.oninput = function(){ renderList(this.value); };
+    inp.onblur = function(){ setTimeout(function(){ list.classList.remove('open'); var co=null,dc=readDest(); for(var i=0;i<COUNTRIES.length;i++) if(COUNTRIES[i].c===dc){co=COUNTRIES[i];break;} if(readShip()==='intl'&&co){ inp.value=flagOf(co.c)+' '+co.n; } else { inp.value=''; } }, 180); };
+    var clr=document.getElementById('ml-dest-clr'); if(clr) clr.onclick=toUAE;
     buildCurTop();
   }
 
@@ -4294,7 +4583,8 @@ window.addEventListener('load',function(){
       try{ alert(_msg); }catch(e){}
       return;
     }
-    var cur = calcP(p, S.pm, S.sd, S.pr, qt(S.qty));
+    var _appsQB = (typeof mlAppList==='function') ? mlAppList() : null;
+    var cur = calcP(p, S.pm, S.sd, S.pr, qt(S.qty), _appsQB);
     if (!cur) return;
     var pmO = PMS.find(function(m){return m.id===S.pm;});
     
@@ -4307,6 +4597,8 @@ window.addEventListener('load',function(){
       pm: S.pm,
       pmName: pmO ? pmO.n : S.pm,
       sd: S.sd,
+      brand2: (_appsQB ? (S.brand2||[]).map(function(a){return {m:a.m,sd:a.sd};}) : []),
+      brandLabel: (typeof mlBrandLabel==='function') ? mlBrandLabel(S.pm,S.sd,_appsQB) : null,
       flatPrint: pmO ? !!pmO.f : true,
       prem: S.pr,
       unit: cur.px,
@@ -4396,7 +4688,8 @@ window.addEventListener('load',function(){
     
     if (items.length>0){
       html += '<div class="qb-actions">'+
-        '<input type="text" id="qbCust" class="qb-cust-inp" placeholder="Customer name (required)" autocomplete="off" value="'+esc(window._qbCust||'')+'">'+
+        '<input type="text" id="qbCust" class="qb-cust-inp" list="qbCustList" placeholder="Customer name (required)" autocomplete="off" value="'+esc(window._qbCust||'')+'">'+
+        '<datalist id="qbCustList"></datalist>'+
         '<button class="qb-act-btn primary" id="qb-save" type="button">\uD83D\uDCBE Save</button>'+
         '<button class="qb-act-btn danger" id="qb-clear" type="button">Clear all</button>'+
         '</div>';
@@ -4412,7 +4705,7 @@ window.addEventListener('load',function(){
       html += '<div class="qb-items">';
       items.forEach(function(it){
         var sideTxt = it.flatPrint ? '' : it.sd+' side'+(it.sd>1?'s':'');
-        var method = it.pm==='none' ? 'No print' : (it.pmName + (sideTxt?' ('+sideTxt+')':''));
+        var method = it.brandLabel ? it.brandLabel : (it.pm==='none' ? 'No print' : (it.pmName + (sideTxt?' ('+sideTxt+')':'')));
         html += '<div class="qb-item" data-id="'+it.id+'">'+
           '<div class="qb-it-info">'+
             '<div class="qb-it-t">'+esc(it.title)+'</div>'+
@@ -4477,6 +4770,8 @@ window.addEventListener('load',function(){
     /* v117: customer name + Save-to-Recent-Quotes for the multi-product list */
     var qbCustEl = document.getElementById('qbCust');
     if (qbCustEl) qbCustEl.oninput = function(){ window._qbCust = this.value; this.style.borderColor=''; this.placeholder='Customer name (required)'; };
+    var qbDl = document.getElementById('qbCustList');
+    if (qbDl && window.MLQ) qbDl.innerHTML = window.MLQ.customers().map(function(cn){ return '<option value="'+esc(cn)+'"></option>'; }).join('');
     var qbSaveBtn = document.getElementById('qb-save');
     if (qbSaveBtn) qbSaveBtn.onclick = function(){
       var its = readQuote();
@@ -4494,7 +4789,7 @@ window.addEventListener('load',function(){
       var tu = its.reduce(function(s,it){return s+it.qty;},0);
       var rec = {
         id:'qb_'+Date.now(), kind:'qb', customer:cust, ts:Date.now(),
-        items: its.map(function(it){ return { sku:it.sku, title:it.title, qty:it.qty, unit:it.unit, lineTotal:it.lineTotal, prem:!!it.prem, pm:it.pm, pmName:it.pmName, sd:it.sd, flatPrint:!!it.flatPrint }; }),
+        items: its.map(function(it){ return { sku:it.sku, title:it.title, qty:it.qty, unit:it.unit, lineTotal:it.lineTotal, prem:!!it.prem, pm:it.pm, pmName:it.pmName, sd:it.sd, flatPrint:!!it.flatPrint, brand2:it.brand2||[], brandLabel:it.brandLabel||null }; }),
         ship:sh, del:del, total:gr, qty:tu,
         title: its.length+' product'+(its.length>1?'s':'')+' \u00B7 quote',
         sku: its.length+' products', unit:null, margin:null
@@ -4864,7 +5159,7 @@ window.addEventListener('load',function(){
     lines.push('');
     items.forEach(function(it){
       var sideTxt = it.flatPrint ? '' : ' ('+it.sd+' side'+(it.sd>1?'s':'')+')';
-      var method = it.pm==='none' ? 'No print' : (it.pmName + sideTxt);
+      var method = it.brandLabel ? it.brandLabel : (it.pm==='none' ? 'No print' : (it.pmName + sideTxt));
       lines.push(b('Product')+': '+it.title+(it.prem?' (Premium)':''));
       lines.push(b('Print Method')+': '+method);
       lines.push(b('Quantity')+': '+it.qty.toLocaleString()+' units');
@@ -5065,7 +5360,8 @@ window.addEventListener('load',function(){
     window.addCurrentToQuote = function(){
       if(typeof S === 'undefined' || S.si === null) return false;
       var p = P[S.si]; if(!p) return false;
-      var cur = calcP(p, S.pm, S.sd, S.pr, qt(S.qty));
+      var _appsQB2 = (typeof mlAppList==='function') ? mlAppList() : null;
+      var cur = calcP(p, S.pm, S.sd, S.pr, qt(S.qty), _appsQB2);
       if(!cur) return false;
       var pmO = PMS.find(function(m){return m.id === S.pm;});
       
@@ -5073,6 +5369,8 @@ window.addEventListener('load',function(){
         id: Date.now() + '-' + Math.random().toString(36).slice(2,7),
         sku: p.sku, title: p.title, cat: p.cat, qty: S.qty,
         pm: S.pm, pmName: pmO ? pmO.n : S.pm, sd: S.sd,
+        brand2: (_appsQB2 ? (S.brand2||[]).map(function(a){return {m:a.m,sd:a.sd};}) : []),
+        brandLabel: (typeof mlBrandLabel==='function') ? mlBrandLabel(S.pm,S.sd,_appsQB2) : null,
         flatPrint: pmO ? !!pmO.f : true, prem: S.pr,
         unit: cur.px, margin: cur.m, lineTotal: cur.px * S.qty,
         addedAt: Date.now()
@@ -5414,6 +5712,7 @@ window.addEventListener('load',function(){
   .tab[data-tab="airec"]::before{content:"\2728 AI"}
   .tab[data-tab="quote"]::before{content:"Quote"}
   .tab[data-tab="recent"]::before{content:"\uD83D\uDCCB Quotes"}
+  .tab[data-tab="analytics"]::before{content:"\uD83D\uDCCA Stats"}
   /* Keep the count badge (font-size:0 on parent zeroed it out) */
   .tab .ml-qb-badge{font-size:9px;margin-left:4px}
   /* keep the NEW badge visible on mobile too (parent tab is font-size:0)  */
@@ -7787,7 +8086,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     }
     var idx=-1; for(var i=0;i<P.length;i++){ if(P[i].sku===rec.sku){ idx=i; break; } }
     if(idx<0){ alert("\u201C"+rec.title+"\u201D is no longer in the catalogue."); return; }
-    S.si=idx; S.qty=rec.qty; S.pm=rec.pm; S.sd=rec.sd; S.pr=!!rec.pr; S.wd=(rec.wd!==false); S.tab="calc";
+    S.si=idx; S.qty=rec.qty; S.pm=rec.pm; S.sd=rec.sd; S.pr=!!rec.pr; S.wd=(rec.wd!==false); S.brand2=(rec.brand2&&rec.brand2.length?rec.brand2.map(function(a){return {m:a.m,sd:a.sd};}):[]); S.brandMode=(rec.brand2&&rec.brand2.length)?"multi":"single"; S.tab="calc";
     if(typeof window.writeShip==="function"&&rec.ship){ try{ window.writeShip(rec.ship); }catch(e){} }
     if(window.MLSHIP){ try{ window.MLSHIP.writeDest(rec.dest||""); window._mlDispCur = rec.dispCur||null; }catch(e){} }
     window._mlqPendingCust = isClone ? "" : (rec.customer||"");
@@ -7795,6 +8094,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
   }
 
   // ── View detail toggle ──
+  try{ window.MLQ.applyQuote = applyQuote; }catch(e){}
   function detailHTML(rec){
     /* v117: multi-product Quote Builder quote — list the items */
     if(rec && rec.kind==="qb"){
@@ -7845,6 +8145,8 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     }
     return H+"</div>";
   }
+  var _rcF='all', _rcQ='';
+  function _needsFollowup(q){ return !q.outcome && q.ts && (Date.now()-q.ts)>=3*864e5; }
   function renderRecent(host){
     var list=window.MLQ.all();
     var H="<div style='max-width:640px;margin:0 auto;padding:4px 2px'>"+
@@ -7860,7 +8162,15 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
         "<div style='font-size:13px'>On the Calc tab, build a quote and tap <strong>\uD83D\uDCBE Save</strong> to keep it here.</div>"+
       "</div>";
     } else {
-      list.forEach(function(q){
+      var _fu=list.filter(_needsFollowup).length;
+      H+="<div style='display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 2px 12px'>"+
+        "<input id='rcSearch' type='text' placeholder='Search customer, product or SKU\u2026' value='"+esc(_rcQ)+"' style='flex:1;min-width:160px;padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:9px;font-size:13px;font-weight:600;color:#111;font-family:inherit'>"+
+        "<div style='display:flex;gap:5px;flex-wrap:wrap'>"+["all","pending","won","lost"].map(function(f){var lbl=f==='all'?('All ('+list.length+')'):f.charAt(0).toUpperCase()+f.slice(1);var on=_rcF===f;return "<button type='button' data-rcf='"+f+"' style='padding:7px 12px;border-radius:8px;font-size:11.5px;font-weight:800;cursor:pointer;font-family:inherit;border:1.5px solid "+(on?'#111':'#e5e7eb')+";background:"+(on?'#111':'#fff')+";color:"+(on?'#fff':'#6b7280')+"'>"+lbl+"</button>";}).join("")+"</div>"+
+      "</div>"+
+      (_fu?"<div style='background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 12px;font-size:12.5px;color:#9a3412;font-weight:600;margin:0 2px 12px'>\u23F0 <b>"+_fu+"</b> quote"+(_fu===1?'':'s')+" with no decision in 3+ days \u2014 worth a follow-up.</div>":"");
+      var vlist=list.filter(function(q){ return _rcF==='all'?true:(_rcF==='pending'?!q.outcome:q.outcome===_rcF); });
+      if(!vlist.length){ H+="<div style='text-align:center;padding:30px;color:#9ca3af;font-size:13px'>No quotes match this filter.</div>"; }
+      vlist.forEach(function(q){
         var mc=(q.margin>35)?"#16a34a":(q.margin>=25)?"#ca8a04":"#dc2626";
         var chev="<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>";
         var trash="<svg width='15' height='15' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2'/></svg>";
@@ -7878,7 +8188,7 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
             "</div>"+
           "</div>"+
           "<div style='display:flex;justify-content:space-between;align-items:center;margin-top:10px'>"+
-            "<div style='font-size:10.5px;color:#b6bac0;font-weight:600'>"+fmtDate(q.ts)+"</div>"+
+            "<div style='font-size:10.5px;color:#b6bac0;font-weight:600'>"+fmtDate(q.ts)+(_needsFollowup(q)?" <span style='display:inline-block;margin-left:6px;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;border-radius:6px;padding:1px 6px;font-size:9.5px;font-weight:800'>\u23F0 Follow up</span>":"")+"</div>"+
             "<div style='display:flex;gap:6px;align-items:center'>"+
               "<button type='button' data-mlq='won' data-id='"+q.id+"' title='Mark Won' style='padding:0 9px;height:30px;border:1px solid "+(q.outcome==='won'?'#16a34a':'#e5e7eb')+";border-radius:7px;background:"+(q.outcome==='won'?'#16a34a':'#fff')+";color:"+(q.outcome==='won'?'#fff':'#16a34a')+";font-size:11px;font-weight:800;cursor:pointer'>Won</button>"+"<button type='button' data-mlq='lost' data-id='"+q.id+"' title='Mark Lost' style='padding:0 9px;height:30px;border:1px solid "+(q.outcome==='lost'?'#dc2626':'#e5e7eb')+";border-radius:7px;background:"+(q.outcome==='lost'?'#dc2626':'#fff')+";color:"+(q.outcome==='lost'?'#fff':'#dc2626')+";font-size:11px;font-weight:800;cursor:pointer'>Lost</button>"+"<button type='button' class='mlq-ico' data-mlq='view' data-id='"+q.id+"' title='Quick view' aria-label='Quick view' style='width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #e5e7eb;border-radius:7px;background:#fff;color:#6b7280;cursor:pointer;transition:transform .15s'>"+chev+"</button>"+
               "<button type='button' class='mlq-ico' data-mlq='delete' data-id='"+q.id+"' title='Delete' aria-label='Delete' style='width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #fecaca;border-radius:7px;background:#fff;color:#dc2626;cursor:pointer'>"+trash+"</button>"+
@@ -7890,6 +8200,11 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
     }
     H+="</div>";
     host.innerHTML=H;
+    host.querySelectorAll("[data-rcf]").forEach(function(b){ b.onclick=function(){ _rcF=b.getAttribute("data-rcf"); renderRecent(host); }; });
+    (function(){ var _rcs=host.querySelector("#rcSearch"); if(!_rcs) return;
+      function applyRc(){ var qq=(_rcQ||"").trim().toLowerCase(); host.querySelectorAll("[data-mlq-open]").forEach(function(card){ var rec=window.MLQ.get(card.getAttribute("data-mlq-open")); var hay=(((rec&&rec.customer)||"")+" "+((rec&&rec.title)||"")+" "+((rec&&rec.sku)||"")).toLowerCase(); card.style.display=(!qq||hay.indexOf(qq)>=0)?"":"none"; }); }
+      _rcs.oninput=function(){ _rcQ=this.value; applyRc(); }; if(_rcQ) applyRc();
+    })();
     // whole card opens the quote
     host.querySelectorAll("[data-mlq-open]").forEach(function(card){
       card.onclick=function(){ var rec=window.MLQ.get(card.getAttribute("data-mlq-open")); if(rec) applyQuote(rec,false); };
@@ -7950,6 +8265,345 @@ window.WCURL = {"TML-HS-004":"https://themerchlist.com/customize/sweatshirt/","T
 })();
 </script>
 <!-- ═══════════════════ END MY RECENT QUOTES ═══════════════════ -->
+<!-- ═══════════════════ ANALYTICS (v127) ═══════════════════ -->
+<style>
+.an-wrap{max-width:1000px;margin:0 auto;padding:8px 6px 44px;font-family:inherit;color:#111}
+.an-head{margin:4px 2px 14px}
+.an-title{font-size:22px;font-weight:900;letter-spacing:-.4px;display:flex;align-items:center;gap:10px}
+.an-title>span{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#22c55e,#15803d);display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 10px rgba(22,163,74,.28)}
+.an-sub{font-size:12.5px;color:#6b7280;margin-top:6px;line-height:1.5;max-width:640px}
+.an-srcrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 2px 14px}
+.an-seg{display:inline-flex;background:#f1f3f5;border-radius:9px;padding:3px}
+.an-seg button{border:none;background:transparent;font-family:inherit;font-size:12px;font-weight:800;color:#6b7280;padding:7px 14px;border-radius:7px;cursor:pointer;transition:all .15s}
+.an-seg button.on{background:#fff;color:#111;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.an-spsel{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:11.5px;color:#6b7280;font-weight:700}
+.an-spsel select{font-family:inherit;font-size:12px;font-weight:700;color:#111;border:1.5px solid #e5e7eb;border-radius:8px;padding:6px 9px;background:#fff;cursor:pointer}
+.an-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:10px;margin-bottom:14px}
+.an-kpi{background:#fff;border:1px solid #e9ebee;border-radius:12px;padding:13px 14px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.an-kpi-l{font-size:9.5px;color:#6b7280;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+.an-kpi-v{font-size:22px;font-weight:900;color:#111;margin-top:3px;letter-spacing:-.5px;line-height:1.1}
+.an-kpi-s{font-size:10.5px;color:#9ca3af;font-weight:600;margin-top:3px}
+.an-grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:720px){.an-grid2{grid-template-columns:1fr}.an-spsel{margin-left:0}}
+.an-sect{background:#fff;border:1px solid #e9ebee;border-radius:13px;padding:15px 16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.an-sect-h{font-size:11px;color:#374151;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:13px;display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.an-sect-sub{font-size:10px;color:#9ca3af;font-weight:600;text-transform:none;letter-spacing:0;text-align:right}
+.an-bar{margin-bottom:11px}.an-bar:last-child{margin-bottom:0}
+.an-bar-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:4px}
+.an-bar-lbl{font-size:12px;font-weight:600;color:#374151;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:58%}
+.an-bar-val{font-size:10.5px;font-weight:700;color:#6b7280;white-space:nowrap}
+.an-bar-track{height:8px;background:#f1f3f5;border-radius:6px;overflow:hidden}
+.an-bar-fill{height:100%;border-radius:6px;transition:width .45s ease}
+.an-stack{display:flex;height:32px;border-radius:8px;overflow:hidden;background:#f1f3f5;margin-bottom:11px}
+.an-stack>div{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;min-width:0}
+.an-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;font-weight:600;color:#374151}
+.an-legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+.an-ins{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:9px 12px;font-size:12.5px;color:#14532d;line-height:1.5;margin-bottom:7px;display:flex;gap:8px}
+.an-ins:last-child{margin-bottom:0}.an-ins b{font-weight:800}
+.an-empty{text-align:center;padding:48px 20px;color:#9ca3af}
+.an-imp{background:#fff;border:2px dashed #cbd5e1;border-radius:14px;padding:30px 22px;text-align:center}
+.an-imp h3{font-size:16px;font-weight:800;color:#374151;margin:8px 0 4px}
+.an-imp p{font-size:12.5px;color:#6b7280;line-height:1.55;max-width:460px;margin:0 auto 16px}
+.an-impbtn{display:inline-block;background:#111;color:#fff;font-weight:800;font-size:13px;padding:11px 20px;border-radius:9px;cursor:pointer}
+.an-impbtn:hover{background:#000}
+.an-odoobar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:9px 13px;margin-bottom:12px;font-size:11.5px;color:#14532d;font-weight:600}
+.an-odoobar .gr{margin-left:auto;display:flex;gap:8px}
+.an-lnk{background:none;border:none;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;color:#15803d;padding:0}
+.an-lnk.red{color:#dc2626}
+.an-map{margin-bottom:12px;border:1px solid #e9ebee;border-radius:10px;background:#fff;overflow:hidden}
+.an-map summary{cursor:pointer;padding:10px 14px;font-size:11px;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.4px;list-style:none}
+.an-map summary::-webkit-details-marker{display:none}
+.an-mapgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;padding:4px 14px 14px}
+.an-mapf label{display:block;font-size:10px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px}
+.an-mapf select{width:100%;font-family:inherit;font-size:12px;border:1.5px solid #e5e7eb;border-radius:7px;padding:6px 8px;background:#fff;color:#111}
+.an-coach{background:linear-gradient(180deg,#f0fdf4,#fff);border:1px solid #bbf7d0;border-radius:14px;padding:15px 16px;margin-bottom:14px}
+.an-coach-h{font-size:13px;font-weight:900;color:#15803d;margin-bottom:12px;letter-spacing:-.2px;display:flex;align-items:center;gap:7px}
+.an-fcast{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:12px}
+.an-fcast>div{background:#fff;border:1px solid #d1fae5;border-radius:10px;padding:9px 11px}
+.an-fc-l{font-size:9px;color:#6b7280;font-weight:800;text-transform:uppercase;letter-spacing:.4px}
+.an-fc-v{font-size:18px;font-weight:900;color:#111;margin-top:2px;line-height:1.1}
+.an-fc-s{font-size:10px;color:#9ca3af;font-weight:600;margin-top:2px}
+.an-cta{background:#fff7ed;border:1px solid #fed7aa;border-radius:9px;padding:9px 12px;font-size:12.5px;color:#9a3412;font-weight:600;margin-bottom:10px}
+.an-cta.ok{background:#f0fdf4;border-color:#bbf7d0;color:#15803d}
+.an-cta b{font-weight:900}
+.an-fu{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.an-fu-row{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e9ebee;border-radius:9px;padding:8px 11px}
+.an-fu-main{flex:1;min-width:0}
+.an-fu-cust{font-size:12.5px;font-weight:800;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-fu-meta{font-size:10.5px;color:#9ca3af;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.an-fu-age{font-size:13px;font-weight:900;flex-shrink:0}
+.an-fu-act{display:flex;gap:5px;flex-shrink:0}
+.an-mini{font-family:inherit;font-size:10.5px;font-weight:800;border:1px solid #e5e7eb;background:#fff;color:#374151;border-radius:6px;padding:5px 8px;cursor:pointer}
+.an-mini:hover{border-color:#111}
+.an-mini.g{color:#16a34a;border-color:#bbf7d0}.an-mini.g:hover{background:#16a34a;color:#fff;border-color:#16a34a}
+.an-mini.r{color:#dc2626;border-color:#fecaca}.an-mini.r:hover{background:#dc2626;color:#fff;border-color:#dc2626}
+.an-tips{display:flex;flex-direction:column;gap:7px}
+.an-tip{display:flex;gap:8px;font-size:12.5px;line-height:1.5;border-radius:8px;padding:9px 12px}
+.an-tip.edge{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d}
+.an-tip.warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+.an-tip.info{background:#f8fafc;border:1px solid #e5e7eb;color:#475569}
+.an-tip b{font-weight:800}
+@media(max-width:720px){.an-fu-act .an-mini{padding:5px 6px}}
+</style>
+<script>
+(function(){
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c];}); }
+  function money(n){ n=Math.round(+n||0); return 'AED '+n.toLocaleString('en-US'); }
+  var PMN={dtf:'DTF',uv:'UV Print',uvdtf:'UV Print',screen:'Screen Print',sublimation:'Sublimation',sub:'Sublimation',engrave:'Engraving',deboss:'Deboss',emboss:'Emboss',gold:'Gold Foil',foil:'Gold Foil',print360:'360 Print',p360:'360 Print',none:'No Print',sand:'Sandblast',trolley:'Trolley'};
+  function pmL(pm){ return PMN[pm]||(pm?String(pm).toUpperCase():'\u2014'); }
+  function kpi(l,v,s,c){ return "<div class='an-kpi'><div class='an-kpi-l'>"+l+"</div><div class='an-kpi-v'"+(c?" style='color:"+c+"'":"")+">"+v+"</div>"+(s?"<div class='an-kpi-s'>"+s+"</div>":"")+"</div>"; }
+  function sect(t,inner,sub){ return "<div class='an-sect'><div class='an-sect-h'><span>"+t+"</span>"+(sub?"<span class='an-sect-sub'>"+sub+"</span>":"")+"</div>"+inner+"</div>"; }
+  function bar(lbl,val,max,extra,color){ var pct=max>0?Math.max(3,Math.round(val/max*100)):0; return "<div class='an-bar'><div class='an-bar-top'><span class='an-bar-lbl'>"+esc(lbl)+"</span><span class='an-bar-val'>"+extra+"</span></div><div class='an-bar-track'><div class='an-bar-fill' style='width:"+pct+"%;background:"+(color||'#16a34a')+"'></div></div></div>"; }
+  function pair(a,b){ var arr=[a,b].filter(Boolean); if(arr.length===2) return "<div class='an-grid2'>"+arr[0]+arr[1]+"</div>"; return arr[0]||''; }
+
+  /* ── CSV / JSON parsing for Odoo exports ───────────────────────── */
+  function parseCSV(text){
+    text=String(text||'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+    var rows=[],i=0,field='',row=[],inQ=false;
+    while(i<text.length){ var ch=text[i];
+      if(inQ){ if(ch==='"'){ if(text[i+1]==='"'){field+='"';i+=2;continue;} inQ=false;i++;continue; } field+=ch;i++;continue; }
+      if(ch==='"'){inQ=true;i++;continue;}
+      if(ch===','){row.push(field);field='';i++;continue;}
+      if(ch==='\n'){row.push(field);rows.push(row);row=[];field='';i++;continue;}
+      field+=ch;i++;
+    }
+    if(field.length||row.length){ row.push(field); rows.push(row); }
+    if(!rows.length) return null;
+    var headers=rows[0].map(function(h){return String(h).trim();});
+    var out=[];
+    for(var r=1;r<rows.length;r++){ if(rows[r].length===1 && rows[r][0]==='') continue; var o={}; for(var c=0;c<headers.length;c++){ o[headers[c]]=rows[r][c]!=null?String(rows[r][c]).trim():''; } out.push(o); }
+    return {headers:headers, rows:out};
+  }
+  function parseJSONText(text){
+    try{ var a=JSON.parse(text); var arr=Array.isArray(a)?a:(a&&Array.isArray(a.rows)?a.rows:(a&&Array.isArray(a.data)?a.data:null)); if(!arr||!arr.length) return null;
+      var hs={}; arr.forEach(function(o){ if(o&&typeof o==='object') Object.keys(o).forEach(function(k){hs[k]=1;}); });
+      var headers=Object.keys(hs);
+      var rows=arr.map(function(o){ var r={}; headers.forEach(function(h){ r[h]=(o&&o[h]!=null)?(typeof o[h]==='object'?JSON.stringify(o[h]):String(o[h])):''; }); return r; });
+      return {headers:headers, rows:rows};
+    }catch(e){ return null; }
+  }
+  function autoMap(headers){
+    var m={salesperson:'',customer:'',product:'',amount:'',status:'',date:'',qty:''};
+    var pats={ salesperson:/sales\s*person|salesperson|sales\s*rep|salesman|^rep$|user_?id|owner|assigned\s*to/i,
+      customer:/customer|partner|client|account|company|buyer/i,
+      product:/product|item|description|^line$/i,
+      amount:/amount_?total|grand\s*total|^total$|total\s*amount|^amount$|untaxed|revenue|^value$|subtotal/i,
+      status:/status|state|stage/i,
+      date:/date_?order|order\s*date|^date$|created|confirm|invoice\s*date|booking/i,
+      qty:/qty|quantity|units|product_?uom_?qty/i };
+    ['salesperson','customer','status','date','qty','product','amount'].forEach(function(f){
+      for(var i=0;i<headers.length;i++){ if(pats[f].test(headers[i])){ m[f]=headers[i]; break; } }
+    });
+    return m;
+  }
+  function statusOutcome(s){ s=String(s||'').toLowerCase().trim(); if(!s) return null;
+    if(/cancel|lost|reject|refus|void/.test(s)) return 'lost';
+    if(/sale|done|posted|paid|invoiced|^confirmed?$|confirm|won|complete|deliver/.test(s)) return 'won';
+    return null; }
+
+  var OKEY='ml_odoo_v1';
+  function odooGet(){ try{ var o=JSON.parse(localStorage.getItem(OKEY)); return (o&&o.rows&&o.rows.length)?o:null; }catch(e){ return null; } }
+  function odooSet(o){ try{ localStorage.setItem(OKEY, JSON.stringify(o)); }catch(e){} }
+  function odooClear(){ try{ localStorage.removeItem(OKEY); }catch(e){} }
+  function num(v){ return parseFloat(String(v==null?'':v).replace(/[^0-9.\-]/g,''))||0; }
+  function odooRecords(store){
+    var m=store.map||{}, rows=store.rows||[], out=[];
+    rows.forEach(function(r){
+      out.push({ sp:(m.salesperson?String(r[m.salesperson]||'').trim():'')||'(unassigned)',
+        customer:(m.customer?String(r[m.customer]||'').trim():'')||'(no name)',
+        title:(m.product?String(r[m.product]||'').trim():'')||'\u2014',
+        qty:m.qty?num(r[m.qty]):0, total:m.amount?num(r[m.amount]):0, margin:null, pm:null,
+        outcome:(m.status?statusOutcome(r[m.status]):null),
+        ts:(function(){ if(!m.date)return null; var t=Date.parse(r[m.date]); return isNaN(t)?null:t; })() });
+    });
+    return out;
+  }
+
+  /* ── Sales Coach: action-first conversion panel ───────────────── */
+  function coachHTML(L, opts){
+    opts=opts||{}; var isMlq=(opts.source==='mlq'); var now=Date.now(), DAY=864e5;
+    var won=0,lost=0,wonVal=0,pendVal=0, pend=[];
+    var band={red:{w:0,l:0},amber:{w:0,l:0},green:{w:0,l:0}}, prodWL={};
+    L.forEach(function(q){ var v=+q.total||0, oc=q.outcome;
+      if(oc==='won'){won++;wonVal+=v;} else if(oc==='lost')lost++; else { pendVal+=v; pend.push(q); }
+      if(q.margin!=null && oc){ var b=q.margin>35?'green':(q.margin>=25?'amber':'red'); if(oc==='won')band[b].w++; else band[b].l++; }
+      if(!q.kind && oc){ var k=q.title||q.sku; if(k){ if(!prodWL[k])prodWL[k]={w:0,l:0}; if(oc==='won')prodWL[k].w++; else prodWL[k].l++; } }
+    });
+    var dec=won+lost, wr=dec?won/dec:null, weighted=(wr!=null)?pendVal*wr:null;
+    var queue=pend.filter(function(q){return q.ts;}).map(function(q){ var age=Math.floor((now-q.ts)/DAY); return {q:q,age:age,val:+q.total||0,score:(+q.total||0)*(1+Math.min(age,30)/8)}; }).sort(function(a,b){return b.score-a.score;});
+    var chase=queue.filter(function(x){return x.age>=4;});
+    var H="<div class='an-coach'><div class='an-coach-h'>\uD83C\uDFAF Sales Coach</div>";
+    H+="<div class='an-fcast'>"+
+      "<div><div class='an-fc-l'>Open pipeline</div><div class='an-fc-v'>"+money(pendVal)+"</div><div class='an-fc-s'>"+pend.length+" open</div></div>"+
+      (weighted!=null?"<div><div class='an-fc-l'>Weighted forecast</div><div class='an-fc-v' style='color:#15803d'>"+money(weighted)+"</div><div class='an-fc-s'>at "+Math.round(wr*100)+"% win rate</div></div>":"")+
+      "<div><div class='an-fc-l'>Won so far</div><div class='an-fc-v'>"+money(wonVal)+"</div><div class='an-fc-s'>"+won+" deal"+(won===1?'':'s')+"</div></div>"+
+    "</div>";
+    if(chase.length){
+      var tot=chase.reduce(function(s,x){return s+x.val;},0);
+      H+="<div class='an-cta'>\u23F0 <b>"+chase.length+"</b> open quote"+(chase.length===1?'':'s')+" worth <b>"+money(tot)+"</b> going cold \u2014 a quick follow-up is the cheapest deal you'll ever win.</div><div class='an-fu'>";
+      chase.slice(0,6).forEach(function(x){ var q=x.q, col=x.age>=14?'#dc2626':(x.age>=7?'#d97706':'#6b7280');
+        H+="<div class='an-fu-row'><div class='an-fu-main'><div class='an-fu-cust'>"+esc(q.customer||'(no name)')+"</div><div class='an-fu-meta'>"+esc(q.title||q.sku||'\u2014')+" \u00B7 "+money(q.total)+"</div></div><div class='an-fu-age' style='color:"+col+"'>"+x.age+"d</div>"+
+          (isMlq?"<div class='an-fu-act'><button class='an-mini' data-an-reopen='"+esc(q.id)+"' type='button'>Re-open</button><button class='an-mini g' data-an-won='"+esc(q.id)+"' type='button'>Won</button><button class='an-mini r' data-an-lost='"+esc(q.id)+"' type='button'>Lost</button></div>":"")+"</div>";
+      });
+      H+="</div>";
+    } else { H+="<div class='an-cta ok'>\u2705 Nothing going cold right now \u2014 your pipeline's tidy.</div>"; }
+    var tips=[];
+    function bwr(b){ var t=band[b].w+band[b].l; return t?{wr:band[b].w/t,n:t}:null; }
+    var g=bwr('green'), r=bwr('red');
+    if(g&&g.n>=2&&g.wr>=0.5) tips.push({k:'edge',t:"You close <b>"+Math.round(g.wr*100)+"%</b> of healthy-margin quotes (&gt;35%) \u2014 hold your price, you don't need to discount to win."});
+    if(r&&r.n>=2&&(!g||r.wr<g.wr)) tips.push({k:'warn',t:"Thin-margin quotes (&lt;25%) only convert <b>"+Math.round(r.wr*100)+"%</b> \u2014 discounting is giving away margin without buying the win."});
+    var bestP=null; Object.keys(prodWL).forEach(function(k){ var d=prodWL[k],n=d.w+d.l; if(n>=2){ var rr=d.w/n; if(!bestP||rr>bestP.r){bestP={k:k,r:rr,n:n};} } });
+    if(bestP&&bestP.r>=0.5) tips.push({k:'edge',t:"<b>"+esc(bestP.k)+"</b> is your strongest pitch \u2014 "+Math.round(bestP.r*100)+"% win across "+bestP.n+". Lead with it where it fits."});
+    if(!tips.length) tips.push({k:'info',t:(dec<3?"Tag a few more quotes <b>Won/Lost</b> and the Coach will spot your winning pattern.":"No standout pattern yet \u2014 keep tagging outcomes and it'll sharpen.")});
+    H+="<div class='an-tips'>"+tips.map(function(t){ var ic=t.k==='edge'?'\uD83D\uDCAA':t.k==='warn'?'\u26A0\uFE0F':'\uD83D\uDCA1'; return "<div class='an-tip "+t.k+"'><span>"+ic+"</span><span>"+t.t+"</span></div>"; }).join('')+"</div>";
+    return H+"</div>";
+  }
+
+  /* ── Analytics core (shared by My Quotes + Odoo) ───────────────── */
+  function coreHTML(L, opts){
+    opts=opts||{}; var who=opts.who||'You', poss=(who==='You')?'Your':(esc(who)+"\u2019s");
+    var now=Date.now(), WK=6048e5;
+    var total=L.length, value=0, won=0, lost=0, wonVal=0, lostVal=0, pendVal=0, mSum=0,mN=0, thisWk=0;
+    var prod={}, cust={}, meth={}, bands={red:{n:0,w:0,l:0},amber:{n:0,w:0,l:0},green:{n:0,w:0,l:0}};
+    function prodAdd(t,u,v,oc){ var k=t||'\u2014'; if(!prod[k])prod[k]={n:0,val:0,w:0,l:0}; prod[k].n++; prod[k].val+=v||0; if(oc==='won')prod[k].w++; else if(oc==='lost')prod[k].l++; }
+    L.forEach(function(q){ var v=+q.total||0; value+=v;
+      if(q.outcome==='won'){won++;wonVal+=v;} else if(q.outcome==='lost'){lost++;lostVal+=v;} else pendVal+=v;
+      if(q.ts && now-q.ts<=WK) thisWk++;
+      var c=(q.customer||'').trim()||'(no name)'; if(!cust[c])cust[c]={n:0,val:0,w:0,l:0}; cust[c].n++; cust[c].val+=v; if(q.outcome==='won')cust[c].w++; else if(q.outcome==='lost')cust[c].l++;
+      if(q.kind==='qb'){ (q.items||[]).forEach(function(it){ prodAdd(it.title,it.qty,it.lineTotal,q.outcome); }); }
+      else { prodAdd(q.title||q.sku,q.qty,v,q.outcome);
+        if(q.pm){ meth[q.pm]=(meth[q.pm]||0)+1; }
+        if(q.margin!=null){ mSum+=q.margin; mN++; var b=q.margin>35?'green':(q.margin>=25?'amber':'red'); bands[b].n++; if(q.outcome==='won')bands[b].w++; else if(q.outcome==='lost')bands[b].l++; } }
+    });
+    var decided=won+lost, wr=decided?Math.round(won/decided*100):null, avgM=mN?(mSum/mN):null, avgDeal=total?value/total:0, pend=total-decided;
+    var H="<div class='an-kpis'>"+
+      kpi('Records', total, thisWk+' this week')+
+      kpi('Value', money(value), money(avgDeal)+' avg')+
+      kpi('Win rate', wr==null?'\u2014':wr+'%', decided?(won+'W / '+lost+'L'):'no won/lost yet')+
+      (avgM!=null?kpi('Avg margin', avgM.toFixed(1)+'%', '', (avgM>35?'#16a34a':avgM>=25?'#ca8a04':'#dc2626')):kpi('Won value', money(wonVal), won+' deal'+(won===1?'':'s'), '#16a34a'))+
+      (avgM!=null?kpi('Won value', money(wonVal), won+' deal'+(won===1?'':'s'), '#16a34a'):kpi('Lost value', money(lostVal), lost+' deal'+(lost===1?'':'s'), '#dc2626'))+
+      kpi('Open pipeline', money(pendVal), pend+' pending')+
+    "</div>";
+    (function(){ function s(n,col,lab){ if(!n)return ''; var pct=Math.round(n/total*100); return "<div style='flex:"+n+";background:"+col+"' title='"+lab+": "+n+"'>"+(pct>=8?n:'')+"</div>"; }
+      var inner="<div class='an-stack'>"+s(won,'#16a34a','Won')+s(lost,'#dc2626','Lost')+s(pend,'#cbd5e1','Pending')+"</div>"+
+        "<div class='an-legend'><span><i style='background:#16a34a'></i>Won \u00B7 "+won+" \u00B7 "+money(wonVal)+"</span><span><i style='background:#dc2626'></i>Lost \u00B7 "+lost+" \u00B7 "+money(lostVal)+"</span><span><i style='background:#cbd5e1'></i>Pending \u00B7 "+pend+"</span></div>";
+      H+=sect('Win / Loss', inner, wr==null?'no outcomes yet':wr+'% win rate'); })();
+    var topP=Object.keys(prod).map(function(k){return [k,prod[k]];}).sort(function(a,b){return b[1].n-a[1].n;}).slice(0,7), maxP=topP.length?topP[0][1].n:0;
+    var pInner=topP.map(function(e){ var d=e[1],dec=d.w+d.l,wp=dec?' \u00B7 '+Math.round(d.w/dec*100)+'% win':''; return bar(e[0],d.n,maxP,d.n+'\u00D7 \u00B7 '+money(d.val)+wp); }).join('');
+    var topC=Object.keys(cust).map(function(k){return [k,cust[k]];}).sort(function(a,b){return b[1].val-a[1].val;}).slice(0,7), maxC=topC.length?topC[0][1].val:0;
+    var cInner=topC.map(function(e){ var d=e[1],dec=d.w+d.l,wp=dec?' \u00B7 '+Math.round(d.w/dec*100)+'% win':''; return bar(e[0],d.val,maxC,money(d.val)+' \u00B7 '+d.n+'q'+wp); }).join('');
+    H+="<div class='an-grid2'>"+sect('Most quoted', pInner,'by # of records')+sect('Top customers', cInner,'by value')+"</div>";
+    var mSect=null, methSect=null;
+    if(mN){ var maxB=Math.max(bands.red.n,bands.amber.n,bands.green.n);
+      function brow(b,lab,col){ var d=bands[b],dec=d.w+d.l,wp=dec?Math.round(d.w/dec*100)+'% win':'untagged'; return bar(lab,d.n,maxB,d.n+' \u00B7 '+wp,col); }
+      mSect=sect('Margin health', brow('green','Healthy (&gt;35%)','#16a34a')+brow('amber','OK (25\u201335%)','#ca8a04')+brow('red','Thin (&lt;25%)','#dc2626'),'win rate by band'); }
+    var mk=Object.keys(meth).sort(function(a,b){return meth[b]-meth[a];}), maxMe=mk.length?meth[mk[0]]:0;
+    if(mk.length) methSect=sect('Branding methods', mk.map(function(k){return bar(pmL(k),meth[k],maxMe,meth[k]+'\u00D7','#0ea5e9');}).join(''),'by method');
+    H+=pair(mSect,methSect);
+    (function(){ var weeks=[]; for(var i=7;i>=0;i--){ weeks.push({s:now-(i+1)*WK,e:now-i*WK,n:0}); }
+      L.forEach(function(q){ if(!q.ts)return; for(var i=0;i<weeks.length;i++){ if(q.ts>weeks[i].s && q.ts<=weeks[i].e){ weeks[i].n++; break; } } });
+      var maxW=Math.max.apply(null,weeks.map(function(w){return w.n;}).concat([1]));
+      var any=weeks.some(function(w){return w.n>0;});
+      if(any){ var inner=weeks.map(function(w,i){ var lab=(i===7)?'This week':(i===6)?'Last week':new Date(w.e-1).toLocaleDateString('en-GB',{day:'numeric',month:'short'}); return bar(lab,w.n,maxW,w.n+(w.n===1?'':'')); }).join(''); H+=sect('Activity', inner,'records per week, last 8'); } })();
+    (function(){ var ins=[];
+      if(decided){ ins.push(poss+" win rate is <b>"+wr+"%</b> across "+decided+" decided record"+(decided===1?'':'s')+"."+(wr>=50?" Strong.":wr>=30?"":" Worth a review.")); }
+      else { ins.push("No <b>won/lost</b> outcomes detected yet \u2014 "+(opts.odoo?"check the <b>Status</b> column mapping below.":"tag quotes on the Quotes tab.")); }
+      var bestP=null; Object.keys(prod).forEach(function(k){ var d=prod[k],dec=d.w+d.l; if(dec>=2){ var r=d.w/dec; if(!bestP||r>bestP.r){bestP={k:k,r:r,dec:dec};} } });
+      if(bestP&&bestP.r>0) ins.push("Strongest converter: <b>"+esc(bestP.k)+"</b> \u2014 "+Math.round(bestP.r*100)+"% of "+bestP.dec+" decided.");
+      var gd=bands.green.w+bands.green.l, rd=bands.red.w+bands.red.l;
+      if(gd>=2&&rd>=2){ var gr=bands.green.w/gd, rr=bands.red.w/rd; ins.push(gr>=rr?("Healthy-margin quotes win <b>"+Math.round(gr*100)+"%</b> vs thin-margin <b>"+Math.round(rr*100)+"%</b> \u2014 discounting isn't buying wins."):("Thin-margin quotes convert better ("+Math.round(rr*100)+"% vs "+Math.round(gr*100)+"%) \u2014 price is a real lever here.")); }
+      if(topC.length&&topC[0][0]!=='(no name)') ins.push("Biggest account: <b>"+esc(topC[0][0])+"</b> ("+money(topC[0][1].val)+" across "+topC[0][1].n+").");
+      if(pend>0&&decided>0) ins.push("<b>"+pend+"</b> still open \u2014 "+money(pendVal)+" of pipeline to chase.");
+      H+=sect('What this tells you', ins.map(function(t){return "<div class='an-ins'><span>\uD83D\uDCA1</span><span>"+t+"</span></div>";}).join('')); })();
+    return H;
+  }
+
+  function leaderboard(allRecs){
+    var by={}; allRecs.forEach(function(r){ var k=r.sp||'(unassigned)'; if(!by[k])by[k]={n:0,val:0,w:0,l:0}; by[k].n++; by[k].val+=r.total||0; if(r.outcome==='won')by[k].w++; else if(r.outcome==='lost')by[k].l++; });
+    var rows=Object.keys(by).map(function(k){return [k,by[k]];}).sort(function(a,b){return b[1].val-a[1].val;});
+    var maxV=rows.length?rows[0][1].val:0;
+    var inner=rows.map(function(e){ var d=e[1],dec=d.w+d.l,wp=dec?' \u00B7 '+Math.round(d.w/dec*100)+'% win':''; return bar(e[0],d.val,maxV,money(d.val)+' \u00B7 '+d.n+wp); }).join('');
+    return sect('Salesperson leaderboard', inner, 'by value');
+  }
+
+  function mlqRecords(){ return (window.MLQ&&window.MLQ.all)?window.MLQ.all():[]; }
+
+  var SRC='mlq', SP='__all';
+
+  function headHTML(){ return "<div class='an-head'><div class='an-title'><span>\uD83D\uDCCA</span> My Analytics</div><div class='an-sub'>Insights from your quotes and your Odoo orders \u2014 spot what wins and where margins land.</div></div>"; }
+  function srcRow(people){
+    var sw="<div class='an-seg'><button data-src='mlq' class='"+(SRC==='mlq'?'on':'')+"' type='button'>My quotes</button><button data-src='odoo' class='"+(SRC==='odoo'?'on':'')+"' type='button'>Odoo data</button></div>";
+    var sp='';
+    if(SRC==='odoo'&&people&&people.length){ sp="<div class='an-spsel'>Salesperson <select id='an-sp'><option value='__all'"+(SP==='__all'?' selected':'')+">All (team)</option>"+people.map(function(p){return "<option value='"+esc(p)+"'"+(SP===p?' selected':'')+">"+esc(p)+"</option>";}).join('')+"</select></div>"; }
+    return "<div class='an-srcrow'>"+sw+sp+"</div>";
+  }
+  function importPanel(){
+    return "<div class='an-imp'><div style='font-size:34px'>\uD83D\uDCE5</div><h3>Import your Odoo orders</h3>"+
+      "<p>Export your sales orders/quotations from Odoo as <b>CSV</b> or <b>JSON</b> (your Odoo Claude project can produce this), then drop it in. Columns are auto-detected; you can remap any of them after. Re-import any time to refresh.</p>"+
+      "<label class='an-impbtn'>Choose file \u2014 CSV or JSON<input type='file' id='an-file' accept='.csv,.json,text/csv,application/json' style='display:none'></label>"+
+      "<p style='margin-top:14px;font-size:11px;color:#9ca3af'>Stored only in this browser. Nothing is uploaded.</p></div>";
+  }
+  function mapUI(store){
+    var fields=[['salesperson','Salesperson'],['customer','Customer'],['product','Product / line'],['amount','Amount (total)'],['status','Status / state'],['date','Order date'],['qty','Quantity']];
+    var opt=function(sel){ return "<option value=''>\u2014 none \u2014</option>"+store.headers.map(function(h){return "<option value='"+esc(h)+"'"+(sel===h?' selected':'')+">"+esc(h)+"</option>";}).join(''); };
+    return "<details class='an-map'><summary>\u2699\uFE0F Column mapping \u2014 "+esc(store.fname||'imported file')+" \u00B7 "+store.rows.length+" rows</summary><div class='an-mapgrid'>"+
+      fields.map(function(f){ return "<div class='an-mapf'><label>"+f[1]+"</label><select data-map='"+f[0]+"'>"+opt((store.map||{})[f[0]])+"</select></div>"; }).join('')+
+      "</div></details>";
+  }
+
+  function renderAnalytics(host){
+    var H="<div class='an-wrap'>"+headHTML();
+    if(SRC==='odoo'){
+      var store=odooGet();
+      if(!store){ H+=srcRow(null)+importPanel()+"</div>"; host.innerHTML=H; wire(host,null); return; }
+      var allRecs=odooRecords(store);
+      var people=[]; var seen={}; allRecs.forEach(function(r){ if(r.sp&&!seen[r.sp]){seen[r.sp]=1;people.push(r.sp);} }); people.sort();
+      if(SP!=='__all'&&!seen[SP]) SP='__all';
+      H+=srcRow(people);
+      var d=new Date(store.ts||Date.now());
+      H+="<div class='an-odoobar'>\u2705 Odoo data \u00B7 "+store.rows.length+" rows \u00B7 imported "+d.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+" "+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+"<span class='gr'><label class='an-lnk' style='cursor:pointer'>Re-import<input type='file' id='an-file' accept='.csv,.json,text/csv,application/json' style='display:none'></label><button class='an-lnk red' id='an-clear' type='button'>Clear</button></span></div>";
+      H+=mapUI(store);
+      var recs=(SP==='__all')?allRecs:allRecs.filter(function(r){return r.sp===SP;});
+      if(!recs.length){ H+="<div class='an-empty'>No rows for this selection.</div>"; }
+      else { H+=coachHTML(recs,{source:'odoo'}); if(SP==='__all'&&people.length>1) H+=leaderboard(allRecs); H+=coreHTML(recs,{who:(SP==='__all'?'The team':SP), odoo:true}); }
+      H+="</div>"; host.innerHTML=H; wire(host,store); return;
+    }
+    var L=mlqRecords();
+    H+=srcRow(null);
+    if(!L.length){ H+="<div class='an-empty'><div style='font-size:38px;margin-bottom:10px'>\uD83D\uDCC8</div><div style='font-size:15px;font-weight:700;color:#6b7280;margin-bottom:4px'>No saved quotes yet</div><div style='font-size:13px'>Save quotes (and tag them Won/Lost) on the Quotes tab \u2014 or switch to <b>Odoo data</b> above to import live orders.</div></div>"; }
+    else H+=coachHTML(L,{source:'mlq',who:'You'})+coreHTML(L,{who:'You'});
+    H+="</div>"; host.innerHTML=H; wire(host,null);
+  }
+
+  function readFile(f,host){ var rd=new FileReader(); rd.onload=function(){ var txt=String(rd.result||''); var p=/\.json$/i.test(f.name||'')?parseJSONText(txt):(parseCSV(txt)||parseJSONText(txt)); if(!p||!p.rows.length){ try{alert('Could not read that file. Please export as CSV or JSON.');}catch(e){} return; } odooSet({headers:p.headers, rows:p.rows, map:autoMap(p.headers), ts:Date.now(), fname:f.name}); SRC='odoo'; SP='__all'; renderAnalytics(host); }; rd.readAsText(f); }
+
+  function wire(host,store){
+    host.querySelectorAll('[data-src]').forEach(function(b){ b.onclick=function(){ SRC=b.getAttribute('data-src'); renderAnalytics(host); }; });
+    var sp=host.querySelector('#an-sp'); if(sp) sp.onchange=function(){ SP=this.value; renderAnalytics(host); };
+    var fi=host.querySelector('#an-file'); if(fi) fi.onchange=function(){ var f=this.files&&this.files[0]; if(f) readFile(f,host); };
+    var cl=host.querySelector('#an-clear'); if(cl) cl.onclick=function(){ odooClear(); SP='__all'; renderAnalytics(host); };
+    host.querySelectorAll('[data-an-reopen]').forEach(function(b){ b.onclick=function(){ if(window.MLQ&&window.MLQ.applyQuote&&window.MLQ.get){ var rec=window.MLQ.get(b.getAttribute('data-an-reopen')); if(rec) window.MLQ.applyQuote(rec,false); } }; });
+    host.querySelectorAll('[data-an-won]').forEach(function(b){ b.onclick=function(){ if(window.MLQ&&window.MLQ.setOutcome){ window.MLQ.setOutcome(b.getAttribute('data-an-won'),'won'); renderAnalytics(host); } }; });
+    host.querySelectorAll('[data-an-lost]').forEach(function(b){ b.onclick=function(){ if(window.MLQ&&window.MLQ.setOutcome){ window.MLQ.setOutcome(b.getAttribute('data-an-lost'),'lost'); renderAnalytics(host); } }; });
+    if(store) host.querySelectorAll('[data-map]').forEach(function(s){ s.onchange=function(){ var cur=odooGet(); if(!cur)return; cur.map[s.getAttribute('data-map')]=this.value; odooSet(cur); renderAnalytics(host); }; });
+  }
+
+  function ensureTab(){ /* v130: Analytics tab hidden for now — module stays loaded but no tab is shown */
+    var tabs=document.querySelector('.tb-tabs'); if(!tabs) return;
+    var ex=tabs.querySelector('[data-tab="analytics"]'); if(ex) ex.remove();
+  }
+  var _p=false;
+  function patch(){ if(_p||typeof window.render!=='function')return; _p=true; var orig=window.render;
+    window.render=function(){ var r=orig.apply(this,arguments); try{ ensureTab(); if(typeof window.S!=='undefined'&&window.S.tab==='analytics'){ var mn=document.querySelector('.mn'); if(mn) renderAnalytics(mn); } }catch(e){ console.error('[v127 Analytics]',e); } return r; }; }
+  var bt=0,bi=setInterval(function(){ bt++; if(typeof window.render==='function'){ clearInterval(bi); patch(); ensureTab(); } else if(bt>80){ clearInterval(bi); } },150);
+  /* expose for tests + merged Quotes & Analytics tab */
+  window.renderAnalytics=renderAnalytics;
+  window.MLAN={ parseCSV:parseCSV, parseJSONText:parseJSONText, autoMap:autoMap, statusOutcome:statusOutcome, odooRecords:odooRecords };
+})();
+</script>
+<!-- ═══════════════════ END ANALYTICS ═══════════════════ -->
+
+
 
 <style>
 .ml-chg{display:inline-flex;align-items:center;gap:4px;margin-left:7px;padding:3px 9px;border-radius:999px;font-size:10px;font-weight:800;background:#fef9c3;color:#a16207;border:1px solid #fde68a;vertical-align:middle}
